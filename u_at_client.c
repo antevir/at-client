@@ -1,13 +1,43 @@
+/** @file
+ * @brief Short description of the purpose of the file
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <limits.h>
 
-#include "at_util.h"
-#include "at_client.h"
+#include "u_at_util.h"
+#include "u_at_client.h"
+
+/* ----------------------------------------------------------------
+ * COMPILE-TIME MACROS
+ * -------------------------------------------------------------- */
 
 #define NO_STATUS   (INT_MAX)
+
+/* ----------------------------------------------------------------
+ * TYPES
+ * -------------------------------------------------------------- */
+
+enum uAtParserCode {
+    AT_PARSER_NOP = 0,
+    AT_PARSER_GOT_STATUS,
+    AT_PARSER_GOT_RSP,
+};
+
+/* ----------------------------------------------------------------
+ * STATIC PROTOTYPES
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC VARIABLES
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC FUNCTIONS
+ * -------------------------------------------------------------- */
 
 size_t read(void *pData, size_t length)
 {
@@ -19,15 +49,21 @@ void write(const void *pData, size_t length)
     fwrite(pData, 1, length, stdout);
 }
 
-enum atParserCode {
-    AT_PARSER_NOP = 0,
-    AT_PARSER_GOT_STATUS,
-    AT_PARSER_GOT_RSP,
-};
-
-static int parseLine(atClient_t *pClient, char *pLine)
+static int parseLine(uAtClient_t *pClient, char *pLine)
 {
     int ret = AT_PARSER_NOP;
+
+    char *pPtr = pLine;
+    bool emptyLine = true;
+    while (*pPtr) {
+        if ((*pPtr != '\n') && (*pPtr != '\r')) {
+            emptyLine = false;
+        }
+        pPtr++;
+    }
+    if (emptyLine) {
+        return AT_PARSER_NOP;
+    }
 
     if (pClient->executingCmd) {
         if ((pClient->pExpectedRsp != NULL) &&
@@ -40,6 +76,9 @@ static int parseLine(atClient_t *pClient, char *pLine)
         } else if (strcmp(pLine, "ERROR") == 0) {
             pClient->status = -1;
             ret = AT_PARSER_GOT_STATUS;
+        } else if ((pLine[0] != '+') && (pLine[0] != '*')) {
+            pClient->pRspParams = &pLine[0];
+            ret = AT_PARSER_GOT_RSP;
         }
     }
 
@@ -54,7 +93,7 @@ static int parseLine(atClient_t *pClient, char *pLine)
     return ret;
 }
 
-static int parseIncomingChar(atClient_t *pClient, char ch)
+static int parseIncomingChar(uAtClient_t *pClient, char ch)
 {
     int ret = AT_PARSER_NOP;
 
@@ -73,7 +112,7 @@ static int parseIncomingChar(atClient_t *pClient, char ch)
     return ret;
 }
 
-static int handleRxData(atClient_t *pClient)
+static int handleRxData(uAtClient_t *pClient)
 {
     int ret = AT_PARSER_NOP;
     char ch;
@@ -89,17 +128,17 @@ static int handleRxData(atClient_t *pClient)
 }
 
 
-static void cmdBeginF(atClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
+static void cmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
     //handleRxData(pClient);
 
     pClient->pRspParams = NULL;
     pClient->executingCmd = true;
     pClient->status = NO_STATUS;
-    atClient_sendCmdVaList(pClient, pCmd, pParamFmt, args);
+    uAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
 }
 
-static int cmdEnd(atClient_t *pClient)
+static int cmdEnd(uAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
@@ -110,15 +149,18 @@ static int cmdEnd(atClient_t *pClient)
     return pClient->status;
 }
 
+/* ----------------------------------------------------------------
+ * PUBLIC FUNCTIONS
+ * -------------------------------------------------------------- */
 
-void atClient_init(void *pRxBuffer, size_t rxBufferLen, atClient_t *pClient)
+void uAtClientInit(void *pRxBuffer, size_t rxBufferLen, uAtClient_t *pClient)
 {
-    memset(pClient, 0, sizeof(atClient_t));
+    memset(pClient, 0, sizeof(uAtClient_t));
     pClient->pRxBuffer = pRxBuffer;
     pClient->rxBufferLen = rxBufferLen;
 }
 
-void atClient_sendCmdVaList(atClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
+void uAtClientSendCmdVaList(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
     char buf[16];
 
@@ -155,7 +197,7 @@ void atClient_sendCmdVaList(atClient_t *pClient, const char *pCmd, const char *p
                     int len = va_arg(args, int);
                     uint8_t *pData = va_arg(args, uint8_t *);
                     for (int i = 0; i < len; i++) {
-                        atUtil_byteToHex(pData[i], buf);
+                        uAtUtilByteToHex(pData[i], buf);
                         write(buf, 2);
                     }
                 }
@@ -167,7 +209,7 @@ void atClient_sendCmdVaList(atClient_t *pClient, const char *pCmd, const char *p
     write("\r", 1);
 }
 
-int atClient_execSimpleCmdF(atClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
+int uAtClientExecSimpleCmdF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
 {
     va_list args;
 
@@ -178,14 +220,14 @@ int atClient_execSimpleCmdF(atClient_t *pClient, const char *pCmd, const char *p
     return cmdEnd(pClient);
 }
 
-int atClient_execSimpleCmd(atClient_t *pClient, const char *pCmd)
+int uAtClientExecSimpleCmd(uAtClient_t *pClient, const char *pCmd)
 {
     cmdBeginF(pClient, pCmd, "", NULL);
 
     return cmdEnd(pClient);
 }
 
-void atClient_cmdBeginF(atClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
+void uAtClientCmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
 {
     va_list args;
 
@@ -194,12 +236,16 @@ void atClient_cmdBeginF(atClient_t *pClient, const char *pCmd, const char *pPara
     va_end(args);
 }
 
-char *atClient_cmdGetRspParamLine(atClient_t *pClient, const char *pExpectedRsp)
+char *uAtClientCmdGetRspParamLine(uAtClient_t *pClient, const char *pExpectedRsp)
 {
     char *pRet = NULL;
     pClient->pRspParams = NULL;
     pClient->pExpectedRsp = pExpectedRsp;
-    pClient->pExpectedRspLen = strlen(pExpectedRsp);
+    if (pExpectedRsp) {
+        pClient->pExpectedRspLen = strlen(pExpectedRsp);
+    } else {
+        pClient->pExpectedRspLen = 0;
+    }
 
     while (pClient->status == NO_STATUS) {
         if (handleRxData(pClient) == AT_PARSER_GOT_RSP) {
@@ -211,19 +257,19 @@ char *atClient_cmdGetRspParamLine(atClient_t *pClient, const char *pExpectedRsp)
     return pRet;
 }
 
-int atClient_cmdGetRspParamsF(atClient_t *pClient, const char *pExpectedRsp, const char *pParamFmt, ...)
+int uAtClientCmdGetRspParamsF(uAtClient_t *pClient, const char *pExpectedRsp, const char *pParamFmt, ...)
 {
     va_list args;
-    char *pRspParams = atClient_cmdGetRspParamLine(pClient, pExpectedRsp);
+    char *pRspParams = uAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
 
     va_start(args, pParamFmt);
-    int ret = atUtil_parseParamsVaList(pRspParams, pParamFmt, args);
+    int ret = uAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
     va_end(args);
 
     return ret;
 }
 
-int atClient_cmdEnd(atClient_t *pClient)
+int uAtClientCmdEnd(uAtClient_t *pClient)
 {
     return cmdEnd(pClient);
 }

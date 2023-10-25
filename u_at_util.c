@@ -1,9 +1,33 @@
+/** @file
+ * @brief Short description of the purpose of the file
+ */
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
 
-#include "at_util.h"
+#include "u_at_util.h"
+
+/* ----------------------------------------------------------------
+ * COMPILE-TIME MACROS
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * TYPES
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC PROTOTYPES
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC VARIABLES
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * STATIC FUNCTIONS
+ * -------------------------------------------------------------- */
 
 static inline char nibbleToHex(uint8_t nibble)
 {
@@ -25,13 +49,17 @@ static inline int hexToNibble(char hexChar)
     return -1;
 }
 
-void atUtil_byteToHex(uint8_t byte, char *pOutPtr)
+/* ----------------------------------------------------------------
+ * PUBLIC FUNCTIONS
+ * -------------------------------------------------------------- */
+
+void uAtUtilByteToHex(uint8_t byte, char *pOutPtr)
 {
     pOutPtr[0] = nibbleToHex(byte >> 4);
     pOutPtr[1] = nibbleToHex(byte & 0xF);
 }
 
-int atUtil_hexToByte(char *pHex, uint8_t *pOutByte)
+int uAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
 {
     int highNibble = hexToNibble(pHex[0]);
     int lowNibble = hexToNibble(pHex[1]);
@@ -42,7 +70,7 @@ int atUtil_hexToByte(char *pHex, uint8_t *pOutByte)
     return 0;
 }
 
-char *atUtil_findParamEnd(char *pStr)
+char *uAtUtilFindParamEnd(char *pStr)
 {
     bool insideString = false;
     bool escape = false;
@@ -62,7 +90,7 @@ char *atUtil_findParamEnd(char *pStr)
         } else if (*pIter == ',') {
             break;
         }
-        pIter++;   
+        pIter++;
     }
 
     if (insideString || escape || (pIter == pStr)) {
@@ -72,15 +100,15 @@ char *atUtil_findParamEnd(char *pStr)
     return pIter;
 }
 
-int atUtil_parseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
+int uAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
 {
     const char *pFmtCh = pParamFmt;
     char *pParam = pParams;
     bool last = false;
     int ret = 0;
-    
+
     while (*pFmtCh != 0) {
-        char *pParamEnd = atUtil_findParamEnd(pParam);
+        char *pParamEnd = uAtUtilFindParamEnd(pParam);
         if (pParamEnd == NULL) {
             return -ret;
         }
@@ -94,14 +122,14 @@ int atUtil_parseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
             case 'd':
                 {
                     int *pI = va_arg(args, int *);
-                    ASSERT(pI != AT_UTIL_PARAM_LAST);
+                    ASSERT(pI != U_AT_UTIL_PARAM_LAST);
                     *pI = atoi(pParam);
                 }
                 break;
             case 's':
                 {
                     char **ppStr = va_arg(args, char **);
-                    ASSERT(ppStr != AT_UTIL_PARAM_LAST);
+                    ASSERT(ppStr != U_AT_UTIL_PARAM_LAST);
                     if (*pParam == '"') {
                         pParam++;
                         pParamEnd[-1] = 0;
@@ -115,8 +143,8 @@ int atUtil_parseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
                     uint8_t **ppData = va_arg(args, uint8_t **);
                     uint8_t *pBytes;
                     size_t len = strlen(pParam);
-                    ASSERT(pLen != AT_UTIL_PARAM_LAST);
-                    ASSERT(ppData != AT_UTIL_PARAM_LAST);
+                    ASSERT(pLen != U_AT_UTIL_PARAM_LAST);
+                    ASSERT(ppData != U_AT_UTIL_PARAM_LAST);
                     if ((len % 2) != 0) {
                         return -ret;
                     }
@@ -124,7 +152,7 @@ int atUtil_parseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
                     pBytes = pParam;
                     *ppData = pBytes;
                     for (int i = 0; i < *pLen; i++) {
-                        if (atUtil_hexToByte(&pParam[i * 2], pBytes) < 0) {
+                        if (uAtUtilHexToByte(&pParam[i * 2], pBytes) < 0) {
                             return -ret;
                         }
                         pBytes++;
@@ -143,12 +171,12 @@ int atUtil_parseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
     return ret;
 }
 
-int atUtil_parseParamsF(char *pParams, const char *pParamFmt, ...)
+int uAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...)
 {
     va_list args;
 
     va_start(args, pParamFmt);
-    int ret = atUtil_parseParamsVaList(pParams, pParamFmt, args);
+    int ret = uAtUtilParseParamsVaList(pParams, pParamFmt, args);
     va_end(args);
 
     return ret;

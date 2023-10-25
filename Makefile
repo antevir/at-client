@@ -3,8 +3,8 @@ TARGET_EXEC := at_client
 BUILD_DIR := ./build
 
 SRCS := \
-	at_client.c \
-	at_util.c \
+	u_at_client.c \
+	u_at_util.c \
 	main.c
 
 OBJS := $(SRCS:%.c=$(BUILD_DIR)/%.o)
