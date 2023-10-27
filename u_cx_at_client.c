@@ -8,8 +8,8 @@
 #include <ctype.h>
 #include <limits.h>
 
-#include "u_at_util.h"
-#include "u_at_client.h"
+#include "u_cx_at_util.h"
+#include "u_cx_at_client.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -21,7 +21,7 @@
  * TYPES
  * -------------------------------------------------------------- */
 
-enum uAtParserCode {
+enum uCxAtParserCode {
     AT_PARSER_NOP = 0,
     AT_PARSER_GOT_STATUS,
     AT_PARSER_GOT_RSP,
@@ -49,7 +49,7 @@ void write(const void *pData, size_t length)
     fwrite(pData, 1, length, stdout);
 }
 
-static int parseLine(uAtClient_t *pClient, char *pLine)
+static int parseLine(uCxAtClient_t *pClient, char *pLine)
 {
     int ret = AT_PARSER_NOP;
 
@@ -93,7 +93,7 @@ static int parseLine(uAtClient_t *pClient, char *pLine)
     return ret;
 }
 
-static int parseIncomingChar(uAtClient_t *pClient, char ch)
+static int parseIncomingChar(uCxAtClient_t *pClient, char ch)
 {
     int ret = AT_PARSER_NOP;
 
@@ -101,7 +101,7 @@ static int parseIncomingChar(uAtClient_t *pClient, char ch)
         pClient->pRxBuffer[pClient->rxBufferPos] = 0;
         ret = parseLine(pClient, pClient->pRxBuffer);
         pClient->rxBufferPos = 0;
-    } else if(isprint(ch)) {
+    } else if (isprint(ch)) {
         pClient->pRxBuffer[pClient->rxBufferPos++] = ch;
         if (pClient->rxBufferPos == pClient->rxBufferLen) {
             // Overflow - discard everything and start over
@@ -112,7 +112,7 @@ static int parseIncomingChar(uAtClient_t *pClient, char ch)
     return ret;
 }
 
-static int handleRxData(uAtClient_t *pClient)
+static int handleRxData(uCxAtClient_t *pClient)
 {
     int ret = AT_PARSER_NOP;
     char ch;
@@ -128,17 +128,17 @@ static int handleRxData(uAtClient_t *pClient)
 }
 
 
-static void cmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
+static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
     //handleRxData(pClient);
 
     pClient->pRspParams = NULL;
     pClient->executingCmd = true;
     pClient->status = NO_STATUS;
-    uAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
+    uCxAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
 }
 
-static int cmdEnd(uAtClient_t *pClient)
+static int cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
@@ -153,14 +153,15 @@ static int cmdEnd(uAtClient_t *pClient)
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uAtClientInit(void *pRxBuffer, size_t rxBufferLen, uAtClient_t *pClient)
+void uCxAtClientInit(void *pRxBuffer, size_t rxBufferLen, uCxAtClient_t *pClient)
 {
-    memset(pClient, 0, sizeof(uAtClient_t));
+    memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pRxBuffer = pRxBuffer;
     pClient->rxBufferLen = rxBufferLen;
 }
 
-void uAtClientSendCmdVaList(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
+void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
+                              va_list args)
 {
     char buf[16];
 
@@ -172,36 +173,32 @@ void uAtClientSendCmdVaList(uAtClient_t *pClient, const char *pCmd, const char *
         }
 
         switch (*pCh) {
-            case 'd':
-                {
-                    int i = va_arg(args, int);
-                    int len = snprintf(buf, sizeof(buf), "%d", i);
-                    write(buf, len);
+            case 'd': {
+                int i = va_arg(args, int);
+                int len = snprintf(buf, sizeof(buf), "%d", i);
+                write(buf, len);
+            }
+            break;
+            case 'h': {
+                int i = va_arg(args, int);
+                int len = snprintf(buf, sizeof(buf), "%x", i);
+                write(buf, len);
+            }
+            break;
+            case 's': {
+                char *pStr = va_arg(args, char *);
+                write(pStr, strlen(pStr));
+            }
+            break;
+            case 'b': {
+                int len = va_arg(args, int);
+                uint8_t *pData = va_arg(args, uint8_t *);
+                for (int i = 0; i < len; i++) {
+                    uCxAtUtilByteToHex(pData[i], buf);
+                    write(buf, 2);
                 }
-                break;
-            case 'h':
-                {
-                    int i = va_arg(args, int);
-                    int len = snprintf(buf, sizeof(buf), "%x", i);
-                    write(buf, len);
-                }
-                break;
-            case 's':
-                {
-                    char *pStr = va_arg(args, char *);
-                    write(pStr, strlen(pStr));
-                }
-                break;
-            case 'b':
-                {
-                    int len = va_arg(args, int);
-                    uint8_t *pData = va_arg(args, uint8_t *);
-                    for (int i = 0; i < len; i++) {
-                        uAtUtilByteToHex(pData[i], buf);
-                        write(buf, 2);
-                    }
-                }
-                break;
+            }
+            break;
         }
         pCh++;
     }
@@ -209,7 +206,7 @@ void uAtClientSendCmdVaList(uAtClient_t *pClient, const char *pCmd, const char *
     write("\r", 1);
 }
 
-int uAtClientExecSimpleCmdF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
+int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
 {
     va_list args;
 
@@ -220,14 +217,14 @@ int uAtClientExecSimpleCmdF(uAtClient_t *pClient, const char *pCmd, const char *
     return cmdEnd(pClient);
 }
 
-int uAtClientExecSimpleCmd(uAtClient_t *pClient, const char *pCmd)
+int uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd)
 {
     cmdBeginF(pClient, pCmd, "", NULL);
 
     return cmdEnd(pClient);
 }
 
-void uAtClientCmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
+void uCxAtClientCmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
 {
     va_list args;
 
@@ -236,7 +233,7 @@ void uAtClientCmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pPar
     va_end(args);
 }
 
-char *uAtClientCmdGetRspParamLine(uAtClient_t *pClient, const char *pExpectedRsp)
+char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpectedRsp)
 {
     char *pRet = NULL;
     pClient->pRspParams = NULL;
@@ -257,19 +254,20 @@ char *uAtClientCmdGetRspParamLine(uAtClient_t *pClient, const char *pExpectedRsp
     return pRet;
 }
 
-int uAtClientCmdGetRspParamsF(uAtClient_t *pClient, const char *pExpectedRsp, const char *pParamFmt, ...)
+int uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                const char *pParamFmt, ...)
 {
     va_list args;
-    char *pRspParams = uAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
+    char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
 
     va_start(args, pParamFmt);
-    int ret = uAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
+    int ret = uCxAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
     va_end(args);
 
     return ret;
 }
 
-int uAtClientCmdEnd(uAtClient_t *pClient)
+int uCxAtClientCmdEnd(uCxAtClient_t *pClient)
 {
     return cmdEnd(pClient);
 }

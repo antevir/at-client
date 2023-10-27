@@ -1,8 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "u_at_client.h"
-#include "u_at_util.h"
+#include "u_cx_at_client.h"
+#include "u_cx_at_util.h"
 
 void myUrc(char *pUrcLine)
 {
@@ -11,7 +11,7 @@ void myUrc(char *pUrcLine)
 
 int main(void)
 {
-    uAtClient_t client;
+    uCxAtClient_t client;
 
     char *s1;
     char *s2;
@@ -21,18 +21,20 @@ int main(void)
     char buf[64];
     char rxBuf[1024];
     strcpy(buf, "\"hej\",123,hopp,-100,10200a0b0c01");
-    int ret = uAtUtilParseParamsF(buf, "sdsdb", &s1, &d1, &s2, &d2, &len, &pData);
+    int ret = uCxAtUtilParseParamsF(buf, "sdsdb", &s1, &d1, &s2, &d2, &len, &pData);
     printf("ret: %d, s1: %s, d1: %d, s2: %s, d2: %d\n", ret, s1, d1, s2, d2);
-    printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3], pData[4], pData[5]);
-    uAtClientInit(rxBuf, sizeof(rxBuf), &client);
-    uAtClientExecSimpleCmd(&client, "TESTING");
+    printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3],
+           pData[4], pData[5]);
+    uCxAtClientInit(rxBuf, sizeof(rxBuf), &client);
+    uCxAtClientExecSimpleCmd(&client, "TESTING");
     client.urcCallback = myUrc;
-    uAtClientCmdBeginF(&client, "AT+HEJ=", "dhsb", 123, 65535, "foo", 3, "abc", U_AT_UTIL_PARAM_LAST);
+    uCxAtClientCmdBeginF(&client, "AT+HEJ=", "dhsb", 123, 65535, "foo", 3, "abc",
+                         U_CX_AT_UTIL_PARAM_LAST);
     printf("\n");
-    char *pRsp = uAtClientCmdGetRspParamLine(&client, "+RSP");
+    char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "+RSP");
     if (pRsp) {
         printf("Got response: %s\n", pRsp);
     }
 
-    printf("status: %d\n", uAtClientCmdEnd(&client));
+    printf("status: %d\n", uCxAtClientCmdEnd(&client));
 }
