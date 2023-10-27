@@ -2,11 +2,38 @@
  * @brief Short description of the purpose of the file
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
+#include "limits.h"  // For INT_MAX
+#include "stddef.h"  // NULL, size_t etc.
+#include "stdint.h"  // int32_t etc.
+#include "stdbool.h"
+#include "string.h"  // memcpy(), strcmp(), strcspn(), strspm()
+#include "stdio.h"   // snprintf()
+#include "ctype.h"   // isprint()
+
+#include "u_cfg_sw.h"
+#include "u_cfg_os_platform_specific.h"
+
+#include "u_error_common.h"
+
+#include "u_assert.h"
+
+#include "u_port.h"
+#include "u_port_os.h"
+#include "u_port_heap.h"
+#include "u_port_debug.h"
+#include "u_port_gpio.h"
+#include "u_port_uart.h"
+#include "u_port_event_queue.h"
+
+#include "u_device_serial.h"
+
+#include "u_at_client.h"
+#include "u_short_range_pbuf.h"
+#include "u_short_range_module_type.h"
+#include "u_short_range.h"
+#include "u_short_range_edm_stream.h"
+
+#include "u_hex_bin_convert.h"
 
 #include "u_cx_at_util.h"
 #include "u_cx_at_client.h"
@@ -39,14 +66,14 @@ enum uCxAtParserCode {
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-size_t read(void *pData, size_t length)
+static size_t read(uCxAtClient_t *pClient, void *pData, size_t length)
 {
-    return fread(pData, 1, length, stdin);
+    return uPortUartRead(U_PTR_TO_INT32(pClient->streamHandle), pData, length);
 }
 
-void write(const void *pData, size_t length)
+static void write(uCxAtClient_t *pClient, const void *pData, size_t length)
 {
-    fwrite(pData, 1, length, stdout);
+    uPortUartWrite(U_PTR_TO_INT32(pClient->streamHandle), pData, length);
 }
 
 static int parseLine(uCxAtClient_t *pClient, char *pLine)
@@ -117,7 +144,7 @@ static int handleRxData(uCxAtClient_t *pClient)
     int ret = AT_PARSER_NOP;
     char ch;
 
-    while (read(&ch, 1) > 0) {
+    while (read(pClient, &ch, 1) > 0) {
         ret = parseIncomingChar(pClient, ch);
         if (ret != AT_PARSER_NOP) {
             break;
@@ -142,6 +169,7 @@ static int cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
+        uPortTaskBlock(100);
     }
 
     pClient->executingCmd = false;
@@ -153,9 +181,11 @@ static int cmdEnd(uCxAtClient_t *pClient)
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uCxAtClientInit(void *pRxBuffer, size_t rxBufferLen, uCxAtClient_t *pClient)
+void uCxAtClientInit(void *streamHandle, void *pRxBuffer, size_t rxBufferLen,
+                     uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
+    pClient->streamHandle = streamHandle;
     pClient->pRxBuffer = pRxBuffer;
     pClient->rxBufferLen = rxBufferLen;
 }
@@ -165,29 +195,29 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
 {
     char buf[16];
 
-    write(pCmd, strlen(pCmd));
+    write(pClient, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
         if (pCh != pParamFmt) {
-            write(",", 1);
+            write(pClient, ",", 1);
         }
 
         switch (*pCh) {
             case 'd': {
                 int i = va_arg(args, int);
                 int len = snprintf(buf, sizeof(buf), "%d", i);
-                write(buf, len);
+                write(pClient, buf, len);
             }
             break;
             case 'h': {
                 int i = va_arg(args, int);
                 int len = snprintf(buf, sizeof(buf), "%x", i);
-                write(buf, len);
+                write(pClient, buf, len);
             }
             break;
             case 's': {
                 char *pStr = va_arg(args, char *);
-                write(pStr, strlen(pStr));
+                write(pClient, pStr, strlen(pStr));
             }
             break;
             case 'b': {
@@ -195,7 +225,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 uint8_t *pData = va_arg(args, uint8_t *);
                 for (int i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
-                    write(buf, 2);
+                    write(pClient, buf, 2);
                 }
             }
             break;
@@ -203,7 +233,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
         pCh++;
     }
 
-    write("\r", 1);
+    write(pClient, "\r", 1);
 }
 
 int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)

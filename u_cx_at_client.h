@@ -16,6 +16,7 @@
  * -------------------------------------------------------------- */
 
 typedef struct {
+    void *streamHandle;
     char *pRxBuffer;
     size_t rxBufferLen;
     size_t rxBufferPos;
@@ -39,7 +40,8 @@ typedef struct {
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uCxAtClientInit(void *pRxBuffer, size_t rxBufferLen, uCxAtClient_t *pClient);
+void uCxAtClientInit(void *streamHandle, void *pRxBuffer, size_t rxBufferLen,
+                     uCxAtClient_t *pClient);
 
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args);

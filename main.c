@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include "ubxlib.h"
 
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
@@ -25,13 +26,27 @@ int main(void)
     printf("ret: %d, s1: %s, d1: %d, s2: %s, d2: %d\n", ret, s1, d1, s2, d2);
     printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3],
            pData[4], pData[5]);
-    uCxAtClientInit(rxBuf, sizeof(rxBuf), &client);
-    uCxAtClientExecSimpleCmd(&client, "TESTING");
+    uPortInit();
+    uPortUartInit();
+    int32_t handleOrErrorCode = uPortUartOpen(
+                                    0,
+                                    115200,
+                                    NULL,
+                                    1024,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1);
+    if (handleOrErrorCode < 0) {
+        printf("* Failed to open uart\n");
+        return 1;
+    }
+
+    uCxAtClientInit(U_INT32_TO_PTR(handleOrErrorCode), rxBuf, sizeof(rxBuf), &client);
+    uCxAtClientExecSimpleCmd(&client, "AT+CGMM");
     client.urcCallback = myUrc;
-    uCxAtClientCmdBeginF(&client, "AT+HEJ=", "dhsb", 123, 65535, "foo", 3, "abc",
-                         U_CX_AT_UTIL_PARAM_LAST);
-    printf("\n");
-    char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "+RSP");
+    uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
+    char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "\"");
     if (pRsp) {
         printf("Got response: %s\n", pRsp);
     }
