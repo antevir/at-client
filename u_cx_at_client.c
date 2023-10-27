@@ -94,6 +94,7 @@ static int parseLine(uCxAtClient_t *pClient, char *pLine)
 
     if (pClient->executingCmd) {
         if ((pClient->pExpectedRsp != NULL) &&
+            (*pClient->pExpectedRsp != 0) &&
             (strncmp(pLine, pClient->pExpectedRsp, pClient->pExpectedRspLen) == 0)) {
             pClient->pRspParams = &pLine[pClient->pExpectedRspLen + 1];
             ret = AT_PARSER_GOT_RSP;
