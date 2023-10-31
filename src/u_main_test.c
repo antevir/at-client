@@ -25,9 +25,6 @@ int main(void)
 {
     uCxAtClient_t client;
 
-    int len;
-    uint8_t *pData;
-    char buf[64];
     char rxBuf[1024];
 
     uCxAtClientInit(NULL, rxBuf, sizeof(rxBuf), &client);
