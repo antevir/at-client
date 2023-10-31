@@ -1,9 +1,20 @@
 #include <string.h>
 #include <stdio.h>
-#include "ubxlib.h"
 
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
+
+size_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
+{
+    (void)pClient;
+    return fread(pData, 1, length, stdin);
+}
+
+void uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length)
+{
+    (void)pClient;
+    fwrite(pData, 1, length, stdout);
+}
 
 void myUrc(char *pUrcLine)
 {
@@ -27,25 +38,7 @@ int main(void)
     printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3],
            pData[4], pData[5]);
 
-    // Initiate ubxlib
-    uPortInit();
-    // Get the uart
-    uPortUartInit();
-    int32_t handleOrErrorCode = uPortUartOpen(
-                                    0,
-                                    115200,
-                                    NULL,
-                                    1024,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    -1);
-    if (handleOrErrorCode < 0) {
-        printf("* Failed to open uart\n");
-        return 1;
-    }
-
-    uCxAtClientInit(U_INT32_TO_PTR(handleOrErrorCode), rxBuf, sizeof(rxBuf), &client);
+    uCxAtClientInit(NULL, rxBuf, sizeof(rxBuf), &client);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
     client.urcCallback = myUrc;
     for (int i = 0; i < 3; i++) {

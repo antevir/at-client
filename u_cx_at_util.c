@@ -146,7 +146,7 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
                     return -ret;
                 }
                 *pLen = len / 2;
-                pBytes = pParam;
+                pBytes = (uint8_t *)pParam;
                 *ppData = pBytes;
                 for (int i = 0; i < *pLen; i++) {
                     if (uCxAtUtilHexToByte(&pParam[i * 2], pBytes) < 0) {
