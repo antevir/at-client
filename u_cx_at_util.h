@@ -2,8 +2,8 @@
  * @brief Short description of the purpose of the file
  */
 
-#ifndef U_AT_UTIL_H
-#define U_AT_UTIL_H
+#ifndef U_CX_AT_UTIL_H
+#define U_CX_AT_UTIL_H
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -17,7 +17,7 @@
 # define ASSERT assert
 #endif
 
-#define U_AT_UTIL_PARAM_LAST  NULL
+#define U_CX_AT_UTIL_PARAM_LAST  NULL
 
 /* ----------------------------------------------------------------
  * TYPES
@@ -31,10 +31,10 @@
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uAtUtilByteToHex(uint8_t byte, char *pOutPtr);
-int uAtUtilHexToByte(char *pHex, uint8_t *pOutByte);
-char *uAtUtilFindParamEnd(char *pStr);
-int uAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args);
-int uAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...);
+void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr);
+int uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte);
+char *uCxAtUtilFindParamEnd(char *pStr);
+int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args);
+int uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...);
 
-#endif // U_AT_UTIL_H
+#endif // U_CX_AT_UTIL_H

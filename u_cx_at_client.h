@@ -2,20 +2,21 @@
  * @brief Short description of the purpose of the file
  */
 
-#ifndef U_AT_CLIENT_H
-#define U_AT_CLIENT_H
+#ifndef U_CX_AT_CLIENT_H
+#define U_CX_AT_CLIENT_H
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdarg.h>
 
-#include "u_at_util.h"
+#include "u_cx_at_util.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
 
 typedef struct {
+    void *streamHandle;
     char *pRxBuffer;
     size_t rxBufferLen;
     size_t rxBufferPos;
@@ -25,7 +26,7 @@ typedef struct {
     char *pRspParams;
     int status;
     void (*urcCallback)(char *pLine);
-} uAtClient_t;
+} uCxAtClient_t;
 
 /* ----------------------------------------------------------------
  * TYPES
@@ -39,19 +40,22 @@ typedef struct {
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uAtClientInit(void *pRxBuffer, size_t rxBufferLen, uAtClient_t *pClient);
+void uCxAtClientInit(void *streamHandle, void *pRxBuffer, size_t rxBufferLen,
+                     uCxAtClient_t *pClient);
 
-void uAtClientSendCmdVaList(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args);
+void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
+                              va_list args);
 
-int uAtClientExecSimpleCmdF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
-int uAtClientExecSimpleCmd(uAtClient_t *pClient, const char *pCmd);
+int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
+int uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd);
 
-void uAtClientCmdBeginF(uAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
+void uCxAtClientCmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
 
-char *uAtClientCmdGetRspParamLine(uAtClient_t *pClient, const char *pExpectedRsp);
+char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpectedRsp);
 
-int uAtClientCmdGetRspParamsF(uAtClient_t *pClient, const char *pExpectedRsp, const char *pParamFmt, ...);
+int uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                const char *pParamFmt, ...);
 
-int uAtClientCmdEnd(uAtClient_t *pClient);
+int uCxAtClientCmdEnd(uCxAtClient_t *pClient);
 
-#endif // U_AT_CLIENT_H
+#endif // U_CX_AT_CLIENT_H

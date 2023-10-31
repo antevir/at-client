@@ -1,8 +1,9 @@
 #include <string.h>
 #include <stdio.h>
+#include "ubxlib.h"
 
-#include "u_at_client.h"
-#include "u_at_util.h"
+#include "u_cx_at_client.h"
+#include "u_cx_at_util.h"
 
 void myUrc(char *pUrcLine)
 {
@@ -11,7 +12,7 @@ void myUrc(char *pUrcLine)
 
 int main(void)
 {
-    uAtClient_t client;
+    uCxAtClient_t client;
 
     char *s1;
     char *s2;
@@ -21,18 +22,38 @@ int main(void)
     char buf[64];
     char rxBuf[1024];
     strcpy(buf, "\"hej\",123,hopp,-100,10200a0b0c01");
-    int ret = uAtUtilParseParamsF(buf, "sdsdb", &s1, &d1, &s2, &d2, &len, &pData);
+    int ret = uCxAtUtilParseParamsF(buf, "sdsdb", &s1, &d1, &s2, &d2, &len, &pData);
     printf("ret: %d, s1: %s, d1: %d, s2: %s, d2: %d\n", ret, s1, d1, s2, d2);
-    printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3], pData[4], pData[5]);
-    uAtClientInit(rxBuf, sizeof(rxBuf), &client);
-    uAtClientExecSimpleCmd(&client, "TESTING");
-    client.urcCallback = myUrc;
-    uAtClientCmdBeginF(&client, "AT+HEJ=", "dhsb", 123, 65535, "foo", 3, "abc", U_AT_UTIL_PARAM_LAST);
-    printf("\n");
-    char *pRsp = uAtClientCmdGetRspParamLine(&client, "+RSP");
-    if (pRsp) {
-        printf("Got response: %s\n", pRsp);
+    printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3],
+           pData[4], pData[5]);
+
+    // Initiate ubxlib
+    uPortInit();
+    // Get the uart
+    uPortUartInit();
+    int32_t handleOrErrorCode = uPortUartOpen(
+                                    0,
+                                    115200,
+                                    NULL,
+                                    1024,
+                                    -1,
+                                    -1,
+                                    -1,
+                                    -1);
+    if (handleOrErrorCode < 0) {
+        printf("* Failed to open uart\n");
+        return 1;
     }
 
-    printf("status: %d\n", uAtClientCmdEnd(&client));
+    uCxAtClientInit(U_INT32_TO_PTR(handleOrErrorCode), rxBuf, sizeof(rxBuf), &client);
+    uCxAtClientExecSimpleCmd(&client, "ATE0");
+    client.urcCallback = myUrc;
+    for (int i = 0; i < 3; i++) {
+        uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
+        char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");
+        if (pRsp) {
+            printf("%d Got response: %s\n", i, pRsp);
+        }
+        uCxAtClientCmdEnd(&client);
+    }
 }
