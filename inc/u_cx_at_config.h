@@ -29,4 +29,13 @@ extern size_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
 # define U_CX_AT_PORT_READ(AT_CLIENT, DATA, DATA_LEN) uCxAtRead(AT_CLIENT, DATA, DATA_LEN)
 #endif
 
+
+/* U_CX_AT_PORT_ASSERT is used for asserts. To disable asserts just define U_CX_AT_PORT_ASSERT
+ * to nothing like this:
+ * #define U_CX_AT_PORT_ASSERT(COND)
+ */
+#ifndef U_CX_AT_PORT_ASSERT
+# define U_CX_AT_PORT_ASSERT(COND) assert(COND)
+#endif
+
 #endif // U_CX_AT_CONFIG_H
