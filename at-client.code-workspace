@@ -6,10 +6,7 @@
 	],
 	"settings": {
 		"files.associations": {
-			"u_error_common.h": "c",
-			"u_port_event_queue.h": "c",
-			"u_cfg_sw.h": "c",
-			"u_at_client.h": "c"
+			"*.h": "c",
 		}
 	}
 }
