@@ -15,7 +15,7 @@
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
 
-typedef struct {
+typedef struct uCxAtClient {
     void *streamHandle;
     char *pRxBuffer;
     size_t rxBufferLen;
