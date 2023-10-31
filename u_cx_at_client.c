@@ -170,7 +170,6 @@ static int cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
-        uPortTaskBlock(100);
     }
 
     pClient->executingCmd = false;

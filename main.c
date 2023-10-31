@@ -26,7 +26,10 @@ int main(void)
     printf("ret: %d, s1: %s, d1: %d, s2: %s, d2: %d\n", ret, s1, d1, s2, d2);
     printf("len: %d, pData: %02x%02x%02x%02x%02x%02x\n", len, pData[0], pData[1], pData[2], pData[3],
            pData[4], pData[5]);
+
+    // Initiate ubxlib
     uPortInit();
+    // Get the uart
     uPortUartInit();
     int32_t handleOrErrorCode = uPortUartOpen(
                                     0,
@@ -43,13 +46,14 @@ int main(void)
     }
 
     uCxAtClientInit(U_INT32_TO_PTR(handleOrErrorCode), rxBuf, sizeof(rxBuf), &client);
-    uCxAtClientExecSimpleCmd(&client, "AT+CGMM");
+    uCxAtClientExecSimpleCmd(&client, "ATE0");
     client.urcCallback = myUrc;
-    uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
-    char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "\"");
-    if (pRsp) {
-        printf("Got response: %s\n", pRsp);
+    for (int i = 0; i < 3; i++) {
+        uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
+        char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");
+        if (pRsp) {
+            printf("%d Got response: %s\n", i, pRsp);
+        }
+        uCxAtClientCmdEnd(&client);
     }
-
-    printf("status: %d\n", uCxAtClientCmdEnd(&client));
 }
