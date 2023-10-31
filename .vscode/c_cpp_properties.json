@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
+                "${workspaceFolder}/inc/**",
+                "${workspaceFolder}/ucx_api/**",
                 "${env:UBXLIB_DIR}/**"
             ],
             "defines": [],

@@ -5,6 +5,8 @@
 
 #include "ubxlib.h"
 #include "u_cx_at_client.h"
+#include "u_cx_system.h"
+#include "u_cx_general.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -69,13 +71,15 @@ int main(void)
     }
 
     uCxAtClientInit(U_INT32_TO_PTR(handleOrErrorCode), rxBuf, sizeof(rxBuf), &client);
-    uCxAtClientExecSimpleCmd(&client, "ATE0");
+    uCxSystemSetEchoOff(&client);
     client.urcCallback = urcHandler;
     for (int i = 0; i < 3; i++) {
-        uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
-        char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");
-        if (pRsp) {
-            printf("%d Got response: %s\n", i, pRsp);
+        const char *pVersion;
+        int32_t ret = uCxBeginGeneralGetSoftwareVersion(&client, &pVersion);
+        if (ret >= 0) {
+            printf("%d Got response: %s\n", i, pVersion);
+        } else {
+            printf("%d command failed, error code: %d\n", i, ret);
         }
         uCxAtClientCmdEnd(&client);
     }
