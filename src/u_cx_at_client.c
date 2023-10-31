@@ -125,7 +125,9 @@ static int handleRxData(uCxAtClient_t *pClient)
 
 static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
-    //handleRxData(pClient);
+    // Check that previous command has completed
+    // If this assert fails you have probably forgotten to call uCxAtClientCmdEnd()
+    U_CX_AT_PORT_ASSERT(!pClient->executingCmd);
 
     pClient->pRspParams = NULL;
     pClient->executingCmd = true;
@@ -138,6 +140,9 @@ static int cmdEnd(uCxAtClient_t *pClient)
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
     }
+
+    // cmdEnd() must be preceeded by a cmdBeginF()
+    U_CX_AT_PORT_ASSERT(pClient->executingCmd);
 
     pClient->executingCmd = false;
 
