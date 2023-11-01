@@ -37,16 +37,6 @@ static void urcHandler(char *pUrcLine)
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-size_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
-{
-    return uPortUartRead(U_PTR_TO_INT32(pClient->streamHandle), pData, length);
-}
-
-void uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length)
-{
-    uPortUartWrite(U_PTR_TO_INT32(pClient->streamHandle), pData, length);
-}
-
 int main(void)
 {
     char rxBuf[1024];

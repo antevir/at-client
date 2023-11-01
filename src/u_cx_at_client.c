@@ -43,9 +43,9 @@ enum uCxAtParserCode {
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-static int parseLine(uCxAtClient_t *pClient, char *pLine)
+static int32_t parseLine(uCxAtClient_t *pClient, char *pLine)
 {
-    int ret = AT_PARSER_NOP;
+    int32_t ret = AT_PARSER_NOP;
 
     char *pPtr = pLine;
     bool emptyLine = true;
@@ -88,9 +88,9 @@ static int parseLine(uCxAtClient_t *pClient, char *pLine)
     return ret;
 }
 
-static int parseIncomingChar(uCxAtClient_t *pClient, char ch)
+static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
 {
-    int ret = AT_PARSER_NOP;
+    int32_t ret = AT_PARSER_NOP;
 
     if ((ch == '\r') || (ch == '\n')) {
         pClient->pRxBuffer[pClient->rxBufferPos] = 0;
@@ -107,19 +107,20 @@ static int parseIncomingChar(uCxAtClient_t *pClient, char ch)
     return ret;
 }
 
-static int handleRxData(uCxAtClient_t *pClient)
+static int32_t handleRxData(uCxAtClient_t *pClient)
 {
-    int ret = AT_PARSER_NOP;
+    int32_t ret = AT_PARSER_NOP;
+    int32_t readStatus;
     char ch;
 
-    while (U_CX_AT_PORT_READ(pClient, &ch, 1) > 0) {
+    while ((readStatus = U_CX_AT_PORT_READ(pClient, &ch, 1)) == 1) {
         ret = parseIncomingChar(pClient, ch);
         if (ret != AT_PARSER_NOP) {
             break;
         }
     }
 
-    return ret;
+    return (readStatus < 0 ? readStatus : ret);
 }
 
 
@@ -135,7 +136,7 @@ static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pPar
     uCxAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
 }
 
-static int cmdEnd(uCxAtClient_t *pClient)
+static int32_t cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
@@ -208,7 +209,8 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
     U_CX_AT_PORT_WRITE(pClient, "\r", 1);
 }
 
-int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
+int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
+                                  ...)
 {
     va_list args;
 
@@ -219,7 +221,7 @@ int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const ch
     return cmdEnd(pClient);
 }
 
-int uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd)
+int32_t uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd)
 {
     cmdBeginF(pClient, pCmd, "", NULL);
 
@@ -256,20 +258,20 @@ char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpecte
     return pRet;
 }
 
-int uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
-                                const char *pParamFmt, ...)
+int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                    const char *pParamFmt, ...)
 {
     va_list args;
     char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
 
     va_start(args, pParamFmt);
-    int ret = uCxAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
+    int32_t ret = uCxAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
     va_end(args);
 
     return ret;
 }
 
-int uCxAtClientCmdEnd(uCxAtClient_t *pClient)
+int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient)
 {
     return cmdEnd(pClient);
 }

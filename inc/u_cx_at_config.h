@@ -17,7 +17,7 @@ struct uCxAtClient;
  * when writing to the AT interface (typically UART)
  */
 #ifndef U_CX_AT_PORT_WRITE
-extern size_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length);
+extern int32_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length);
 # define U_CX_AT_PORT_WRITE(AT_CLIENT, DATA, DATA_LEN) uCxAtWrite(AT_CLIENT, DATA, DATA_LEN)
 #endif
 
@@ -25,7 +25,7 @@ extern size_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t 
  * when reading from the AT interface (typically UART)
  */
 #ifndef U_CX_AT_PORT_READ
-extern size_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length);
+extern int32_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length);
 # define U_CX_AT_PORT_READ(AT_CLIENT, DATA, DATA_LEN) uCxAtRead(AT_CLIENT, DATA, DATA_LEN)
 #endif
 

@@ -4,16 +4,16 @@
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
 
-size_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
+int32_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
 {
     (void)pClient;
-    return fread(pData, 1, length, stdin);
+    return (int32_t)fread(pData, 1, length, stdin);
 }
 
-void uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length)
+int32_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length)
 {
     (void)pClient;
-    fwrite(pData, 1, length, stdout);
+    return (int32_t)fwrite(pData, 1, length, stdout);
 }
 
 void myUrc(char *pUrcLine)

@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.4)
 project(at_client)
 string(TOLOWER  ${CMAKE_SYSTEM_NAME} OS_NAME)
-file(REAL_PATH "~" HOME EXPAND_TILDE)
 
 file(GLOB UCX_API_SRC ucx_api/*.c)
 
@@ -9,12 +8,8 @@ if (DEFINED ENV{UBXLIB_DIR})
   # Ubxlib based AT client app
   set(APP_NAME_UBXLIB at_client)
   add_executable(${APP_NAME_UBXLIB}
-    src/u_cx_at_client.c
-    src/u_cx_at_util.c
-    src/u_main_ubxlib.c
-    ${UCX_API_SRC}
+    test/u_main_ubxlib.c
   )
-
   # Get and build the ubxlib library
   set(UBXLIB_BASE $ENV{UBXLIB_DIR})
   include(${UBXLIB_BASE}/port/platform/${OS_NAME}/${OS_NAME}.cmake)
@@ -30,7 +25,7 @@ set(APP_NAME_TEST at_client_test)
 add_executable(${APP_NAME_TEST}
   src/u_cx_at_client.c
   src/u_cx_at_util.c
-  src/u_main_test.c
+  test/u_main_test.c
   ${UCX_API_SRC}
 )
 target_include_directories(${APP_NAME_TEST} PUBLIC ${UBXLIB_INC} ${UBXLIB_PUBLIC_INC_PORT} inc ucx_api)
