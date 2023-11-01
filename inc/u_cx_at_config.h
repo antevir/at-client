@@ -35,6 +35,7 @@ extern int32_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length
  * #define U_CX_AT_PORT_ASSERT(COND)
  */
 #ifndef U_CX_AT_PORT_ASSERT
+# include <assert.h>
 # define U_CX_AT_PORT_ASSERT(COND) assert(COND)
 #endif
 

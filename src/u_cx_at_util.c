@@ -121,13 +121,13 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
         switch (*pFmtCh) {
             case 'd': {
                 int *pI = va_arg(args, int *);
-                ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
                 *pI = atoi(pParam);
             }
             break;
             case 's': {
                 char **ppStr = va_arg(args, char **);
-                ASSERT(ppStr != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(ppStr != U_CX_AT_UTIL_PARAM_LAST);
                 if (*pParam == '"') {
                     pParam++;
                     pParamEnd[-1] = 0;
@@ -140,8 +140,8 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
                 uint8_t **ppData = va_arg(args, uint8_t **);
                 uint8_t *pBytes;
                 size_t len = strlen(pParam);
-                ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
-                ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
                 if ((len % 2) != 0) {
                     return -ret;
                 }

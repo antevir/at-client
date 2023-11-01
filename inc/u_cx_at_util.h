@@ -8,14 +8,11 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+#include "u_cx_at_config.h"
+
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
-
-#ifndef ASSERT
-# include <assert.h>
-# define ASSERT assert
-#endif
 
 #define U_CX_AT_UTIL_PARAM_LAST  NULL
 
