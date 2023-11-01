@@ -11,24 +11,6 @@
 # include U_CX_AT_CONFIG_FILE
 #endif
 
-struct uCxAtClient;
-
-/* U_CX_AT_PORT_WRITE can be used to redefine the function that will be called
- * when writing to the AT interface (typically UART)
- */
-#ifndef U_CX_AT_PORT_WRITE
-extern int32_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length);
-# define U_CX_AT_PORT_WRITE(AT_CLIENT, DATA, DATA_LEN) uCxAtWrite(AT_CLIENT, DATA, DATA_LEN)
-#endif
-
-/* U_CX_AT_PORT_READ can be used to redefine the function that will be called
- * when reading from the AT interface (typically UART)
- */
-#ifndef U_CX_AT_PORT_READ
-extern int32_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length);
-# define U_CX_AT_PORT_READ(AT_CLIENT, DATA, DATA_LEN) uCxAtRead(AT_CLIENT, DATA, DATA_LEN)
-#endif
-
 
 /* U_CX_AT_PORT_ASSERT is used for asserts. To disable asserts just define U_CX_AT_PORT_ASSERT
  * to nothing like this:

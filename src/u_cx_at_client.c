@@ -91,14 +91,15 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine)
 static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
 {
     int32_t ret = AT_PARSER_NOP;
+    char *pRxBuffer = (char *)pClient->pConfig->pRxBuffer;
 
     if ((ch == '\r') || (ch == '\n')) {
-        pClient->pRxBuffer[pClient->rxBufferPos] = 0;
-        ret = parseLine(pClient, pClient->pRxBuffer);
+        pRxBuffer[pClient->rxBufferPos] = 0;
+        ret = parseLine(pClient, pRxBuffer);
         pClient->rxBufferPos = 0;
     } else if (isprint(ch)) {
-        pClient->pRxBuffer[pClient->rxBufferPos++] = ch;
-        if (pClient->rxBufferPos == pClient->rxBufferLen) {
+        pRxBuffer[pClient->rxBufferPos++] = ch;
+        if (pClient->rxBufferPos == pClient->pConfig->rxBufferLen) {
             // Overflow - discard everything and start over
             pClient->rxBufferPos = 0;
         }
@@ -113,7 +114,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     int32_t readStatus;
     char ch;
 
-    while ((readStatus = U_CX_AT_PORT_READ(pClient, &ch, 1)) == 1) {
+    while ((readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle, &ch, 1)) == 1) {
         ret = parseIncomingChar(pClient, ch);
         if (ret != AT_PARSER_NOP) {
             break;
@@ -154,43 +155,41 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-void uCxAtClientInit(void *streamHandle, void *pRxBuffer, size_t rxBufferLen,
-                     uCxAtClient_t *pClient)
+void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
-    pClient->streamHandle = streamHandle;
-    pClient->pRxBuffer = pRxBuffer;
-    pClient->rxBufferLen = rxBufferLen;
+    pClient->pConfig = pConfig;
 }
 
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args)
 {
     char buf[16];
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
-    U_CX_AT_PORT_WRITE(pClient, pCmd, strlen(pCmd));
+    pConfig->write(pClient, pConfig->pStreamHandle, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
         if (pCh != pParamFmt) {
-            U_CX_AT_PORT_WRITE(pClient, ",", 1);
+            pConfig->write(pClient, pConfig->pStreamHandle, ",", 1);
         }
 
         switch (*pCh) {
             case 'd': {
                 int i = va_arg(args, int);
                 int len = snprintf(buf, sizeof(buf), "%d", i);
-                U_CX_AT_PORT_WRITE(pClient, buf, len);
+                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
             }
             break;
             case 'h': {
                 int i = va_arg(args, int);
                 int len = snprintf(buf, sizeof(buf), "%x", i);
-                U_CX_AT_PORT_WRITE(pClient, buf, len);
+                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
             }
             break;
             case 's': {
                 char *pStr = va_arg(args, char *);
-                U_CX_AT_PORT_WRITE(pClient, pStr, strlen(pStr));
+                pConfig->write(pClient, pConfig->pStreamHandle, pStr, strlen(pStr));
             }
             break;
             case 'b': {
@@ -198,7 +197,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 uint8_t *pData = va_arg(args, uint8_t *);
                 for (int i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
-                    U_CX_AT_PORT_WRITE(pClient, buf, 2);
+                    pConfig->write(pClient, pConfig->pStreamHandle, buf, 2);
                 }
             }
             break;
@@ -206,7 +205,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
         pCh++;
     }
 
-    U_CX_AT_PORT_WRITE(pClient, "\r", 1);
+    pConfig->write(pClient, pConfig->pStreamHandle, "\r", 1);
 }
 
 int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,

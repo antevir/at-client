@@ -16,9 +16,7 @@
  * -------------------------------------------------------------- */
 
 typedef struct uCxAtClient {
-    void *streamHandle;
-    char *pRxBuffer;
-    size_t rxBufferLen;
+    const struct uCxAtClientConfig *pConfig;
     size_t rxBufferPos;
     bool executingCmd;
     const char *pExpectedRsp;
@@ -27,6 +25,24 @@ typedef struct uCxAtClient {
     int32_t status;
     void (*urcCallback)(char *pLine);
 } uCxAtClient_t;
+
+typedef struct uCxAtClientConfig {
+    void *pRxBuffer;        /**< Pointer to a buffer that the client will use as RX buffer */
+    size_t rxBufferLen;     /**< Size of the RX buffer. */
+    void *pStreamHandle;    /**< User pointer associated with the AT interface.
+                                 This pointer will be passed to write and read functions below
+                                 and can be used to talk to a certain COM port etc.*/
+
+    /* Callback for writing to the AT interface (typically a UART)
+     * The function should return the number of actual bytes written or negative number on error.
+     */
+    int32_t (*write)(uCxAtClient_t *pClient, void *pStreamHandle, const void *pData, size_t length);
+
+    /* Callback for reading from the AT interface (typically a UART)
+     * The function should return the number of actual bytes read or negative number on error.
+     */
+    int32_t (*read)(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length);
+} uCxAtClientConfig_t;
 
 /* ----------------------------------------------------------------
  * TYPES
@@ -45,15 +61,10 @@ typedef struct uCxAtClient {
   *
   * This function must be called before any other uCxAtClientXxx function is called.
   *
-  * @param[in]  pStreamHandle:  a user pointer associated with the AT interface.
-  *                             You make use of this pointer in U_CX_AT_PORT_WRITE and U_CX_AT_PORT_READ
-  *                             to talk to a certain COM port etc.
-  * @param[in]  pRxBuffer:      pointer to a buffer that the client will use as RX buffer.
-  * @param      rxBufferLen:    the size of the RX buffer.
-  * @param[out] pClient:        a pointer to an AT client struct that will be initialized.
+  * @param[in]  pConfig:  the AT client configuration (see \ref uCxAtClientConfig_t)
+  * @param[out] pClient:  a pointer to an AT client struct that will be initialized.
   */
-void uCxAtClientInit(void *pStreamHandle, void *pRxBuffer, size_t rxBufferLen,
-                     uCxAtClient_t *pClient);
+void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient);
 
 /**
   * @brief  Execute an AT command without any response
