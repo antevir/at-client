@@ -24,7 +24,7 @@ typedef struct uCxAtClient {
     const char *pExpectedRsp;
     size_t pExpectedRspLen;
     char *pRspParams;
-    int status;
+    int32_t status;
     void (*urcCallback)(char *pLine);
 } uCxAtClient_t;
 
@@ -46,16 +46,17 @@ void uCxAtClientInit(void *streamHandle, void *pRxBuffer, size_t rxBufferLen,
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args);
 
-int uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
-int uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd);
+int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
+                                  ...);
+int32_t uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd);
 
 void uCxAtClientCmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...);
 
 char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpectedRsp);
 
-int uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
-                                const char *pParamFmt, ...);
+int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                    const char *pParamFmt, ...);
 
-int uCxAtClientCmdEnd(uCxAtClient_t *pClient);
+int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient);
 
 #endif // U_CX_AT_CLIENT_H
