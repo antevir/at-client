@@ -1,5 +1,5 @@
 /** @file
- * @brief Short description of the purpose of the file
+ * @brief AT string utilities
  */
 
 #ifndef U_CX_AT_UTIL_H

@@ -1,5 +1,5 @@
 /** @file
- * @brief Short description of the purpose of the file
+ * @brief 2nd gen uConnectXpress AT client
  */
 
 #include "limits.h"  // For INT_MAX

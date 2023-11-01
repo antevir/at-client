@@ -1,5 +1,5 @@
 /** @file
- * @brief Short description of the purpose of the file
+ * @brief AT string utilities
  */
 
 #include <stdlib.h>
