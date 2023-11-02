@@ -121,6 +121,10 @@ void test_uCxAtUtilParseParamsF_withValidInput_expectParsedParams(void)
     TEST_ASSERT_EQUAL(2, uCxAtUtilParseParamsF(testData, "sd", &pStr, &digit, U_CX_AT_UTIL_PARAM_LAST));
     TEST_ASSERT_EQUAL_STRING("", pStr);
     TEST_ASSERT_EQUAL(123, digit);
+
+    strcpy(testData, "");
+    TEST_ASSERT_EQUAL(1, uCxAtUtilParseParamsF(testData, "s", &pStr, &digit, U_CX_AT_UTIL_PARAM_LAST));
+    TEST_ASSERT_EQUAL_STRING("", pStr);
 }
 
 void test_uCxAtUtilParseParamsF_withInvalidInput_expectNegativeReturnValue(void)
@@ -133,5 +137,8 @@ void test_uCxAtUtilParseParamsF_withInvalidInput_expectNegativeReturnValue(void)
     TEST_ASSERT_LESS_THAN(0, uCxAtUtilParseParamsF(testData, "ds", &digit, &pStr, U_CX_AT_UTIL_PARAM_LAST));
 
     strcpy(testData, "123,missing esc char\\");
+    TEST_ASSERT_LESS_THAN(0, uCxAtUtilParseParamsF(testData, "ds", &digit, &pStr, U_CX_AT_UTIL_PARAM_LAST));
+
+    strcpy(testData, ",int param not allowed to be empty");
     TEST_ASSERT_LESS_THAN(0, uCxAtUtilParseParamsF(testData, "ds", &digit, &pStr, U_CX_AT_UTIL_PARAM_LAST));
 }

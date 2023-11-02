@@ -93,7 +93,7 @@ char *uCxAtUtilFindParamEnd(char *pStr)
         pIter++;
     }
 
-    if (insideString || escape || (pIter == pStr)) {
+    if (insideString || escape) {
         return NULL;
     }
 
@@ -108,6 +108,7 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
     int ret = 0;
 
     while (*pFmtCh != 0) {
+        ret++;
         char *pParamEnd = uCxAtUtilFindParamEnd(pParam);
         if (pParamEnd == NULL) {
             return -ret;
@@ -120,9 +121,14 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
 
         switch (*pFmtCh) {
             case 'd': {
+                char * pEnd;
                 int *pI = va_arg(args, int *);
                 U_CX_AT_PORT_ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
-                *pI = atoi(pParam);
+                *pI = strtol(pParam, &pEnd, 10);
+                if (!isdigit(*pParam) || (*pEnd != 0)) {
+                    // Not a valid integer
+                    return -ret;
+                }
             }
             break;
             case 's': {
@@ -157,7 +163,6 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
             }
             break;
         }
-        ret++;
         if (last) {
             break;
         }
