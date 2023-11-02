@@ -53,6 +53,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
     while (pPtr < &pLine[lineLength]) {
         if ((*pPtr != '\n') && (*pPtr != '\r')) {
             emptyLine = false;
+            break;
         }
         pPtr++;
     }
@@ -308,4 +309,11 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
 int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient)
 {
     return cmdEnd(pClient);
+}
+
+void uCxAtClientHandleRx(uCxAtClient_t *pClient)
+{
+    if (!pClient->executingCmd) {
+        handleRxData(pClient);
+    }
 }

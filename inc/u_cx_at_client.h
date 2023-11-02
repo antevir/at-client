@@ -181,4 +181,18 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
   */
 int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient);
 
+/**
+  * @brief  Handle AT RX data
+  *
+  * Call this function when data has been received by the AT interface (UART) while no
+  * AT command is being executed.
+  *
+  * This is needed for handling URCs that can be sent by the AT server at any time.
+  * If this function is called when AT client is currently handling an AT command it
+  * will do nothing.
+  *
+  * @param[in]  pClient:   the AT client from uCxAtClientInit().
+  */
+void uCxAtClientHandleRx(uCxAtClient_t *pClient);
+
 #endif // U_CX_AT_CLIENT_H
