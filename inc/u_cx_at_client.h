@@ -18,17 +18,20 @@
 typedef struct uCxAtClient {
     const struct uCxAtClientConfig *pConfig;
     size_t rxBufferPos;
+    size_t urcBufferPos;
     bool executingCmd;
     const char *pExpectedRsp;
     size_t pExpectedRspLen;
     char *pRspParams;
     int32_t status;
-    void (*urcCallback)(char *pLine);
+    void (*urcCallback)(struct uCxAtClient *pClient, void *pStreamHandle, char *pLine, size_t lineLength);
 } uCxAtClient_t;
 
 typedef struct uCxAtClientConfig {
     void *pRxBuffer;        /**< Pointer to a buffer that the client will use as RX buffer */
     size_t rxBufferLen;     /**< Size of the RX buffer. */
+    void *pUrcBuffer;       /**< Pointer to a separate URC buffer */
+    size_t urcBufferLen;    /**< Size of the URC buffer. */
     void *pStreamHandle;    /**< User pointer associated with the AT interface.
                                  This pointer will be passed to write and read functions below
                                  and can be used to talk to a certain COM port etc.*/

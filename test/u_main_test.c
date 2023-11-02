@@ -18,9 +18,9 @@ static int32_t uCxAtWrite(uCxAtClient_t *pClient, void *pStreamHandle, const voi
     return (int32_t)fwrite(pData, 1, length, stdout);
 }
 
-void myUrc(char *pUrcLine)
+void myUrc(struct uCxAtClient *pClient, void *pStreamHandle, char *pLine, size_t lineLength)
 {
-    printf("Got URC: %s\n", pUrcLine);
+    printf("Got URC: %s\n", pLine);
 }
 
 int main(void)
@@ -28,9 +28,12 @@ int main(void)
     uCxAtClient_t client;
 
     static char rxBuf[1024];
+    static char urcBuf[1024];
     static const uCxAtClientConfig_t config = {
         .pRxBuffer = &rxBuf[0],
         .rxBufferLen = sizeof(rxBuf),
+        .pUrcBuffer = &urcBuf[0],
+        .urcBufferLen = sizeof(urcBuf),
         .pStreamHandle = NULL,
         .write = uCxAtWrite,
         .read = uCxAtRead

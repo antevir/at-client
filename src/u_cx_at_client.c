@@ -43,13 +43,14 @@ enum uCxAtParserCode {
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-static int32_t parseLine(uCxAtClient_t *pClient, char *pLine)
+static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
 {
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
     int32_t ret = AT_PARSER_NOP;
 
     char *pPtr = pLine;
     bool emptyLine = true;
-    while (*pPtr) {
+    while (pPtr < &pLine[lineLength]) {
         if ((*pPtr != '\n') && (*pPtr != '\r')) {
             emptyLine = false;
         }
@@ -78,10 +79,32 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine)
     }
 
     if (ret == AT_PARSER_NOP) {
+        // Check if this is URC data
         if ((pLine[0] == '+') || (pLine[0] == '*')) {
-            if (pClient->urcCallback) {
-                pClient->urcCallback(pLine);
+            if (!pClient->executingCmd) {
+                // If there are no command is currently executing we can just
+                // execute the URC handler right away
+                if (pClient->urcCallback) {
+                    pClient->urcCallback(pClient, pConfig->pStreamHandle, pLine, lineLength);
+                }
+            } else {
+                // AT client is busy handling AT command
+                // Defer callback until command is done
+
+                // We only support deferring one URC at the moment
+                U_CX_AT_PORT_ASSERT(pClient->urcBufferPos == 0);
+
+                if (lineLength <= pConfig->urcBufferLen) {
+                    memcpy(pConfig->pUrcBuffer, pLine, lineLength);
+                    pClient->urcBufferPos = lineLength;
+                } else {
+                    // URC buffer too small. Fail assert for now.
+                    U_CX_AT_PORT_ASSERT(false);
+                }
             }
+        } else {
+            // Received unexpected data
+            // TODO: Handle
         }
     }
 
@@ -95,7 +118,7 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
 
     if ((ch == '\r') || (ch == '\n')) {
         pRxBuffer[pClient->rxBufferPos] = 0;
-        ret = parseLine(pClient, pRxBuffer);
+        ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos);
         pClient->rxBufferPos = 0;
     } else if (isprint(ch)) {
         pRxBuffer[pClient->rxBufferPos++] = ch;
@@ -124,6 +147,16 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     return (readStatus < 0 ? readStatus : ret);
 }
 
+static void handleDeferredUrc(uCxAtClient_t *pClient)
+{
+    if (pClient->urcBufferPos > 0) {
+        if (pClient->urcCallback) {
+            const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+            pClient->urcCallback(pClient, pConfig->pStreamHandle, (char *)pConfig->pUrcBuffer, pClient->urcBufferPos);
+        }
+        pClient->urcBufferPos = 0;
+    }
+}
 
 static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
@@ -147,6 +180,8 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
     U_CX_AT_PORT_ASSERT(pClient->executingCmd);
 
     pClient->executingCmd = false;
+    // We may have received URCs during command execution
+    handleDeferredUrc(pClient);
 
     return pClient->status;
 }
