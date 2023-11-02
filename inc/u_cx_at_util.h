@@ -55,7 +55,7 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr);
   * @param[out] pOutByte:  the output byte.
   * @retval                0 on success otherwise negative value.
   */
-int uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte);
+int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte);
 
 /**
   * @brief Find end of a parameter in an AT parameter string
@@ -103,7 +103,7 @@ char *uCxAtUtilFindParamEnd(char *pStr);
   * @param[out] ...:       the output AT param pointers. Last param is always U_CX_AT_UTIL_PARAM_LAST!
   * @retval                the number of parsed params on success otherwise negative value.
   */
-int uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...);
+int32_t uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...);
 
 /**
   * @brief  Parse an AT parameter string
@@ -115,6 +115,6 @@ int uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...);
   * @param[out] args:      the output AT param pointers. Last param is always U_CX_AT_UTIL_PARAM_LAST!
   * @retval                the number of parsed params on success otherwise negative value.
   */
-int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args);
+int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args);
 
 #endif // U_CX_AT_UTIL_H

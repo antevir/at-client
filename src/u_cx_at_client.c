@@ -218,14 +218,14 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
 
         switch (*pCh) {
             case 'd': {
-                int i = va_arg(args, int);
-                int len = snprintf(buf, sizeof(buf), "%d", i);
+                int32_t i = va_arg(args, int32_t);
+                int32_t len = snprintf(buf, sizeof(buf), "%d", i);
                 pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
             }
             break;
             case 'h': {
-                int i = va_arg(args, int);
-                int len = snprintf(buf, sizeof(buf), "%x", i);
+                int32_t i = va_arg(args, int32_t);
+                int32_t len = snprintf(buf, sizeof(buf), "%x", i);
                 pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
             }
             break;
@@ -235,9 +235,9 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'b': {
-                int len = va_arg(args, int);
+                int32_t len = va_arg(args, int32_t);
                 uint8_t *pData = va_arg(args, uint8_t *);
-                for (int i = 0; i < len; i++) {
+                for (int32_t i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
                     pConfig->write(pClient, pConfig->pStreamHandle, buf, 2);
                 }
