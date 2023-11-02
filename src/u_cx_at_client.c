@@ -86,7 +86,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
                 // If there are no command is currently executing we can just
                 // execute the URC handler right away
                 if (pClient->urcCallback) {
-                    pClient->urcCallback(pClient, pConfig->pStreamHandle, pLine, lineLength);
+                    pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pLine, lineLength);
                 }
             } else {
                 // AT client is busy handling AT command
@@ -153,7 +153,8 @@ static void handleDeferredUrc(uCxAtClient_t *pClient)
     if (pClient->urcBufferPos > 0) {
         if (pClient->urcCallback) {
             const struct uCxAtClientConfig *pConfig = pClient->pConfig;
-            pClient->urcCallback(pClient, pConfig->pStreamHandle, (char *)pConfig->pUrcBuffer, pClient->urcBufferPos);
+            pClient->urcCallback(pClient, pClient->pUrcCallbackTag,
+                                 (char *)pConfig->pUrcBuffer, pClient->urcBufferPos);
         }
         pClient->urcBufferPos = 0;
     }
@@ -195,6 +196,11 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pConfig = pConfig;
+}
+
+void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
+{
+    pClient->urcCallback = urcCallback;
 }
 
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,

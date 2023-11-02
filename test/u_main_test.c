@@ -18,7 +18,7 @@ static int32_t uCxAtWrite(uCxAtClient_t *pClient, void *pStreamHandle, const voi
     return (int32_t)fwrite(pData, 1, length, stdout);
 }
 
-void myUrc(struct uCxAtClient *pClient, void *pStreamHandle, char *pLine, size_t lineLength)
+void myUrc(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength)
 {
     printf("Got URC: %s\n", pLine);
 }
@@ -40,8 +40,8 @@ int main(void)
     };
 
     uCxAtClientInit(&config, &client);
+    uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
-    client.urcCallback = myUrc;
     for (int i = 0; i < 3; i++) {
         uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
         char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");

@@ -15,6 +15,10 @@
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
 
+struct uCxAtClient;
+
+typedef void (*uUrcCallback_t)(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength);
+
 typedef struct uCxAtClient {
     const struct uCxAtClientConfig *pConfig;
     size_t rxBufferPos;
@@ -24,7 +28,8 @@ typedef struct uCxAtClient {
     size_t pExpectedRspLen;
     char *pRspParams;
     int32_t status;
-    void (*urcCallback)(struct uCxAtClient *pClient, void *pStreamHandle, char *pLine, size_t lineLength);
+    uUrcCallback_t urcCallback;
+    void *pUrcCallbackTag;
 } uCxAtClient_t;
 
 typedef struct uCxAtClientConfig {
@@ -68,6 +73,16 @@ typedef struct uCxAtClientConfig {
   * @param[out] pClient:  a pointer to an AT client struct that will be initialized.
   */
 void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient);
+
+/**
+  * @brief  Set URC callback
+  *
+  * @param[in]  pClient:      the AT client from uCxAtClientInit().
+  * @param[in]  urcCallback:  the callback to be called when a URC line is received.
+  *                           Can be set to NULL for disabling the callback.
+  * @param[in]  pTag          a user pointer that will be passed to the callback when called.
+  */
+void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag);
 
 /**
   * @brief  Execute an AT command without any response
