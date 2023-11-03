@@ -201,6 +201,7 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
 {
     pClient->urcCallback = urcCallback;
+    pClient->pUrcCallbackTag = pTag;
 }
 
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
