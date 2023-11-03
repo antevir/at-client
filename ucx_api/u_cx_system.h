@@ -15,27 +15,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "u_cx_at_client.h"
+#include "u_cx_types.h"
+#include "u_cx.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-/* ------------------------------------------------------------
- * ENUMERATORS
- * ---------------------------------------------------------- */
-
-typedef enum
-{
-    U_BOOTLOADER_MODE_XMODEM,          /**< Enter xmodem mode for u-connect software update using serial port. */
-    U_BOOTLOADER_MODE_COMMAND_LINE = 1 /**< Enter the bootloader command line mode using serial port. */
-} uBootloaderMode_t;
-
-typedef enum
-{
-    U_ECHO_ON_OFF,   /**< Module does not echo the characters */
-    U_ECHO_ON_ON = 1 /**< (Factory default) Module echoes the characters */
-} uEchoOn_t;
 
 /* ------------------------------------------------------------
  * RESPONSE STRUCTS
@@ -66,9 +51,9 @@ typedef struct
  * Output AT command:
  * > AT+USYFR
  *
- * @param[in]  pAtClient: AT client
+ * @param[in]  puCxHandle: uCX API handle
  */
-int32_t uCxSystemFactoryReset(uCxAtClient_t * pAtClient);
+int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle);
 
 /**
  * Configure new UART settings that will be used after restart
@@ -76,10 +61,10 @@ int32_t uCxSystemFactoryReset(uCxAtClient_t * pAtClient);
  * Output AT command:
  * > AT+USYUS=<baud_rate>
  *
- * @param[in]  pAtClient: AT client
- * @param      baud_rate: Baudrate
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      baud_rate:  Baudrate
  */
-int32_t uCxSystemSetUartSettings1(uCxAtClient_t * pAtClient, int32_t baud_rate);
+int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate);
 
 /**
  * Configure new UART settings that will be used after restart
@@ -87,11 +72,11 @@ int32_t uCxSystemSetUartSettings1(uCxAtClient_t * pAtClient, int32_t baud_rate);
  * Output AT command:
  * > AT+USYUS=<baud_rate>,<flow_control>
  *
- * @param[in]  pAtClient:    AT client
+ * @param[in]  puCxHandle:   uCX API handle
  * @param      baud_rate:    Baudrate
  * @param      flow_control: 
  */
-int32_t uCxSystemSetUartSettings2(uCxAtClient_t * pAtClient, int32_t baud_rate, int32_t flow_control);
+int32_t uCxSystemSetUartSettings2(uCxHandle_t * puCxHandle, int32_t baud_rate, int32_t flow_control);
 
 /**
  * Configure new UART settings that will be used after restart
@@ -99,12 +84,12 @@ int32_t uCxSystemSetUartSettings2(uCxAtClient_t * pAtClient, int32_t baud_rate, 
  * Output AT command:
  * > AT+USYUS=<baud_rate>,<flow_control>,<change_after_confirm>
  *
- * @param[in]  pAtClient:            AT client
+ * @param[in]  puCxHandle:           uCX API handle
  * @param      baud_rate:            Baudrate
  * @param      flow_control:         
  * @param      change_after_confirm: 
  */
-int32_t uCxSystemSetUartSettings3(uCxAtClient_t * pAtClient, int32_t baud_rate, int32_t flow_control, int32_t change_after_confirm);
+int32_t uCxSystemSetUartSettings3(uCxHandle_t * puCxHandle, int32_t baud_rate, int32_t flow_control, int32_t change_after_confirm);
 
 /**
  * Reads current UART settings from the module
@@ -112,10 +97,10 @@ int32_t uCxSystemSetUartSettings3(uCxAtClient_t * pAtClient, int32_t baud_rate, 
  * Output AT command:
  * > AT+USYUS?
  *
- * @param[in]  pAtClient:                 AT client
+ * @param[in]  puCxHandle:                uCX API handle
  * @param[out] pSystemGetUartSettingsRsp: Please see \ref uCxSystemGetUartSettings_t
  */
-int32_t uCxBeginSystemGetUartSettings(uCxAtClient_t * pAtClient, uCxSystemGetUartSettings_t * pSystemGetUartSettingsRsp);
+int32_t uCxBeginSystemGetUartSettings(uCxHandle_t * puCxHandle, uCxSystemGetUartSettings_t * pSystemGetUartSettingsRsp);
 
 /**
  * Force start of the boot loader.
@@ -123,11 +108,11 @@ int32_t uCxBeginSystemGetUartSettings(uCxAtClient_t * pAtClient, uCxSystemGetUar
  * Output AT command:
  * > AT+USYFWU=<bootloader_mode>,<baud_rate>
  *
- * @param[in]  pAtClient:       AT client
+ * @param[in]  puCxHandle:      uCX API handle
  * @param      bootloader_mode: 
  * @param      baud_rate:       
  */
-int32_t uCxSystemFirmwareUpdate2(uCxAtClient_t * pAtClient, uBootloaderMode_t bootloader_mode, int32_t baud_rate);
+int32_t uCxSystemFirmwareUpdate2(uCxHandle_t * puCxHandle, uBootloaderMode_t bootloader_mode, int32_t baud_rate);
 
 /**
  * Force start of the boot loader.
@@ -135,12 +120,12 @@ int32_t uCxSystemFirmwareUpdate2(uCxAtClient_t * pAtClient, uBootloaderMode_t bo
  * Output AT command:
  * > AT+USYFWU=<bootloader_mode>,<baud_rate>,<flow_control>
  *
- * @param[in]  pAtClient:       AT client
+ * @param[in]  puCxHandle:      uCX API handle
  * @param      bootloader_mode: 
  * @param      baud_rate:       
  * @param      flow_control:    
  */
-int32_t uCxSystemFirmwareUpdate3(uCxAtClient_t * pAtClient, uBootloaderMode_t bootloader_mode, int32_t baud_rate, int32_t flow_control);
+int32_t uCxSystemFirmwareUpdate3(uCxHandle_t * puCxHandle, uBootloaderMode_t bootloader_mode, int32_t baud_rate, int32_t flow_control);
 
 /**
  * Set echo off
@@ -148,9 +133,9 @@ int32_t uCxSystemFirmwareUpdate3(uCxAtClient_t * pAtClient, uBootloaderMode_t bo
  * Output AT command:
  * > ATE0
  *
- * @param[in]  pAtClient: AT client
+ * @param[in]  puCxHandle: uCX API handle
  */
-int32_t uCxSystemSetEchoOff(uCxAtClient_t * pAtClient);
+int32_t uCxSystemSetEchoOff(uCxHandle_t * puCxHandle);
 
 /**
  * Set echo on
@@ -158,9 +143,9 @@ int32_t uCxSystemSetEchoOff(uCxAtClient_t * pAtClient);
  * Output AT command:
  * > ATE1
  *
- * @param[in]  pAtClient: AT client
+ * @param[in]  puCxHandle: uCX API handle
  */
-int32_t uCxSystemSetEchoOn(uCxAtClient_t * pAtClient);
+int32_t uCxSystemSetEchoOn(uCxHandle_t * puCxHandle);
 
 /**
  * Read current echo setting
@@ -168,10 +153,10 @@ int32_t uCxSystemSetEchoOn(uCxAtClient_t * pAtClient);
  * Output AT command:
  * > ATE?
  *
- * @param[in]  pAtClient: AT client
- * @param[out] pEchoOn:   
+ * @param[in]  puCxHandle: uCX API handle
+ * @param[out] pEchoOn:    
  */
-int32_t uCxBeginSystemGetEcho(uCxAtClient_t * pAtClient, uEchoOn_t * pEchoOn);
+int32_t uCxBeginSystemGetEcho(uCxHandle_t * puCxHandle, uEchoOn_t * pEchoOn);
 
 /**
  * Write escape character. This settings change the decimal value of the escape character used by some modes, such as
@@ -180,10 +165,10 @@ int32_t uCxBeginSystemGetEcho(uCxAtClient_t * pAtClient, uEchoOn_t * pEchoOn);
  * Output AT command:
  * > ATS2=<escape_char>
  *
- * @param[in]  pAtClient:   AT client
+ * @param[in]  puCxHandle:  uCX API handle
  * @param      escape_char: Escape character. Factory default: 43
  */
-int32_t uCxSystemSetEscSequenceChar(uCxAtClient_t * pAtClient, int32_t escape_char);
+int32_t uCxSystemSetEscSequenceChar(uCxHandle_t * puCxHandle, int32_t escape_char);
 
 /**
  * Read escape character
@@ -191,10 +176,10 @@ int32_t uCxSystemSetEscSequenceChar(uCxAtClient_t * pAtClient, int32_t escape_ch
  * Output AT command:
  * > ATS2?
  *
- * @param[in]  pAtClient:   AT client
+ * @param[in]  puCxHandle:  uCX API handle
  * @param[out] pEscapeChar: Escape character. Factory default: 43
  */
-int32_t uCxBeginSystemGetEscSequenceChar(uCxAtClient_t * pAtClient, int32_t * pEscapeChar);
+int32_t uCxBeginSystemGetEscSequenceChar(uCxHandle_t * puCxHandle, int32_t * pEscapeChar);
 
 /**
  * Write line termination character. This setting changes the decimal value of the character recognized by the DCE from the
@@ -208,10 +193,10 @@ int32_t uCxBeginSystemGetEscSequenceChar(uCxAtClient_t * pAtClient, int32_t * pE
  * Output AT command:
  * > ATS3=<line_term>
  *
- * @param[in]  pAtClient: AT client
- * @param      line_term: Command line termination character. Factory default: 13
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      line_term:  Command line termination character. Factory default: 13
  */
-int32_t uCxSystemSetLineTermChar(uCxAtClient_t * pAtClient, int32_t line_term);
+int32_t uCxSystemSetLineTermChar(uCxHandle_t * puCxHandle, int32_t line_term);
 
 /**
  * Read line termination character
@@ -219,10 +204,10 @@ int32_t uCxSystemSetLineTermChar(uCxAtClient_t * pAtClient, int32_t line_term);
  * Output AT command:
  * > ATS3?
  *
- * @param[in]  pAtClient: AT client
- * @param[out] pLineTerm: Command line termination character. Factory default: 13
+ * @param[in]  puCxHandle: uCX API handle
+ * @param[out] pLineTerm:  Command line termination character. Factory default: 13
  */
-int32_t uCxBeginSystemGetLineTermChar(uCxAtClient_t * pAtClient, int32_t * pLineTerm);
+int32_t uCxBeginSystemGetLineTermChar(uCxHandle_t * puCxHandle, int32_t * pLineTerm);
 
 /**
  * Write response format character. This setting changes the decimal value of the character generated by the DCE as part of
@@ -232,10 +217,10 @@ int32_t uCxBeginSystemGetLineTermChar(uCxAtClient_t * pAtClient, int32_t * pLine
  * Output AT command:
  * > ATS4=<resp_format>
  *
- * @param[in]  pAtClient:   AT client
+ * @param[in]  puCxHandle:  uCX API handle
  * @param      resp_format: Response format character. Factory default: 10
  */
-int32_t uCxSystemSetRspFormatChar(uCxAtClient_t * pAtClient, int32_t resp_format);
+int32_t uCxSystemSetRspFormatChar(uCxHandle_t * puCxHandle, int32_t resp_format);
 
 /**
  * Read response format character
@@ -243,10 +228,10 @@ int32_t uCxSystemSetRspFormatChar(uCxAtClient_t * pAtClient, int32_t resp_format
  * Output AT command:
  * > ATS4?
  *
- * @param[in]  pAtClient:   AT client
+ * @param[in]  puCxHandle:  uCX API handle
  * @param[out] pRespFormat: Response format character. Factory default: 10
  */
-int32_t uCxBeginSystemGetRspFormatChar(uCxAtClient_t * pAtClient, int32_t * pRespFormat);
+int32_t uCxBeginSystemGetRspFormatChar(uCxHandle_t * puCxHandle, int32_t * pRespFormat);
 
 /**
  * Writes backspace character. This setting changes the decimal value of the character recognized by the DCE as a request
@@ -255,10 +240,10 @@ int32_t uCxBeginSystemGetRspFormatChar(uCxAtClient_t * pAtClient, int32_t * pRes
  * Output AT command:
  * > ATS5=<backspace>
  *
- * @param[in]  pAtClient: AT client
- * @param      backspace: Backspace character. Factory default: 8
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      backspace:  Backspace character. Factory default: 8
  */
-int32_t uCxSystemSetBackspaceChar(uCxAtClient_t * pAtClient, int32_t backspace);
+int32_t uCxSystemSetBackspaceChar(uCxHandle_t * puCxHandle, int32_t backspace);
 
 /**
  * Read backspace character
@@ -266,10 +251,10 @@ int32_t uCxSystemSetBackspaceChar(uCxAtClient_t * pAtClient, int32_t backspace);
  * Output AT command:
  * > ATS5?
  *
- * @param[in]  pAtClient:  AT client
+ * @param[in]  puCxHandle: uCX API handle
  * @param[out] pBackspace: Backspace character. Factory default: 8
  */
-int32_t uCxBeginSystemGetBackspaceChar(uCxAtClient_t * pAtClient, int32_t * pBackspace);
+int32_t uCxBeginSystemGetBackspaceChar(uCxHandle_t * puCxHandle, int32_t * pBackspace);
 
 /**
  * Configures the transparent mode escape sequence settings.
@@ -277,14 +262,14 @@ int32_t uCxBeginSystemGetBackspaceChar(uCxAtClient_t * pAtClient, int32_t * pBac
  * Output AT command:
  * > AT+UTMES=<pre_timeout>,<post_timeout>,<escape_timeout>
  *
- * @param[in]  pAtClient:      AT client
+ * @param[in]  puCxHandle:     uCX API handle
  * @param      pre_timeout:    Minimum time (ms) of no data activity required before the escape sequence is sent. Factory
  *                             default: 1000
  * @param      post_timeout:   Minimum time (ms) of no data activity required after the escape sequence is sent. Factory
  *                             default: 1000
  * @param      escape_timeout: Maximum time interval (ms) between escape characters. Factory default: 200
  */
-int32_t uCxSystemSetEscSequenceSettings(uCxAtClient_t * pAtClient, int32_t pre_timeout, int32_t post_timeout, int32_t escape_timeout);
+int32_t uCxSystemSetEscSequenceSettings(uCxHandle_t * puCxHandle, int32_t pre_timeout, int32_t post_timeout, int32_t escape_timeout);
 
 /**
  * Reads current transparent mode escape sequence settings.
@@ -292,10 +277,10 @@ int32_t uCxSystemSetEscSequenceSettings(uCxAtClient_t * pAtClient, int32_t pre_t
  * Output AT command:
  * > AT+UTMES?
  *
- * @param[in]  pAtClient:                        AT client
+ * @param[in]  puCxHandle:                       uCX API handle
  * @param[out] pSystemGetEscSequenceSettingsRsp: Please see \ref uCxSystemGetEscSequenceSettings_t
  */
-int32_t uCxBeginSystemGetEscSequenceSettings(uCxAtClient_t * pAtClient, uCxSystemGetEscSequenceSettings_t * pSystemGetEscSequenceSettingsRsp);
+int32_t uCxBeginSystemGetEscSequenceSettings(uCxHandle_t * puCxHandle, uCxSystemGetEscSequenceSettings_t * pSystemGetEscSequenceSettingsRsp);
 
 
 #ifdef __cplusplus
