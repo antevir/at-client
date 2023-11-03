@@ -1,5 +1,5 @@
 /** @file
- * @brief Short description of the purpose of the file
+ * @brief AT string utilities
  */
 
 #include <stdlib.h>
@@ -35,7 +35,7 @@ static inline char nibbleToHex(uint8_t nibble)
 }
 
 
-static inline int hexToNibble(char hexChar)
+static inline int32_t hexToNibble(char hexChar)
 {
     if ((hexChar >= '0') && (hexChar <= '9')) {
         return hexChar - '0';
@@ -59,10 +59,10 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr)
     pOutPtr[1] = nibbleToHex(byte & 0xF);
 }
 
-int uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
+int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
 {
-    int highNibble = hexToNibble(pHex[0]);
-    int lowNibble = hexToNibble(pHex[1]);
+    int32_t highNibble = hexToNibble(pHex[0]);
+    int32_t lowNibble = hexToNibble(pHex[1]);
     if ((highNibble < 0) || (lowNibble < 0)) {
         return -1;
     }
@@ -93,21 +93,22 @@ char *uCxAtUtilFindParamEnd(char *pStr)
         pIter++;
     }
 
-    if (insideString || escape || (pIter == pStr)) {
+    if (insideString || escape) {
         return NULL;
     }
 
     return pIter;
 }
 
-int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
+int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list args)
 {
     const char *pFmtCh = pParamFmt;
     char *pParam = pParams;
     bool last = false;
-    int ret = 0;
+    int32_t ret = 0;
 
     while (*pFmtCh != 0) {
+        ret++;
         char *pParamEnd = uCxAtUtilFindParamEnd(pParam);
         if (pParamEnd == NULL) {
             return -ret;
@@ -120,14 +121,19 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
 
         switch (*pFmtCh) {
             case 'd': {
-                int *pI = va_arg(args, int *);
-                ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
-                *pI = atoi(pParam);
+                char * pEnd;
+                int32_t *pI = va_arg(args, int32_t *);
+                U_CX_AT_PORT_ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
+                *pI = strtol(pParam, &pEnd, 10);
+                if (!isdigit(*pParam) || (*pEnd != 0)) {
+                    // Not a valid integer
+                    return -ret;
+                }
             }
             break;
             case 's': {
                 char **ppStr = va_arg(args, char **);
-                ASSERT(ppStr != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(ppStr != U_CX_AT_UTIL_PARAM_LAST);
                 if (*pParam == '"') {
                     pParam++;
                     pParamEnd[-1] = 0;
@@ -136,19 +142,19 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
             }
             break;
             case 'b': {
-                int *pLen = va_arg(args, int *);
+                int32_t *pLen = va_arg(args, int32_t *);
                 uint8_t **ppData = va_arg(args, uint8_t **);
                 uint8_t *pBytes;
                 size_t len = strlen(pParam);
-                ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
-                ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
+                U_CX_AT_PORT_ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
                 if ((len % 2) != 0) {
                     return -ret;
                 }
                 *pLen = len / 2;
                 pBytes = (uint8_t *)pParam;
                 *ppData = pBytes;
-                for (int i = 0; i < *pLen; i++) {
+                for (int32_t i = 0; i < *pLen; i++) {
                     if (uCxAtUtilHexToByte(&pParam[i * 2], pBytes) < 0) {
                         return -ret;
                     }
@@ -157,7 +163,6 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
             }
             break;
         }
-        ret++;
         if (last) {
             break;
         }
@@ -168,12 +173,12 @@ int uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list arg
     return ret;
 }
 
-int uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...)
+int32_t uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...)
 {
     va_list args;
 
     va_start(args, pParamFmt);
-    int ret = uCxAtUtilParseParamsVaList(pParams, pParamFmt, args);
+    int32_t ret = uCxAtUtilParseParamsVaList(pParams, pParamFmt, args);
     va_end(args);
 
     return ret;

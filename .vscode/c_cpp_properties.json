@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/inc/**",
                 "${workspaceFolder}/ucx_api/**",
-                "${env:UBXLIB_DIR}/**"
+                "${env:UBXLIB_DIR}/**",
+                "/var/lib/gems/*/gems/ceedling-*/vendor/cmock/vendor/unity/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

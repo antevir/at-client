@@ -4,32 +4,44 @@
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
 
-int32_t uCxAtRead(struct uCxAtClient *pClient, void *pData, size_t length)
+static int32_t uCxAtRead(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length)
 {
     (void)pClient;
+    (void)pStreamHandle;
     return (int32_t)fread(pData, 1, length, stdin);
 }
 
-int32_t uCxAtWrite(struct uCxAtClient *pClient, const void *pData, size_t length)
+static int32_t uCxAtWrite(uCxAtClient_t *pClient, void *pStreamHandle, const void *pData, size_t length)
 {
     (void)pClient;
+    (void)pStreamHandle;
     return (int32_t)fwrite(pData, 1, length, stdout);
 }
 
-void myUrc(char *pUrcLine)
+void myUrc(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength)
 {
-    printf("Got URC: %s\n", pUrcLine);
+    printf("Got URC: %s\n", pLine);
 }
 
 int main(void)
 {
     uCxAtClient_t client;
 
-    char rxBuf[1024];
+    static char rxBuf[1024];
+    static char urcBuf[1024];
+    static const uCxAtClientConfig_t config = {
+        .pRxBuffer = &rxBuf[0],
+        .rxBufferLen = sizeof(rxBuf),
+        .pUrcBuffer = &urcBuf[0],
+        .urcBufferLen = sizeof(urcBuf),
+        .pStreamHandle = NULL,
+        .write = uCxAtWrite,
+        .read = uCxAtRead
+    };
 
-    uCxAtClientInit(NULL, rxBuf, sizeof(rxBuf), &client);
+    uCxAtClientInit(&config, &client);
+    uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
-    client.urcCallback = myUrc;
     for (int i = 0; i < 3; i++) {
         uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
         char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");
