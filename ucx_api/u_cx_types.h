@@ -38,6 +38,36 @@ typedef enum
 
 typedef enum
 {
+    U_WPA_THRESHOLD_WPA2,    /**< Only connect to access points that support WPA2 or up */
+    U_WPA_THRESHOLD_WPA3 = 1 /**< Only connect to access points that support WPA3 */
+} uWpaThreshold_t;
+
+typedef enum
+{
+    U_CHANNEL1 = 1,   /**< 1 */
+    U_CHANNEL2 = 2,   /**< 2 */
+    U_CHANNEL3 = 3,   /**< 3 */
+    U_CHANNEL4 = 4,   /**< 4 */
+    U_CHANNEL5 = 5,   /**< 5 */
+    U_CHANNEL6 = 6,   /**< 6 */
+    U_CHANNEL7 = 7,   /**< 7 */
+    U_CHANNEL8 = 8,   /**< 8 */
+    U_CHANNEL9 = 9,   /**< 9 */
+    U_CHANNEL10 = 10, /**< 10 */
+    U_CHANNEL11 = 11, /**< 11 */
+    U_CHANNEL36 = 36, /**< 36 */
+    U_CHANNEL40 = 40, /**< 40 */
+    U_CHANNEL44 = 44, /**< 44 */
+    U_CHANNEL48 = 48  /**< 48 */
+} uChannel_t;
+
+typedef enum
+{
+    U_WPA_VERSION_WPA2 /**< WPA 2 */
+} uWpaVersion_t;
+
+typedef enum
+{
     U_PING_RESPONSE_FALSE,   /**< Ping failed. */
     U_PING_RESPONSE_TRUE = 1 /**< Ping succeeded. */
 } uPingResponse_t;
