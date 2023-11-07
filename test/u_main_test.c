@@ -3,6 +3,8 @@
 
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
+#include "u_cx.h"
+#include "u_cx_urc.h"
 
 static int32_t uCxAtRead(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length)
 {
@@ -23,9 +25,20 @@ void myUrc(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLeng
     printf("Got URC: %s\n", pLine);
 }
 
+void callbackUEDGP(struct uCxHandle *puCxHandle, uPingResponse_t ping_response, int32_t response_time)
+{
+    printf("callbackUEDGP: %d, %d\n", ping_response, response_time);
+}
+
+void networkUpUrc(struct uCxHandle *puCxHandle)
+{
+    printf("networkUpUrc\n");
+}
+
 int main(void)
 {
     uCxAtClient_t client;
+    uCxHandle_t ucxHandle;
 
     static char rxBuf[1024];
     static char urcBuf[1024];
@@ -40,6 +53,11 @@ int main(void)
     };
 
     uCxAtClientInit(&config, &client);
+    uCxInit(&client, &ucxHandle);
+    uCxUrcRegisterWiFiStationNetworkUp(&ucxHandle, networkUpUrc);
+    ucxHandle.callbacks.UEDGP = callbackUEDGP;
+
+    uCxAtClientHandleRx(&client);
     uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
     for (int i = 0; i < 3; i++) {

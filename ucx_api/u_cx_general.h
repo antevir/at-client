@@ -15,15 +15,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "u_cx_at_client.h"
+#include "u_cx_types.h"
+#include "u_cx.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-/* ------------------------------------------------------------
- * ENUMERATORS
- * ---------------------------------------------------------- */
 
 /* ------------------------------------------------------------
  * RESPONSE STRUCTS
@@ -39,9 +36,9 @@ extern "C" {
  * Output AT command:
  * > AT
  *
- * @param[in]  pAtClient: AT client
+ * @param[in]  puCxHandle: uCX API handle
  */
-int32_t uCxGeneralAttention(uCxAtClient_t * pAtClient);
+int32_t uCxGeneralAttention(uCxHandle_t * puCxHandle);
 
 /**
  * Read manufacturer text string.
@@ -49,10 +46,10 @@ int32_t uCxGeneralAttention(uCxAtClient_t * pAtClient);
  * Output AT command:
  * > AT+GMI
  *
- * @param[in]  pAtClient:     AT client
+ * @param[in]  puCxHandle:    uCX API handle
  * @param[out] pManufacturer: Manufacturer ("u-blox").
  */
-int32_t uCxBeginGeneralGetManufacturerIdentification(uCxAtClient_t * pAtClient, const char * * pManufacturer);
+int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char * * pManufacturer);
 
 /**
  * Read device model.
@@ -60,10 +57,10 @@ int32_t uCxBeginGeneralGetManufacturerIdentification(uCxAtClient_t * pAtClient, 
  * Output AT command:
  * > AT+GMM
  *
- * @param[in]  pAtClient:    AT client
+ * @param[in]  puCxHandle:   uCX API handle
  * @param[out] pDeviceModel: Device model
  */
-int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxAtClient_t * pAtClient, const char * * pDeviceModel);
+int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char * * pDeviceModel);
 
 /**
  * Read software version.
@@ -71,10 +68,10 @@ int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxAtClient_t * pAtClient, c
  * Output AT command:
  * > AT+GMR
  *
- * @param[in]  pAtClient: AT client
- * @param[out] pVersion:  Version.
+ * @param[in]  puCxHandle: uCX API handle
+ * @param[out] pVersion:   Version.
  */
-int32_t uCxBeginGeneralGetSoftwareVersion(uCxAtClient_t * pAtClient, const char * * pVersion);
+int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char * * pVersion);
 
 /**
  * Read serial number.
@@ -82,10 +79,10 @@ int32_t uCxBeginGeneralGetSoftwareVersion(uCxAtClient_t * pAtClient, const char 
  * Output AT command:
  * > AT+GSN
  *
- * @param[in]  pAtClient:     AT client
+ * @param[in]  puCxHandle:    uCX API handle
  * @param[out] pSerialNumber: Serial number.
  */
-int32_t uCxBeginGeneralGetSerialNumber(uCxAtClient_t * pAtClient, const char * * pSerialNumber);
+int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char * * pSerialNumber);
 
 
 #ifdef __cplusplus

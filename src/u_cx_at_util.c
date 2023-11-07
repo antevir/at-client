@@ -57,6 +57,7 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr)
 {
     pOutPtr[0] = nibbleToHex(byte >> 4);
     pOutPtr[1] = nibbleToHex(byte & 0xF);
+    pOutPtr[2] = 0;
 }
 
 int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
