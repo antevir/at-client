@@ -560,3 +560,18 @@ void uCxUrcRegisterWiFiApDown(struct uCxHandle * puCxHandle, uUEWAPD_t callback)
     puCxHandle->callbacks.UEWAPD = callback;
 }
 
+void uCxUrcRegisterSocketConnect(struct uCxHandle * puCxHandle, uUESOC_t callback)
+{
+    puCxHandle->callbacks.UESOC = callback;
+}
+
+void uCxUrcRegisterSocketDataAvailable(struct uCxHandle * puCxHandle, uUESODA_t callback)
+{
+    puCxHandle->callbacks.UESODA = callback;
+}
+
+void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callback)
+{
+    puCxHandle->callbacks.UESOCL = callback;
+}
+

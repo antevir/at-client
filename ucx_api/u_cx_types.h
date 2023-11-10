@@ -68,6 +68,64 @@ typedef enum
 
 typedef enum
 {
+    U_PROTOCOL_TCP = 6, /**< TCP */
+    U_PROTOCOL_UDP = 17 /**< UDP */
+} uProtocol_t;
+
+typedef enum
+{
+    U_PREFERRED_PROTOCOL_TYPE_IP_V4,    /**< IPv4 address. */
+    U_PREFERRED_PROTOCOL_TYPE_IP_V6 = 1 /**< IPv6 address. */
+} uPreferredProtocolType_t;
+
+typedef enum
+{
+    U_READ_MODE_BUFFERED,          /**< Buffered mode */
+    U_READ_MODE_DIRECT_STRING = 1, /**< Direct String mode */
+    U_READ_MODE_DIRECT_BINARY = 2  /**< Direct Binary Mode */
+} uReadMode_t;
+
+typedef enum
+{
+    U_SOCKET_STATUS_NOT_CONNECTED, /**< Not Connected */
+    U_SOCKET_STATUS_LISTENING = 1, /**< Listening */
+    U_SOCKET_STATUS_CONNECTED = 2  /**< Connected */
+} uSocketStatus_t;
+
+typedef enum
+{
+    U_OPTION_NO_DELAY,       /**< Turn on/off No delay feature for TCP sockets.
+                                  Integer flag: 0 = off (i.e. Nagle algorithm enabled), 1 = on  (i.e. Nagle algorithm
+                                  disabled)
+                                  Default: to 1
+                                  Note: This will make no difference if applied to UDP sockets. */
+    U_OPTION_BLOCK = 1,      /**< Set socket to be blocking or non blocking.
+                                  Integer flag: 0 = off, 1 = on.
+                                  Sockets are non-blocking by default (Note that read/write will always be non-blocking).
+                                  Can only be set while the socket is in a non connected state.
+                                  Note: Only valid for TCP sockets, will have no effect on UDP sockets */
+    U_OPTION_KEEP_ALIVE = 2, /**< Keep connections alive by sending keepalive probes.
+                                  Integer flag: 0 = off, 1 = on.
+                                  To calculate the keepalive time us this formula KeepIdle + (KeepIntvl * KeepCnt).
+                                  Defaults to 1.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_IDLE = 3,  /**< Set Keep Idle value for the socket.
+                                  This specifies the amount of time (in sec) that the connection must be idle before sending
+                                  keepalive probes (if keepalive is enabled).
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_INTVL = 4, /**< Set keep alive interval value for the socket. This is the time in seconds between two
+                                  successive keepalive retransmissions.
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_CNT = 5    /**< Set keep alive counter value for the socket.
+                                  The number of unanswered probes required to force closure of the socket.
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+} uOption_t;
+
+typedef enum
+{
     U_PING_RESPONSE_FALSE,   /**< Ping failed. */
     U_PING_RESPONSE_TRUE = 1 /**< Ping succeeded. */
 } uPingResponse_t;
