@@ -126,6 +126,13 @@ typedef enum
 
 typedef enum
 {
+    U_OPTIONS_WRITE_WITH_OUT_RESPONSE, /**< Write without Response performed */
+    U_OPTIONS_WRITE_WITH_RESPONSE = 1, /**< Write with Response performed */
+    U_OPTIONS_WRITE_LONG = 2           /**< Write long performed */
+} uOptions_t;
+
+typedef enum
+{
     U_PING_RESPONSE_FALSE,   /**< Ping failed. */
     U_PING_RESPONSE_TRUE = 1 /**< Ping succeeded. */
 } uPingResponse_t;
@@ -137,6 +144,9 @@ typedef enum
 struct uCxHandle;
 typedef void (*uUEBTDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUEBTPHYU_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t phy_status, int32_t tx_phy, int32_t rx_phy);
+typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
+typedef void (*uUEBTGCI_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
+typedef void (*uUEBTGCW_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * value, uOptions_t options);
 typedef void (*uUEBTGRR_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle);
 typedef void (*uUEBTGIC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t char_handle);
 typedef void (*uUESPSC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
@@ -144,6 +154,7 @@ typedef void (*uUESPSDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDS_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, const char * string_data);
 typedef void (*uUESPSDB_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDA_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t number_bytes);
+typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, const char * bssid, int32_t channel);
 typedef void (*uUEWLD_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, int32_t reason);
 typedef void (*uUEWSNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWSND_t)(struct uCxHandle *puCxHandle);
@@ -151,6 +162,8 @@ typedef void (*uUEWAPNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPND_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPD_t)(struct uCxHandle *puCxHandle);
+typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, const char * mac);
+typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, const char * mac);
 typedef void (*uUESOC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
 typedef void (*uUESODA_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, int32_t number_bytes);
 typedef void (*uUESODS_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, const char * string_data);
@@ -170,6 +183,9 @@ typedef struct
 {
     uUEBTDC_t UEBTDC;
     uUEBTPHYU_t UEBTPHYU;
+    uUEBTGCN_t UEBTGCN;
+    uUEBTGCI_t UEBTGCI;
+    uUEBTGCW_t UEBTGCW;
     uUEBTGRR_t UEBTGRR;
     uUEBTGIC_t UEBTGIC;
     uUESPSC_t UESPSC;
@@ -177,6 +193,7 @@ typedef struct
     uUESPSDS_t UESPSDS;
     uUESPSDB_t UESPSDB;
     uUESPSDA_t UESPSDA;
+    uUEWLU_t UEWLU;
     uUEWLD_t UEWLD;
     uUEWSNU_t UEWSNU;
     uUEWSND_t UEWSND;
@@ -184,6 +201,8 @@ typedef struct
     uUEWAPND_t UEWAPND;
     uUEWAPU_t UEWAPU;
     uUEWAPD_t UEWAPD;
+    uUEWAPSA_t UEWAPSA;
+    uUEWAPSDA_t UEWAPSDA;
     uUESOC_t UESOC;
     uUESODA_t UESODA;
     uUESODS_t UESODS;

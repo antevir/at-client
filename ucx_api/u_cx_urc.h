@@ -25,6 +25,8 @@ extern "C" {
 
 int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pParams, size_t paramsLength);
 
+void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback);
+
 void uCxUrcRegisterWiFiLinkDown(struct uCxHandle * puCxHandle, uUEWLD_t callback);
 
 void uCxUrcRegisterWiFiStationNetworkUp(struct uCxHandle * puCxHandle, uUEWSNU_t callback);

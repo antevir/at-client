@@ -75,20 +75,42 @@ static int32_t parseUEBTPHYU(uCxHandle_t * puCxHandle, char * pParams, size_t pa
 
 static int32_t parseUEBTGCN(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t conn_handle;
+    int32_t value_handle;
+    const char * hex_data;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "dds", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTGCN) {
+        puCxHandle->callbacks.UEBTGCN(puCxHandle, conn_handle, value_handle, hex_data);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTGCI(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t conn_handle;
+    int32_t value_handle;
+    const char * hex_data;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "dds", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTGCI) {
+        puCxHandle->callbacks.UEBTGCI(puCxHandle, conn_handle, value_handle, hex_data);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTGCW(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t conn_handle;
+    int32_t value_handle;
+    const char * value;
+    uOptions_t options;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "ddsd", &conn_handle, &value_handle, &value, &options, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTGCW) {
+        puCxHandle->callbacks.UEBTGCW(puCxHandle, conn_handle, value_handle, value, options);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTGRR(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -174,8 +196,15 @@ static int32_t parseUESPSDA(uCxHandle_t * puCxHandle, char * pParams, size_t par
 
 static int32_t parseUEWLU(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t wlan_handle;
+    const char * bssid;
+    int32_t channel;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "dsd", &wlan_handle, &bssid, &channel, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEWLU) {
+        puCxHandle->callbacks.UEWLU(puCxHandle, wlan_handle, bssid, channel);
+    }
+    return ret;
 }
 
 static int32_t parseUEWLD(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -252,14 +281,24 @@ static int32_t parseUEWAPD(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUEWAPSA(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    const char * mac;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "s", &mac, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEWAPSA) {
+        puCxHandle->callbacks.UEWAPSA(puCxHandle, mac);
+    }
+    return ret;
 }
 
 static int32_t parseUEWAPSDA(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    const char * mac;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "s", &mac, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEWAPSDA) {
+        puCxHandle->callbacks.UEWAPSDA(puCxHandle, mac);
+    }
+    return ret;
 }
 
 static int32_t parseUESOC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -523,6 +562,11 @@ int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pPar
     if (strcmp(pUrcName, "+UEDGP") == 0) {
         return parseUEDGP(puCxHandle, pParams, paramsLength);
     }
+}
+
+void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback)
+{
+    puCxHandle->callbacks.UEWLU = callback;
 }
 
 void uCxUrcRegisterWiFiLinkDown(struct uCxHandle * puCxHandle, uUEWLD_t callback)
