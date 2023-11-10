@@ -18,13 +18,14 @@
 
 struct uCxAtClient;
 
-typedef void (*uUrcCallback_t)(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength);
+typedef void (*uUrcCallback_t)(struct uCxAtClient *pClient, void *pTag, char *pLine,
+                               size_t lineLength);
 
 typedef struct uCxAtClient {
     const struct uCxAtClientConfig *pConfig;
     size_t rxBufferPos;
     size_t urcBufferPos;
-    bool executingCmd;
+    volatile bool executingCmd;
     const char *pExpectedRsp;
     size_t pExpectedRspLen;
     char *pRspParams;
@@ -50,7 +51,10 @@ typedef struct uCxAtClientConfig {
     /* Callback for reading from the AT interface (typically a UART)
      * The function should return the number of actual bytes read or negative number on error.
      */
-    int32_t (*read)(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length);
+    int32_t (*read)(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length,
+                    int32_t timeoutMs);
+    int32_t timeoutMs;
+    void *pContext;
 } uCxAtClientConfig_t;
 
 /* ----------------------------------------------------------------

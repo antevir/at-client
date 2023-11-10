@@ -29,6 +29,7 @@ enum uCxAtParserCode {
     AT_PARSER_NOP = 0,
     AT_PARSER_GOT_STATUS,
     AT_PARSER_GOT_RSP,
+    AT_PARSER_ERROR
 };
 
 /* ----------------------------------------------------------------
@@ -138,14 +139,18 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     int32_t readStatus;
     char ch;
 
-    while ((readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle, &ch, 1)) == 1) {
+    while ((readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle, &ch, 1,
+                                                pClient->pConfig->timeoutMs)) == 1) {
         ret = parseIncomingChar(pClient, ch);
         if (ret != AT_PARSER_NOP) {
             break;
         }
     }
-
-    return (readStatus < 0 ? readStatus : ret);
+    if (readStatus < 0) {
+        ret = readStatus;
+        pClient->status = AT_PARSER_ERROR;
+    }
+    return ret;
 }
 
 static void handleDeferredUrc(uCxAtClient_t *pClient)
@@ -305,7 +310,10 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
 {
     va_list args;
     char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
-
+    if (pRspParams == NULL) {
+        pClient->executingCmd = false;
+        return -1;
+    }
     va_start(args, pParamFmt);
     int32_t ret = uCxAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
     va_end(args);
