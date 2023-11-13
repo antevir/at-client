@@ -25,6 +25,8 @@ extern "C" {
 
 int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pParams, size_t paramsLength);
 
+void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback);
+
 void uCxUrcRegisterWiFiLinkDown(struct uCxHandle * puCxHandle, uUEWLD_t callback);
 
 void uCxUrcRegisterWiFiStationNetworkUp(struct uCxHandle * puCxHandle, uUEWSNU_t callback);
@@ -38,6 +40,12 @@ void uCxUrcRegisterWiFiApNetworkDown(struct uCxHandle * puCxHandle, uUEWAPND_t c
 void uCxUrcRegisterWiFiApUp(struct uCxHandle * puCxHandle, uUEWAPU_t callback);
 
 void uCxUrcRegisterWiFiApDown(struct uCxHandle * puCxHandle, uUEWAPD_t callback);
+
+void uCxUrcRegisterSocketConnect(struct uCxHandle * puCxHandle, uUESOC_t callback);
+
+void uCxUrcRegisterSocketDataAvailable(struct uCxHandle * puCxHandle, uUESODA_t callback);
+
+void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callback);
 
 #ifdef __cplusplus
 }

@@ -68,6 +68,71 @@ typedef enum
 
 typedef enum
 {
+    U_PROTOCOL_TCP = 6, /**< TCP */
+    U_PROTOCOL_UDP = 17 /**< UDP */
+} uProtocol_t;
+
+typedef enum
+{
+    U_PREFERRED_PROTOCOL_TYPE_IP_V4,    /**< IPv4 address. */
+    U_PREFERRED_PROTOCOL_TYPE_IP_V6 = 1 /**< IPv6 address. */
+} uPreferredProtocolType_t;
+
+typedef enum
+{
+    U_READ_MODE_BUFFERED,          /**< Buffered mode */
+    U_READ_MODE_DIRECT_STRING = 1, /**< Direct String mode */
+    U_READ_MODE_DIRECT_BINARY = 2  /**< Direct Binary Mode */
+} uReadMode_t;
+
+typedef enum
+{
+    U_SOCKET_STATUS_NOT_CONNECTED, /**< Not Connected */
+    U_SOCKET_STATUS_LISTENING = 1, /**< Listening */
+    U_SOCKET_STATUS_CONNECTED = 2  /**< Connected */
+} uSocketStatus_t;
+
+typedef enum
+{
+    U_OPTION_NO_DELAY,       /**< Turn on/off No delay feature for TCP sockets.
+                                  Integer flag: 0 = off (i.e. Nagle algorithm enabled), 1 = on  (i.e. Nagle algorithm
+                                  disabled)
+                                  Default: to 1
+                                  Note: This will make no difference if applied to UDP sockets. */
+    U_OPTION_BLOCK = 1,      /**< Set socket to be blocking or non blocking.
+                                  Integer flag: 0 = off, 1 = on.
+                                  Sockets are non-blocking by default (Note that read/write will always be non-blocking).
+                                  Can only be set while the socket is in a non connected state.
+                                  Note: Only valid for TCP sockets, will have no effect on UDP sockets */
+    U_OPTION_KEEP_ALIVE = 2, /**< Keep connections alive by sending keepalive probes.
+                                  Integer flag: 0 = off, 1 = on.
+                                  To calculate the keepalive time us this formula KeepIdle + (KeepIntvl * KeepCnt).
+                                  Defaults to 1.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_IDLE = 3,  /**< Set Keep Idle value for the socket.
+                                  This specifies the amount of time (in sec) that the connection must be idle before sending
+                                  keepalive probes (if keepalive is enabled).
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_INTVL = 4, /**< Set keep alive interval value for the socket. This is the time in seconds between two
+                                  successive keepalive retransmissions.
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+    U_OPTION_KEEP_CNT = 5    /**< Set keep alive counter value for the socket.
+                                  The number of unanswered probes required to force closure of the socket.
+                                  Defaults to 3.
+                                  Note: Only valid for TCP sockets. */
+} uOption_t;
+
+typedef enum
+{
+    U_OPTIONS_WRITE_WITH_OUT_RESPONSE, /**< Write without Response performed */
+    U_OPTIONS_WRITE_WITH_RESPONSE = 1, /**< Write with Response performed */
+    U_OPTIONS_WRITE_LONG = 2           /**< Write long performed */
+} uOptions_t;
+
+typedef enum
+{
     U_PING_RESPONSE_FALSE,   /**< Ping failed. */
     U_PING_RESPONSE_TRUE = 1 /**< Ping succeeded. */
 } uPingResponse_t;
@@ -79,6 +144,9 @@ typedef enum
 struct uCxHandle;
 typedef void (*uUEBTDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUEBTPHYU_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t phy_status, int32_t tx_phy, int32_t rx_phy);
+typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
+typedef void (*uUEBTGCI_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
+typedef void (*uUEBTGCW_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * value, uOptions_t options);
 typedef void (*uUEBTGRR_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle);
 typedef void (*uUEBTGIC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t char_handle);
 typedef void (*uUESPSC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
@@ -86,6 +154,7 @@ typedef void (*uUESPSDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDS_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, const char * string_data);
 typedef void (*uUESPSDB_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDA_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t number_bytes);
+typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, const char * bssid, int32_t channel);
 typedef void (*uUEWLD_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, int32_t reason);
 typedef void (*uUEWSNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWSND_t)(struct uCxHandle *puCxHandle);
@@ -93,6 +162,8 @@ typedef void (*uUEWAPNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPND_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPD_t)(struct uCxHandle *puCxHandle);
+typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, const char * mac);
+typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, const char * mac);
 typedef void (*uUESOC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
 typedef void (*uUESODA_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, int32_t number_bytes);
 typedef void (*uUESODS_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, const char * string_data);
@@ -112,6 +183,9 @@ typedef struct
 {
     uUEBTDC_t UEBTDC;
     uUEBTPHYU_t UEBTPHYU;
+    uUEBTGCN_t UEBTGCN;
+    uUEBTGCI_t UEBTGCI;
+    uUEBTGCW_t UEBTGCW;
     uUEBTGRR_t UEBTGRR;
     uUEBTGIC_t UEBTGIC;
     uUESPSC_t UESPSC;
@@ -119,6 +193,7 @@ typedef struct
     uUESPSDS_t UESPSDS;
     uUESPSDB_t UESPSDB;
     uUESPSDA_t UESPSDA;
+    uUEWLU_t UEWLU;
     uUEWLD_t UEWLD;
     uUEWSNU_t UEWSNU;
     uUEWSND_t UEWSND;
@@ -126,6 +201,8 @@ typedef struct
     uUEWAPND_t UEWAPND;
     uUEWAPU_t UEWAPU;
     uUEWAPD_t UEWAPD;
+    uUEWAPSA_t UEWAPSA;
+    uUEWAPSDA_t UEWAPSDA;
     uUESOC_t UESOC;
     uUESODA_t UESODA;
     uUESODS_t UESODS;

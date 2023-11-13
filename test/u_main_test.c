@@ -6,10 +6,11 @@
 #include "u_cx.h"
 #include "u_cx_urc.h"
 
-static int32_t uCxAtRead(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length)
+static int32_t uCxAtRead(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length, int32_t timeoutMs)
 {
     (void)pClient;
     (void)pStreamHandle;
+    (void)timeoutMs;
     return (int32_t)fread(pData, 1, length, stdin);
 }
 
