@@ -562,6 +562,7 @@ int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pPar
     if (strcmp(pUrcName, "+UEDGP") == 0) {
         return parseUEDGP(puCxHandle, pParams, paramsLength);
     }
+    return -1;
 }
 
 void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback)

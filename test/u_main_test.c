@@ -1,10 +1,13 @@
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "u_cx_at_client.h"
 #include "u_cx_at_util.h"
 #include "u_cx.h"
 #include "u_cx_urc.h"
+
+static uint64_t gBootTime;
 
 static int32_t uCxAtRead(uCxAtClient_t *pClient, void *pStreamHandle, void *pData, size_t length, int32_t timeoutMs)
 {
@@ -36,6 +39,20 @@ void networkUpUrc(struct uCxHandle *puCxHandle)
     printf("networkUpUrc\n");
 }
 
+static uint64_t getTickTimeMs(void)
+{
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &time);
+    uint64_t timeMs = (time.tv_sec * 1000) + (time.tv_nsec / (1000 * 1000));
+    return timeMs;
+}
+
+uint64_t uPortGetTickTimeMs(void)
+{
+    uint64_t timeMs = getTickTimeMs() - gBootTime;
+    return timeMs;
+}
+
 int main(void)
 {
     uCxAtClient_t client;
@@ -53,12 +70,14 @@ int main(void)
         .read = uCxAtRead
     };
 
+    gBootTime = getTickTimeMs();
+
     uCxAtClientInit(&config, &client);
     uCxInit(&client, &ucxHandle);
     uCxUrcRegisterWiFiStationNetworkUp(&ucxHandle, networkUpUrc);
     ucxHandle.callbacks.UEDGP = callbackUEDGP;
 
-    uCxAtClientHandleRx(&client);
+    //uCxAtClientHandleRx(&client);
     uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
     for (int i = 0; i < 3; i++) {

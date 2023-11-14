@@ -21,4 +21,26 @@
 # define U_CX_AT_PORT_ASSERT(COND) assert(COND)
 #endif
 
+/* Porting layer for printf().*/
+#ifndef U_CX_PORT_PRINTF
+# include <stdio.h>
+# define U_CX_PORT_PRINTF   printf
+#endif
+
+/* Porting layer for getting time in ms.*/
+#ifndef U_CX_PORT_GET_TIME_MS
+extern uint64_t uPortGetTickTimeMs(void);
+# define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
+#endif
+
+/* Configuration for enabling logging off AT protocol.*/
+#ifndef U_CX_LOG_AT
+# define U_CX_LOG_AT 1
+#endif
+
+/* Configuration for enabling ANSI color for logs.*/
+#ifndef U_CX_LOG_USE_ANSI_COLOR
+# define U_CX_LOG_USE_ANSI_COLOR 1
+#endif
+
 #endif // U_CX_AT_CONFIG_H
