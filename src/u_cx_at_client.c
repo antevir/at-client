@@ -12,6 +12,7 @@
 
 #include "u_cx_at_config.h"
 
+#include "u_cx_log.h"
 #include "u_cx_at_util.h"
 #include "u_cx_at_client.h"
 
@@ -61,6 +62,8 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
     if (emptyLine) {
         return AT_PARSER_NOP;
     }
+
+    U_CX_LOG_LINE(U_CX_LOG_CHANNEL_RX, "%s", pLine);
 
     if (pClient->executingCmd) {
         if ((pClient->pExpectedRsp != NULL) &&
@@ -215,13 +218,17 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
     char buf[16];
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
+    U_CX_LOG_BEGIN(U_CX_LOG_CHANNEL_TX);
+
     pConfig->write(pClient, pConfig->pStreamHandle, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
         if (pCh != pParamFmt) {
             pConfig->write(pClient, pConfig->pStreamHandle, ",", 1);
+            U_CX_LOG(U_CX_LOG_CHANNEL_TX, ",");
         }
 
+        buf[0] = 0;
         switch (*pCh) {
             case 'd': {
                 int32_t i = va_arg(args, int32_t);
@@ -250,10 +257,12 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
         }
+        U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", buf);
         pCh++;
     }
 
     pConfig->write(pClient, pConfig->pStreamHandle, "\r", 1);
+    U_CX_LOG_END(U_CX_LOG_CHANNEL_TX);
 }
 
 int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,

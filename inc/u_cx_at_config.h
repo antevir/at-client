@@ -21,4 +21,20 @@
 # define U_CX_AT_PORT_ASSERT(COND) assert(COND)
 #endif
 
+/* Porting layer for printf().*/
+#ifndef U_CX_PORT_PRINTF
+# include <stdio.h>
+# define U_CX_PORT_PRINTF   printf
+#endif
+
+/* Configuration for enabling logging off AT protocol.*/
+#ifndef U_CX_LOG_AT
+# define U_CX_LOG_AT 1
+#endif
+
+/* Configuration for enabling ANSI color for logs.*/
+#ifndef U_CX_LOG_USE_ANSI_COLOR
+# define U_CX_LOG_USE_ANSI_COLOR 1
+#endif
+
 #endif // U_CX_AT_CONFIG_H

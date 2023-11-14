@@ -58,7 +58,7 @@ int main(void)
     uCxUrcRegisterWiFiStationNetworkUp(&ucxHandle, networkUpUrc);
     ucxHandle.callbacks.UEDGP = callbackUEDGP;
 
-    uCxAtClientHandleRx(&client);
+    //uCxAtClientHandleRx(&client);
     uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
     for (int i = 0; i < 3; i++) {
