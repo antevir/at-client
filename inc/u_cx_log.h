@@ -46,7 +46,8 @@
 
 /* Internal defines - do not use! */
 #define _U_CX_LOG_BEGIN_FMT(enabled, chText, format, ...)   \
-    if (enabled) {                                      \
+    if (enabled) {                                          \
+        uCxLogPrintTime();                                  \
         U_CX_PORT_PRINTF(chText " " format, ##__VA_ARGS__); \
     }
 #define _U_CX_LOG(enabled, chText, format, ...)  \
@@ -65,5 +66,7 @@
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
+
+void uCxLogPrintTime(void);
 
 #endif // U_CX_LOG_H

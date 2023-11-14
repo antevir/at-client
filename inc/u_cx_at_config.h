@@ -27,6 +27,12 @@
 # define U_CX_PORT_PRINTF   printf
 #endif
 
+/* Porting layer for getting time in ms.*/
+#ifndef U_CX_PORT_GET_TIME_MS
+extern uint64_t uPortGetTickTimeMs(void);
+# define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
+#endif
+
 /* Configuration for enabling logging off AT protocol.*/
 #ifndef U_CX_LOG_AT
 # define U_CX_LOG_AT 1
