@@ -69,7 +69,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         if ((pClient->pExpectedRsp != NULL) &&
             (*pClient->pExpectedRsp != 0) &&
             (strncmp(pLine, pClient->pExpectedRsp, pClient->pExpectedRspLen) == 0)) {
-            pClient->pRspParams = &pLine[pClient->pExpectedRspLen + 1];
+            pClient->pRspParams = &pLine[pClient->pExpectedRspLen];
             ret = AT_PARSER_GOT_RSP;
         } else if (strcmp(pLine, "OK") == 0) {
             pClient->status = 0;
