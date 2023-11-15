@@ -196,6 +196,13 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
     return pClient->status;
 }
 
+static inline int32_t writeAndLog(uCxAtClient_t *pClient, const void *pData, size_t dataLen)
+{
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+    U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", (char *)pData);
+    return pConfig->write(pClient, pConfig->pStreamHandle, pData, dataLen);
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -220,31 +227,30 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
 
     U_CX_LOG_BEGIN(U_CX_LOG_CHANNEL_TX);
 
-    pConfig->write(pClient, pConfig->pStreamHandle, pCmd, strlen(pCmd));
+    writeAndLog(pClient, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
         if (pCh != pParamFmt) {
-            pConfig->write(pClient, pConfig->pStreamHandle, ",", 1);
-            U_CX_LOG(U_CX_LOG_CHANNEL_TX, ",");
+            writeAndLog(pClient, ",", 1);
         }
 
-        buf[0] = 0;
+        memset(&buf, 0, sizeof(buf));
         switch (*pCh) {
             case 'd': {
                 int32_t i = va_arg(args, int32_t);
                 int32_t len = snprintf(buf, sizeof(buf), "%d", i);
-                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
+                writeAndLog(pClient, buf, len);
             }
             break;
             case 'h': {
                 int32_t i = va_arg(args, int32_t);
                 int32_t len = snprintf(buf, sizeof(buf), "%x", i);
-                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
+                writeAndLog(pClient, buf, len);
             }
             break;
             case 's': {
                 char *pStr = va_arg(args, char *);
-                pConfig->write(pClient, pConfig->pStreamHandle, pStr, strlen(pStr));
+                writeAndLog(pClient, pStr, strlen(pStr));
             }
             break;
             case 'b': {
@@ -252,12 +258,11 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 uint8_t *pData = va_arg(args, uint8_t *);
                 for (int32_t i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
-                    pConfig->write(pClient, pConfig->pStreamHandle, buf, 2);
+                    writeAndLog(pClient, buf, 2);
                 }
             }
             break;
         }
-        U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", buf);
         pCh++;
     }
 
