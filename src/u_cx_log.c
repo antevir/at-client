@@ -36,7 +36,7 @@
 
 void uCxLogPrintTime(void)
 {
-    uint64_t timestamp_ms = U_CX_PORT_GET_TIME_MS();
+    int32_t timestamp_ms = U_CX_PORT_GET_TIME_MS();
     int32_t ms      = (int32_t) (timestamp_ms % 1000);
     int32_t seconds = (int32_t) (timestamp_ms / 1000) % 60 ;
     int32_t minutes = (int32_t) ((timestamp_ms / (1000 * 60)) % 60);

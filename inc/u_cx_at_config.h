@@ -40,7 +40,7 @@
 
 /* Porting layer for getting time in ms.*/
 #ifndef U_CX_PORT_GET_TIME_MS
-extern uint64_t uPortGetTickTimeMs(void);
+extern int32_t uPortGetTickTimeMs(void);
 # define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
 #endif
 

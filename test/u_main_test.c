@@ -39,17 +39,17 @@ void networkUpUrc(struct uCxHandle *puCxHandle)
     printf("networkUpUrc\n");
 }
 
-static uint64_t getTickTimeMs(void)
+static int32_t getTickTimeMs(void)
 {
     struct timespec time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &time);
     uint64_t timeMs = (time.tv_sec * 1000) + (time.tv_nsec / (1000 * 1000));
-    return timeMs;
+    return (int32_t)timeMs;
 }
 
-uint64_t uPortGetTickTimeMs(void)
+int32_t uPortGetTickTimeMs(void)
 {
-    uint64_t timeMs = getTickTimeMs() - gBootTime;
+    int32_t timeMs = getTickTimeMs() - gBootTime;
     return timeMs;
 }
 
