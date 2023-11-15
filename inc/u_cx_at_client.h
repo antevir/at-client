@@ -26,6 +26,8 @@ typedef struct uCxAtClient {
     size_t rxBufferPos;
     size_t urcBufferPos;
     volatile bool executingCmd;
+    int32_t cmdStartTime;
+    int32_t cmdTimeout;
     const char *pExpectedRsp;
     size_t pExpectedRspLen;
     char *pRspParams;

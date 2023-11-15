@@ -149,10 +149,6 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
             break;
         }
     }
-    if (readStatus < 0) {
-        ret = readStatus;
-        pClient->status = AT_PARSER_ERROR;
-    }
     return ret;
 }
 
@@ -179,6 +175,8 @@ static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pPar
     pClient->pRspParams = NULL;
     pClient->executingCmd = true;
     pClient->status = NO_STATUS;
+    pClient->cmdStartTime = U_CX_PORT_GET_TIME_MS();
+    pClient->cmdTimeout = 10000; // Hard coded for now. TODO: Should be function argument
     uCxAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
 }
 
@@ -186,6 +184,12 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
+
+        int32_t now = U_CX_PORT_GET_TIME_MS();
+        if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
+            pClient->status = -1;
+            break;
+        }
     }
 
     // cmdEnd() must be preceeded by a cmdBeginF()
@@ -319,6 +323,11 @@ char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpecte
         if (handleRxData(pClient) == AT_PARSER_GOT_RSP) {
             pRet = pClient->pRspParams;
             break;
+        }
+        // Check for timeout
+        int32_t now = U_CX_PORT_GET_TIME_MS();
+        if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
+            return NULL;
         }
     }
 
