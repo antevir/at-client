@@ -340,7 +340,6 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
     va_list args;
     char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
     if (pRspParams == NULL) {
-        pClient->executingCmd = false;
         return -1;
     }
     va_start(args, pParamFmt);
