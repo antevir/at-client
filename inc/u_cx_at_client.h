@@ -32,6 +32,7 @@ typedef struct uCxAtClient {
     int32_t status;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
+    U_CX_MUTEX_HANDLE cmdMutex;
 } uCxAtClient_t;
 
 typedef struct uCxAtClientConfig {

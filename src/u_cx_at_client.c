@@ -170,6 +170,8 @@ static void handleDeferredUrc(uCxAtClient_t *pClient)
 
 static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
+    U_CX_MUTEX_LOCK(pClient->cmdMutex);
+
     // Check that previous command has completed
     // If this assert fails you have probably forgotten to call uCxAtClientCmdEnd()
     U_CX_AT_PORT_ASSERT(!pClient->executingCmd);
@@ -190,6 +192,9 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
     U_CX_AT_PORT_ASSERT(pClient->executingCmd);
 
     pClient->executingCmd = false;
+
+    U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
+
     // We may have received URCs during command execution
     handleDeferredUrc(pClient);
 
@@ -211,6 +216,7 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pConfig = pConfig;
+    U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
 void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
@@ -342,7 +348,11 @@ int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient)
 
 void uCxAtClientHandleRx(uCxAtClient_t *pClient)
 {
+    U_CX_MUTEX_LOCK(pClient->cmdMutex);
+
     if (!pClient->executingCmd) {
         handleRxData(pClient);
     }
+
+    U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 }
