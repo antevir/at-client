@@ -11,6 +11,7 @@
 #include <stddef.h>
 
 #include "u_cx_at_util.h"
+#include "u_cx_at_params.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS

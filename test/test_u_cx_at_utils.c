@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 #include "unity.h"
+#include "u_cx_at_params.h"
 #include "u_cx_at_util.h"
 
 /* ----------------------------------------------------------------
@@ -141,4 +142,15 @@ void test_uCxAtUtilParseParamsF_withInvalidInput_expectNegativeReturnValue(void)
 
     strcpy(testData, ",int param not allowed to be empty");
     TEST_ASSERT_LESS_THAN(0, uCxAtUtilParseParamsF(testData, "ds", &digit, &pStr, U_CX_AT_UTIL_PARAM_LAST));
+}
+
+void test_uCxAtUtilParseParamsF_withIpAddr_expectParsedParam(void)
+{
+    uSockIpAddress_t ipAddr;
+    char testData[64];
+
+    strcpy(testData, "0.16.32.48");
+    TEST_ASSERT_EQUAL(1, uCxAtUtilParseParamsF(testData, "i", &ipAddr, U_CX_AT_UTIL_PARAM_LAST));
+    TEST_ASSERT_EQUAL(U_SOCK_ADDRESS_TYPE_V4, ipAddr.type);
+    TEST_ASSERT_EQUAL(0x00102030, ipAddr.address.ipv4);
 }
