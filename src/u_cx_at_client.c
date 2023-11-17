@@ -232,7 +232,7 @@ void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallbac
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args)
 {
-    char buf[U_SOCK_ADDRESS_STRING_MAX_LENGTH_BYTES];
+    char buf[U_IP_STRING_MAX_LENGTH_BYTES];
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
     U_CX_LOG_BEGIN(U_CX_LOG_CHANNEL_TX);
@@ -265,7 +265,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             break;
             case 'i': {
                 uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
-                int32_t len = uSockIpAddressToString(pIpAddr, buf, sizeof(buf));
+                int32_t len = uCxIpAddressToString(pIpAddr, buf, sizeof(buf));
                 U_CX_AT_PORT_ASSERT(len > 0);
                 writeAndLog(pClient, buf, len);
             }

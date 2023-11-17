@@ -146,7 +146,7 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
             case 'i': {
                 uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
                 U_CX_AT_PORT_ASSERT(pIpAddr != U_CX_AT_UTIL_PARAM_LAST);
-                if (uSockStringToIpAddress(pParam, pIpAddr) < 0) {
+                if (uCxStringToIpAddress(pParam, pIpAddr) < 0) {
                     return -ret;
                 }
             }

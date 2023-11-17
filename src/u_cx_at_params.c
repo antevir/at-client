@@ -8,12 +8,6 @@
 
 #include "u_cx_at_params.h"
 
-/* U_UCONNECT_GEN2 is set when compiling for ubxlib
- * Since ubxlib already have the param parsers and types
- * we don't want to include them here.
- */
-#ifndef U_UCONNECT_GEN2
-
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
@@ -147,8 +141,8 @@ static bool ipv6StringToIpAddress(const char *pAddressString,
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-int32_t uSockStringToIpAddress(const char *pAddressString,
-                               uSockIpAddress_t *pIpAddress)
+int32_t uCxStringToIpAddress(const char *pAddressString,
+                             uSockIpAddress_t *pIpAddress)
 {
     U_CX_AT_PORT_ASSERT(pAddressString != NULL);
     U_CX_AT_PORT_ASSERT(pIpAddress != NULL);
@@ -166,9 +160,9 @@ int32_t uSockStringToIpAddress(const char *pAddressString,
     return 0;
 }
 
-int32_t uSockIpAddressToString(const uSockIpAddress_t *pIpAddress,
-                               char *pBuffer,
-                               size_t sizeBytes)
+int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
+                             char *pBuffer,
+                             size_t sizeBytes)
 {
     U_CX_AT_PORT_ASSERT(pBuffer != NULL);
     U_CX_AT_PORT_ASSERT(pIpAddress != NULL);
@@ -220,5 +214,3 @@ int32_t uSockIpAddressToString(const uSockIpAddress_t *pIpAddress,
 
     return ret;
 }
-
-#endif // U_UCONNECT_GEN2
