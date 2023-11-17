@@ -6,8 +6,13 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "u_cx_at_config.h"
 #include "u_cx_at_params.h"
+
+/* U_UCONNECT_GEN2 is set when compiling for ubxlib
+ * Since ubxlib already have the param parsers and types
+ * we don't want to include them here.
+ */
+#ifndef U_UCONNECT_GEN2
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -215,3 +220,5 @@ int32_t uSockIpAddressToString(const uSockIpAddress_t *pIpAddress,
 
     return ret;
 }
+
+#endif // U_UCONNECT_GEN2
