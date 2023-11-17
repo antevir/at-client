@@ -167,6 +167,7 @@
             - -Wextra
             - -fsanitize=address
             - -fno-omit-frame-pointer
+            - -DU_CX_LOG_AT=0
     :link:
         :*:
             - -fsanitize=address
