@@ -13,10 +13,22 @@
 #include "u_cx_at_client.h"
 #include "u_cx_system.h"
 
+int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT&W", "", U_CX_AT_UTIL_PARAM_LAST);
+}
+
 int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USYFR", "", U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USYDS", "", U_CX_AT_UTIL_PARAM_LAST);
 }
 
 int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate)

@@ -42,11 +42,23 @@ typedef struct
 } uCxSystemGetEscSequenceSettings_t;
 
 /* ------------------------------------------------------------
- * COMMAND HANDLERS
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
 
 /**
- * Reset to factory defined defaults. A reboot is required before using the new settings.
+ * Write the current configuration to flash. The configuration is stored immediately when AT&W is issued.
+ * 
+ * Output AT command:
+ * > AT&W
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle);
+
+/**
+ * The module is completely restored to factory defaults. All settings are reset to default values.
+ * All certificates and Bluetooth bonding information will be removed.
+ * A reboot is required before using the new settings.
  * 
  * Output AT command:
  * > AT+USYFR
@@ -54,6 +66,18 @@ typedef struct
  * @param[in]  puCxHandle: uCX API handle
  */
 int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle);
+
+/**
+ * Reset all settings to default values.
+ * Certificates and Bluetooth bonding information will be left untouched.
+ * A reboot is required before using the new settings.
+ * 
+ * Output AT command:
+ * > AT+USYDS
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle);
 
 /**
  * Configure new UART settings that will be used after restart

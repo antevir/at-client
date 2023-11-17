@@ -19,30 +19,30 @@ int32_t uCxGeneralAttention(uCxHandle_t * puCxHandle)
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT", "", U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char * * pManufacturer)
+int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char ** ppManufacturer)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMI", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", pManufacturer);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppManufacturer);
 }
 
-int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char * * pDeviceModel)
+int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char ** ppDeviceModel)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMM", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", pDeviceModel);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppDeviceModel);
 }
 
-int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char * * pVersion)
+int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char ** ppVersion)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMR", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", pVersion);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppVersion);
 }
 
-int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char * * pSerialNumber)
+int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char ** ppSerialNumber)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+GSN", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", pSerialNumber);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppSerialNumber);
 }

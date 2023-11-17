@@ -19,11 +19,11 @@ int32_t uCxWifiSetHostname(uCxHandle_t * puCxHandle, const char * host_name)
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWHN=", "s", host_name, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char * * pHostName)
+int32_t uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char ** ppHostName)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UWHN?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UNHN:", "s", pHostName);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UWHN:", "s", ppHostName);
 }
 
 int32_t uCxWifiStationSetSecurityEnterprise(uCxHandle_t * puCxHandle, int32_t wlan_handle, const char * ca_name, const char * client_cert_name, const char * client_key_name)
@@ -56,18 +56,17 @@ int32_t uCxWifiStationSetSecurityOpen(uCxHandle_t * puCxHandle, int32_t wlan_han
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSSO=", "d", wlan_handle, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginWifiStationSetConnectionParams1(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationSetConnectionParams_t * pWifiStationSetConnectionParamsRsp)
+int32_t uCxWifiStationSetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, const char * ssid)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSCP=", "ds", wlan_handle, ssid, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationGetConnectionParams_t * pWifiStationGetConnectionParamsRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UWSCP=", "d", wlan_handle, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "AT+UWSCP=", "ds", &pWifiStationSetConnectionParamsRsp->wlan_handle, &pWifiStationSetConnectionParamsRsp->ssid);
-}
-
-int32_t uCxBeginWifiStationSetConnectionParams2(uCxHandle_t * puCxHandle, int32_t wlan_handle, const char * ssid, uCxWifiStationSetConnectionParams_t * pWifiStationSetConnectionParamsRsp)
-{
-    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    uCxAtClientCmdBeginF(pAtClient, "AT+UWSCP=", "ds", wlan_handle, ssid, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "AT+UWSCP=", "ds", &pWifiStationSetConnectionParamsRsp->wlan_handle, &pWifiStationSetConnectionParamsRsp->ssid);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UWSCP=", "ds", &pWifiStationGetConnectionParamsRsp->wlan_handle, &pWifiStationGetConnectionParamsRsp->ssid);
 }
 
 int32_t uCxWifiStationConnect(uCxHandle_t * puCxHandle, int32_t wlan_handle)
