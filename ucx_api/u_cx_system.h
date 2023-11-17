@@ -46,6 +46,16 @@ typedef struct
  * ---------------------------------------------------------- */
 
 /**
+ * Reboot the DCE.
+ * 
+ * Output AT command:
+ * > AT+CPWROFF
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+int32_t uCxSystemReboot(uCxHandle_t * puCxHandle);
+
+/**
  * Write the current configuration to flash. The configuration is stored immediately when AT&W is issued.
  * 
  * Output AT command:
