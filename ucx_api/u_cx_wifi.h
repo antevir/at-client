@@ -30,16 +30,16 @@ typedef struct
 {
     int32_t wlan_handle; /**< Handle to use for Wi-Fi config and connection */
     const char * ssid;   /**< SSID */
-} uCxWifiStationSetConnectionParams_t;
+} uCxWifiStationGetConnectionParams_t;
 
 typedef struct
 {
-    const char * ssid;  /**< SSID */
-    uChannel_t channel; /**< channel */
+    const char * ssid; /**< SSID */
+    int32_t channel;   /**< channel */
 } uCxWifiApGetConnectionParams_t;
 
 /* ------------------------------------------------------------
- * COMMAND HANDLERS
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
 
 /**
@@ -60,9 +60,9 @@ int32_t uCxWifiSetHostname(uCxHandle_t * puCxHandle, const char * host_name);
  * > AT+UWHN?
  *
  * @param[in]  puCxHandle: uCX API handle
- * @param[out] pHostName:  
+ * @param[out] ppHostName: 
  */
-int32_t uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char * * pHostName);
+int32_t uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char ** ppHostName);
 
 /**
  * Set the EAP-TLS connection parameters to use.
@@ -132,29 +132,28 @@ int32_t uCxWifiStationSetSecurityWpa(uCxHandle_t * puCxHandle, int32_t wlan_hand
 int32_t uCxWifiStationSetSecurityOpen(uCxHandle_t * puCxHandle, int32_t wlan_handle);
 
 /**
- * Sets or reads the connection parameters for the connection. If leaving out SSID this will read the parameters.
+ * Sets the connection parameters for the connection.
+ * 
+ * Output AT command:
+ * > AT+UWSCP=<wlan_handle>,<ssid>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      wlan_handle: Handle to use for Wi-Fi config and connection
+ * @param      ssid:        SSID
+ */
+int32_t uCxWifiStationSetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, const char * ssid);
+
+/**
+ * Reads the connection parameters for the connection.
  * 
  * Output AT command:
  * > AT+UWSCP=<wlan_handle>
  *
  * @param[in]  puCxHandle:                         uCX API handle
  * @param      wlan_handle:                        Handle to use for Wi-Fi config and connection
- * @param[out] pWifiStationSetConnectionParamsRsp: Please see \ref uCxWifiStationSetConnectionParams_t
+ * @param[out] pWifiStationGetConnectionParamsRsp: Please see \ref uCxWifiStationGetConnectionParams_t
  */
-int32_t uCxBeginWifiStationSetConnectionParams1(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationSetConnectionParams_t * pWifiStationSetConnectionParamsRsp);
-
-/**
- * Sets or reads the connection parameters for the connection. If leaving out SSID this will read the parameters.
- * 
- * Output AT command:
- * > AT+UWSCP=<wlan_handle>,<ssid>
- *
- * @param[in]  puCxHandle:                         uCX API handle
- * @param      wlan_handle:                        Handle to use for Wi-Fi config and connection
- * @param      ssid:                               SSID
- * @param[out] pWifiStationSetConnectionParamsRsp: Please see \ref uCxWifiStationSetConnectionParams_t
- */
-int32_t uCxBeginWifiStationSetConnectionParams2(uCxHandle_t * puCxHandle, int32_t wlan_handle, const char * ssid, uCxWifiStationSetConnectionParams_t * pWifiStationSetConnectionParamsRsp);
+int32_t uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationGetConnectionParams_t * pWifiStationGetConnectionParamsRsp);
 
 /**
  * Initiate connection to Wi-Fi network

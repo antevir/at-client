@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "u_cx_at_params.h"
 #include "u_cx_at_util.h"
 
 /* ----------------------------------------------------------------
@@ -140,6 +141,14 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
                     pParamEnd[-1] = 0;
                 }
                 *ppStr = pParam;
+            }
+            break;
+            case 'i': {
+                uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
+                U_CX_AT_PORT_ASSERT(pIpAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToIpAddress(pParam, pIpAddr) < 0) {
+                    return -ret;
+                }
             }
             break;
             case 'b': {

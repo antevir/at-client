@@ -104,7 +104,7 @@ static int32_t parseUEBTGCW(uCxHandle_t * puCxHandle, char * pParams, size_t par
     int32_t conn_handle;
     int32_t value_handle;
     const char * value;
-    uOptions_t options;
+    int32_t options;
     int32_t ret = 0;
     ret = uCxAtUtilParseParamsF(pParams, "ddsd", &conn_handle, &value_handle, &value, &options, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTGCW) {
@@ -338,8 +338,16 @@ static int32_t parseUESODS(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUESODSF(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t socket_handle;
+    uSockIpAddress_t remote_ip;
+    int32_t remote_port;
+    const char * string_data;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "dids", &socket_handle, &remote_ip, &remote_port, &string_data, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UESODSF) {
+        puCxHandle->callbacks.UESODSF(puCxHandle, socket_handle, &remote_ip, remote_port, string_data);
+    }
+    return ret;
 }
 
 static int32_t parseUESODB(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -355,8 +363,15 @@ static int32_t parseUESODB(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUESODBF(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t socket_handle;
+    uSockIpAddress_t remote_ip;
+    int32_t remote_port;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "did", &socket_handle, &remote_ip, &remote_port, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UESODBF) {
+        puCxHandle->callbacks.UESODBF(puCxHandle, socket_handle, &remote_ip, remote_port);
+    }
+    return ret;
 }
 
 static int32_t parseUESOCL(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -372,8 +387,15 @@ static int32_t parseUESOCL(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUESOIC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t socket_handle;
+    uSockIpAddress_t remote_ip;
+    int32_t listening_socket_handle;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "did", &socket_handle, &remote_ip, &listening_socket_handle, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UESOIC) {
+        puCxHandle->callbacks.UESOIC(puCxHandle, socket_handle, &remote_ip, listening_socket_handle);
+    }
+    return ret;
 }
 
 static int32_t parseUEMQC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -427,7 +449,7 @@ static int32_t parseUEDGPC(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUEDGP(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    uPingResponse_t ping_response;
+    int32_t ping_response;
     int32_t response_time;
     int32_t ret = 0;
     ret = uCxAtUtilParseParamsF(pParams, "dd", &ping_response, &response_time, U_CX_AT_UTIL_PARAM_LAST);

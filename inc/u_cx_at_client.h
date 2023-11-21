@@ -11,9 +11,14 @@
 #include <stddef.h>
 
 #include "u_cx_at_util.h"
+#include "u_cx_at_params.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
+ * -------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------
+ * TYPES
  * -------------------------------------------------------------- */
 
 struct uCxAtClient;
@@ -26,12 +31,15 @@ typedef struct uCxAtClient {
     size_t rxBufferPos;
     size_t urcBufferPos;
     volatile bool executingCmd;
+    int32_t cmdStartTime;
+    int32_t cmdTimeout;
     const char *pExpectedRsp;
     size_t pExpectedRspLen;
     char *pRspParams;
     int32_t status;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
+    U_CX_MUTEX_HANDLE cmdMutex;
 } uCxAtClient_t;
 
 typedef struct uCxAtClientConfig {
@@ -57,9 +65,6 @@ typedef struct uCxAtClientConfig {
     void *pContext;
 } uCxAtClientConfig_t;
 
-/* ----------------------------------------------------------------
- * TYPES
- * -------------------------------------------------------------- */
 
 /* ----------------------------------------------------------------
  * VARIABLES

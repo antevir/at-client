@@ -27,7 +27,7 @@ extern "C" {
  * ---------------------------------------------------------- */
 
 /* ------------------------------------------------------------
- * COMMAND HANDLERS
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
 
 /**
@@ -46,10 +46,10 @@ int32_t uCxGeneralAttention(uCxHandle_t * puCxHandle);
  * Output AT command:
  * > AT+GMI
  *
- * @param[in]  puCxHandle:    uCX API handle
- * @param[out] pManufacturer: Manufacturer ("u-blox").
+ * @param[in]  puCxHandle:     uCX API handle
+ * @param[out] ppManufacturer: Manufacturer ("u-blox").
  */
-int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char * * pManufacturer);
+int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char ** ppManufacturer);
 
 /**
  * Read device model.
@@ -57,10 +57,10 @@ int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, c
  * Output AT command:
  * > AT+GMM
  *
- * @param[in]  puCxHandle:   uCX API handle
- * @param[out] pDeviceModel: Device model
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param[out] ppDeviceModel: Device model
  */
-int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char * * pDeviceModel);
+int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char ** ppDeviceModel);
 
 /**
  * Read software version.
@@ -69,9 +69,9 @@ int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, co
  * > AT+GMR
  *
  * @param[in]  puCxHandle: uCX API handle
- * @param[out] pVersion:   Version.
+ * @param[out] ppVersion:  Version.
  */
-int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char * * pVersion);
+int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char ** ppVersion);
 
 /**
  * Read serial number.
@@ -79,10 +79,10 @@ int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char *
  * Output AT command:
  * > AT+GSN
  *
- * @param[in]  puCxHandle:    uCX API handle
- * @param[out] pSerialNumber: Serial number.
+ * @param[in]  puCxHandle:     uCX API handle
+ * @param[out] ppSerialNumber: Serial number.
  */
-int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char * * pSerialNumber);
+int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char ** ppSerialNumber);
 
 
 #ifdef __cplusplus

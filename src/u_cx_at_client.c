@@ -69,7 +69,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         if ((pClient->pExpectedRsp != NULL) &&
             (*pClient->pExpectedRsp != 0) &&
             (strncmp(pLine, pClient->pExpectedRsp, pClient->pExpectedRspLen) == 0)) {
-            pClient->pRspParams = &pLine[pClient->pExpectedRspLen + 1];
+            pClient->pRspParams = &pLine[pClient->pExpectedRspLen];
             ret = AT_PARSER_GOT_RSP;
         } else if (strcmp(pLine, "OK") == 0) {
             pClient->status = 0;
@@ -149,10 +149,6 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
             break;
         }
     }
-    if (readStatus < 0) {
-        ret = readStatus;
-        pClient->status = AT_PARSER_ERROR;
-    }
     return ret;
 }
 
@@ -170,6 +166,8 @@ static void handleDeferredUrc(uCxAtClient_t *pClient)
 
 static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
+    U_CX_MUTEX_LOCK(pClient->cmdMutex);
+
     // Check that previous command has completed
     // If this assert fails you have probably forgotten to call uCxAtClientCmdEnd()
     U_CX_AT_PORT_ASSERT(!pClient->executingCmd);
@@ -177,6 +175,8 @@ static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pPar
     pClient->pRspParams = NULL;
     pClient->executingCmd = true;
     pClient->status = NO_STATUS;
+    pClient->cmdStartTime = U_CX_PORT_GET_TIME_MS();
+    pClient->cmdTimeout = 10000; // Hard coded for now. TODO: Should be function argument
     uCxAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
 }
 
@@ -184,16 +184,32 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
 {
     while (pClient->status == NO_STATUS) {
         handleRxData(pClient);
+
+        int32_t now = U_CX_PORT_GET_TIME_MS();
+        if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
+            pClient->status = -1;
+            break;
+        }
     }
 
     // cmdEnd() must be preceeded by a cmdBeginF()
     U_CX_AT_PORT_ASSERT(pClient->executingCmd);
 
     pClient->executingCmd = false;
+
+    U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
+
     // We may have received URCs during command execution
     handleDeferredUrc(pClient);
 
     return pClient->status;
+}
+
+static inline int32_t writeAndLog(uCxAtClient_t *pClient, const void *pData, size_t dataLen)
+{
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+    U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", (char *)pData);
+    return pConfig->write(pClient, pConfig->pStreamHandle, pData, dataLen);
 }
 
 /* ----------------------------------------------------------------
@@ -204,6 +220,7 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pConfig = pConfig;
+    U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
 void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
@@ -215,36 +232,42 @@ void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallbac
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args)
 {
-    char buf[16];
+    char buf[U_IP_STRING_MAX_LENGTH_BYTES];
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
     U_CX_LOG_BEGIN(U_CX_LOG_CHANNEL_TX);
 
-    pConfig->write(pClient, pConfig->pStreamHandle, pCmd, strlen(pCmd));
+    writeAndLog(pClient, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
         if (pCh != pParamFmt) {
-            pConfig->write(pClient, pConfig->pStreamHandle, ",", 1);
-            U_CX_LOG(U_CX_LOG_CHANNEL_TX, ",");
+            writeAndLog(pClient, ",", 1);
         }
 
-        buf[0] = 0;
+        memset(&buf, 0, sizeof(buf));
         switch (*pCh) {
             case 'd': {
                 int32_t i = va_arg(args, int32_t);
                 int32_t len = snprintf(buf, sizeof(buf), "%d", i);
-                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
+                writeAndLog(pClient, buf, len);
             }
             break;
             case 'h': {
                 int32_t i = va_arg(args, int32_t);
                 int32_t len = snprintf(buf, sizeof(buf), "%x", i);
-                pConfig->write(pClient, pConfig->pStreamHandle, buf, len);
+                writeAndLog(pClient, buf, len);
             }
             break;
             case 's': {
                 char *pStr = va_arg(args, char *);
-                pConfig->write(pClient, pConfig->pStreamHandle, pStr, strlen(pStr));
+                writeAndLog(pClient, pStr, strlen(pStr));
+            }
+            break;
+            case 'i': {
+                uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
+                int32_t len = uCxIpAddressToString(pIpAddr, buf, sizeof(buf));
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeAndLog(pClient, buf, len);
             }
             break;
             case 'b': {
@@ -252,12 +275,11 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 uint8_t *pData = va_arg(args, uint8_t *);
                 for (int32_t i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
-                    pConfig->write(pClient, pConfig->pStreamHandle, buf, 2);
+                    writeAndLog(pClient, buf, 2);
                 }
             }
             break;
         }
-        U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", buf);
         pCh++;
     }
 
@@ -309,6 +331,11 @@ char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpecte
             pRet = pClient->pRspParams;
             break;
         }
+        // Check for timeout
+        int32_t now = U_CX_PORT_GET_TIME_MS();
+        if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
+            return NULL;
+        }
     }
 
     return pRet;
@@ -320,7 +347,6 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
     va_list args;
     char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp);
     if (pRspParams == NULL) {
-        pClient->executingCmd = false;
         return -1;
     }
     va_start(args, pParamFmt);
@@ -337,7 +363,11 @@ int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient)
 
 void uCxAtClientHandleRx(uCxAtClient_t *pClient)
 {
+    U_CX_MUTEX_LOCK(pClient->cmdMutex);
+
     if (!pClient->executingCmd) {
         handleRxData(pClient);
     }
+
+    U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 }

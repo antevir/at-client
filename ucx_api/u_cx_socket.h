@@ -41,13 +41,13 @@ typedef struct
 
 typedef struct
 {
-    int32_t socket_handle;         /**< Socket identifier to be used for any future operation on that socket. */
-    uProtocol_t protocol;          /**< IP protocol. */
-    uSocketStatus_t socket_status;
+    int32_t socket_handle; /**< Socket identifier to be used for any future operation on that socket. */
+    int32_t protocol;      /**< IP protocol. */
+    int32_t socket_status;
 } uCxSocketStatus_t;
 
 /* ------------------------------------------------------------
- * COMMAND HANDLERS
+ * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
 
 /**
@@ -193,6 +193,18 @@ int32_t uCxBeginSocketStatus(uCxHandle_t * puCxHandle, uCxSocketStatus_t * pSock
  * @param      value:         See option parameter
  */
 int32_t uCxSocketSetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, int32_t value);
+
+/**
+ * Does a DNS lookup of a host name and returns the IP address.
+ * 
+ * Output AT command:
+ * > AT+USOH=<host_name>
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      host_name:  Name to lookup.
+ * @param[out] pHostIp:    The ip address of the host.
+ */
+int32_t uCxBeginSocketGetHostByName(uCxHandle_t * puCxHandle, const char * host_name, uSockIpAddress_t * pHostIp);
 
 
 #ifdef __cplusplus

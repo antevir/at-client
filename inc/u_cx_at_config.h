@@ -27,9 +27,20 @@
 # define U_CX_PORT_PRINTF   printf
 #endif
 
+/* Porting layer for mutexes.*/
+#ifndef U_CX_MUTEX_HANDLE
+// Default to Posix Threads
+#include <pthread.h>
+# define U_CX_MUTEX_HANDLE          pthread_mutex_t
+# define U_CX_MUTEX_CREATE(mutex)   pthread_mutex_init(&mutex, NULL)
+# define U_CX_MUTEX_DELETE(mutex)
+# define U_CX_MUTEX_LOCK(mutex)     pthread_mutex_lock(&mutex)
+# define U_CX_MUTEX_UNLOCK(mutex)   pthread_mutex_unlock(&mutex)
+#endif
+
 /* Porting layer for getting time in ms.*/
 #ifndef U_CX_PORT_GET_TIME_MS
-extern uint64_t uPortGetTickTimeMs(void);
+extern int32_t uPortGetTickTimeMs(void);
 # define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
 #endif
 
