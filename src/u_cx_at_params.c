@@ -244,11 +244,11 @@ int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
     return ret;
 }
 
-int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr)
+int32_t uCxStringToBdAddress(const char *pBtLeAddrString, uBtLeAddress_t *pBtLeAddr)
 {
-    int32_t ret = findBdAddressType(pBdAddrString, &pBdAddr->type);
+    int32_t ret = findBdAddressType(pBtLeAddrString, &pBtLeAddr->type);
     if (ret == 0) {
-        uint32_t len = uCxAtUtilHexToBinary(pBdAddrString, pBdAddr->address, U_BD_ADDR_LEN);
+        uint32_t len = uCxAtUtilHexToBinary(pBtLeAddrString, pBtLeAddr->address, U_BD_ADDR_LEN);
         if (len != U_BD_ADDR_LEN) {
             ret = -1;
         }
@@ -256,16 +256,16 @@ int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr)
     return ret;
 }
 
-int32_t uCxBdAddressToString(const uBdAddress_t *pBdAddr, char *pBuffer, size_t sizeBytes)
+int32_t uCxBdAddressToString(const uBtLeAddress_t *pBtLeAddr, char *pBuffer, size_t sizeBytes)
 {
     if (sizeBytes < U_BD_STRING_MAX_LENGTH_BYTES) {
         return -1;
     }
-    if (!uCxAtUtilBinaryToHex(&pBdAddr->address[0], U_BD_ADDR_LEN, pBuffer, sizeBytes)) {
+    if (!uCxAtUtilBinaryToHex(&pBtLeAddr->address[0], U_BD_ADDR_LEN, pBuffer, sizeBytes)) {
         return -1;
     }
     size_t pos = strlen(pBuffer);
-    pBuffer[pos++] = (pBdAddr->type == U_BD_ADDRESS_TYPE_RANDOM) ? 'r' : 'p';
+    pBuffer[pos++] = (pBtLeAddr->type == U_BD_ADDRESS_TYPE_RANDOM) ? 'r' : 'p';
     pBuffer[pos] = 0;
     return pos;
 }

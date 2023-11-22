@@ -272,8 +272,8 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'b': {
-                uBdAddress_t *pBdAddr = va_arg(args, uBdAddress_t *);
-                int32_t len = uCxBdAddressToString(pBdAddr, buf, sizeof(buf));
+                uBtLeAddress_t *pBtLeAddr = va_arg(args, uBtLeAddress_t *);
+                int32_t len = uCxBdAddressToString(pBtLeAddr, buf, sizeof(buf));
                 U_CX_AT_PORT_ASSERT(len > 0);
                 writeAndLog(pClient, buf, len);
             }

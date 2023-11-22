@@ -219,9 +219,9 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
             }
             break;
             case 'b': {
-                uBdAddress_t *pBdAddr = va_arg(args, uBdAddress_t *);
-                U_CX_AT_PORT_ASSERT(pBdAddr != U_CX_AT_UTIL_PARAM_LAST);
-                if (uCxStringToBdAddress(pParam, pBdAddr) < 0) {
+                uBtLeAddress_t *pBtLeAddr = va_arg(args, uBtLeAddress_t *);
+                U_CX_AT_PORT_ASSERT(pBtLeAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToBdAddress(pParam, pBtLeAddr) < 0) {
                     return -ret;
                 }
             }

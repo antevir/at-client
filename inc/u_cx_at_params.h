@@ -54,7 +54,7 @@ typedef enum {
 typedef struct {
     uint8_t address[U_BD_ADDR_LEN];
     uBdAddressType_t type;
-} uBdAddress_t;
+} uBtLeAddress_t;
 
 typedef struct {
     uint8_t address[U_MAC_ADDR_LEN];
@@ -96,18 +96,18 @@ int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
 
 /** Convert a Bluetooth Device address string into a struct.
  *
- * @param pBdAddrString     the null terminated string to convert.
- * @param[out] pBdAddr      a pointer to a place to put the address.
+ * @param pBtLeAddrString   the null terminated string to convert.
+ * @param[out] pBtLeAddr    a pointer to a place to put the address.
  * @return                  zero on success else negative error code.
  */
-int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr);
+int32_t uCxStringToBdAddress(const char *pBtLeAddrString, uBtLeAddress_t *pBtLeAddr);
 
 /** Convert a Bluetooth Device address struct into a string.
  *
- * @param pBdAddr       a pointer to the MAC address to convert.
+ * @param pBtLeAddr     a pointer to the Bluetooth address to convert.
  * @param[out] pBuffer  a buffer in which to place the string.
- *                      Allow U_MAC_STRING_MAX_LENGTH_BYTES
- *                      for a MAC address and terminator.
+ *                      Allow U_BD_STRING_MAX_LENGTH_BYTES
+ *                      for a Bluetooth address and terminator.
  * @param sizeBytes     the amount of memory pointed to by
  *                      pBuffer.
  * @return              on success the length of the string, not
@@ -115,7 +115,7 @@ int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr);
  *                      strlen() would return) else negative
  *                      error code.
  */
-int32_t uCxBdAddressToString(const uBdAddress_t *pBdAddr, char *pBuffer, size_t sizeBytes);
+int32_t uCxBdAddressToString(const uBtLeAddress_t *pBtLeAddr, char *pBuffer, size_t sizeBytes);
 
 /** Convert a MAC address string into a struct.
  *
