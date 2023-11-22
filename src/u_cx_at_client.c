@@ -270,6 +270,13 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 writeAndLog(pClient, buf, len);
             }
             break;
+            case 'm': {
+                uMacAddress_t *pMacAddr = va_arg(args, uMacAddress_t *);
+                int32_t len = uCxMacAddressToString(pMacAddr, buf, sizeof(buf));
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeAndLog(pClient, buf, len);
+            }
+            break;
             case 'b': {
                 int32_t len = va_arg(args, int32_t);
                 uint8_t *pData = va_arg(args, uint8_t *);

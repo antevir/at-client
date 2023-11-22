@@ -50,6 +50,34 @@ static inline int32_t hexToNibble(char hexChar)
     return -1;
 }
 
+static bool binaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf,
+                        size_t bufSize, bool reverse)
+{
+    uint32_t i;
+
+    U_CX_AT_PORT_ASSERT(pBuf != NULL);
+    U_CX_AT_PORT_ASSERT(bufSize > 0);
+
+    // Check that the hex string can be fitted into the buffer (don't forget null termination)
+    if (bufSize < (2 * dataLen) + 1) {
+        pBuf[0] = 0;
+        return false;
+    }
+    pBuf[2 * dataLen] = 0;
+
+    if (pData != NULL) {
+        for (i = 0; i < dataLen; i++) {
+            uint32_t dataIndex = reverse ? dataLen - i - 1 : i;
+            pBuf[i * 2] = nibbleToHex(pData[dataIndex] >> 4);
+            pBuf[(i * 2) + 1] = nibbleToHex(pData[dataIndex] & 0x0F);
+        }
+    } else {
+        strncpy(pBuf, "(null)", bufSize);
+    }
+
+    return true;
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -61,7 +89,7 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr)
     pOutPtr[2] = 0;
 }
 
-int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
+int32_t uCxAtUtilHexToByte(const char *pHex, uint8_t *pOutByte)
 {
     int32_t highNibble = hexToNibble(pHex[0]);
     int32_t lowNibble = hexToNibble(pHex[1]);
@@ -70,6 +98,37 @@ int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
     }
     *pOutByte = (highNibble << 4) | lowNibble;
     return 0;
+}
+
+uint32_t uCxAtUtilHexToBinary(const char *pHexString, uint8_t *pBuf, size_t bufSize)
+{
+    uint32_t i = 0;
+    uint32_t len;
+    uint32_t toIndex = 0;
+
+    len = strlen(pHexString);
+
+    while ((toIndex < bufSize) && ((i + 1) < len)) {
+        int32_t ret = uCxAtUtilHexToByte(&pHexString[i], &pBuf[toIndex]);
+        if (ret < 0) {
+            // Invalid byte array return converted size
+            return toIndex;
+        }
+        toIndex++;
+        i += 2;
+    }
+
+    return toIndex;
+}
+
+bool uCxAtUtilBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize)
+{
+    return binaryToHex(pData, dataLen, pBuf, bufSize, false);
+}
+
+bool uCxAtUtilReverseBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize)
+{
+    return binaryToHex(pData, dataLen, pBuf, bufSize, true);
 }
 
 char *uCxAtUtilFindParamEnd(char *pStr)
@@ -147,6 +206,14 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
                 uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
                 U_CX_AT_PORT_ASSERT(pIpAddr != U_CX_AT_UTIL_PARAM_LAST);
                 if (uCxStringToIpAddress(pParam, pIpAddr) < 0) {
+                    return -ret;
+                }
+            }
+            break;
+            case 'm': {
+                uMacAddress_t *pMacAddr = va_arg(args, uMacAddress_t *);
+                U_CX_AT_PORT_ASSERT(pMacAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToMacAddress(pParam, pMacAddr) < 0) {
                     return -ret;
                 }
             }

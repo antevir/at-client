@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "u_cx_at_params.h"
+#include "u_cx_at_util.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -214,4 +215,23 @@ int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
     }
 
     return ret;
+}
+
+int32_t uCxStringToMacAddress(const char *pMacString, uMacAddress_t *pMac)
+{
+    if (strlen(pMacString) != U_MAC_ADDR_LEN * 2) {
+        return -1;
+    }
+    if (uCxAtUtilHexToBinary(pMacString, &pMac->address[0], U_MAC_ADDR_LEN) != U_MAC_ADDR_LEN) {
+        return -1;
+    }
+    return 0;
+}
+
+int32_t uCxMacAddressToString(const uMacAddress_t *pMac, char *pBuffer, size_t sizeBytes)
+{
+    if (!uCxAtUtilBinaryToHex(&pMac->address[0], U_MAC_ADDR_LEN, pBuffer, sizeBytes)) {
+        return -1;
+    }
+    return strlen(pBuffer);
 }

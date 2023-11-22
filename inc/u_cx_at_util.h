@@ -55,7 +55,47 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr);
   * @param[out] pOutByte:  the output byte.
   * @retval                0 on success otherwise negative value.
   */
-int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte);
+int32_t uCxAtUtilHexToByte(const char *pHex, uint8_t *pOutByte);
+
+/** Convert an ascii hex string to corresponding byte array
+ *
+ * The conversion will stop if an invalid character is detected,
+ * i.e a character that is not 0-9, a-f, or A-F
+ *
+ * @param[in]  pHexString null terminated ascii string representing bytes
+ * @param[out] pBuf buffer to put the converted bytes in
+ * @param      bufSize size of buffer
+ *
+ * @return number of bytes actually converted.
+ *
+ */
+uint32_t uCxAtUtilHexToBinary(const char *pHexString, uint8_t *pBuf, size_t bufSize);
+
+/** Convert binary data to an ascii hex string.
+ *
+ * @param[in]  pData binary data to convert
+ * @param      dataLen the number of bytes in pData to convert
+ * @param[out] pBuf buffer to put the ascii hex string in
+ * @param      bufSize size of pBuf
+ *
+ * @return true if the data could be fitted into pBuf otherwise false.
+ *
+ */
+bool uCxAtUtilBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize);
+
+/**
+ * Same as uStringBinaryToHex() but outputs the hexdata in reverse byte order
+ * i.e. [0x01,0x02,0x03] will be outputed as "030201"
+ *
+ * @param[in]  pData binary data to convert
+ * @param      dataLen the number of bytes in pData to convert
+ * @param[out] pBuf buffer to put the ascii hex string in
+ * @param      bufSize size of pBuf
+ *
+ * @return true if the data could be fitted into pBuf otherwise false.
+ *
+ */
+bool uCxAtUtilReverseBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize);
 
 /**
   * @brief Find end of a parameter in an AT parameter string

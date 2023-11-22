@@ -9,6 +9,9 @@
  * STATIC VARIABLES
  * -------------------------------------------------------------- */
 
+static uint8_t gBinarySeq[32];
+static char gHexSeq[(sizeof(gBinarySeq) * 2) + 1] = {0};
+
 /* ----------------------------------------------------------------
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -19,6 +22,14 @@
 
 void setUp(void)
 {
+    if (gHexSeq[0] == 0) {
+        for (unsigned int i = 0; i < sizeof(gBinarySeq); i++ ) {
+            char buf[16];
+            sprintf(buf, "%02X", i);
+            strcat(gHexSeq, buf);
+            gBinarySeq[i] = i;
+        }
+    }
 }
 
 void tearDown(void)
@@ -153,4 +164,103 @@ void test_uCxAtUtilParseParamsF_withIpAddr_expectParsedParam(void)
     TEST_ASSERT_EQUAL(1, uCxAtUtilParseParamsF(testData, "i", &ipAddr, U_CX_AT_UTIL_PARAM_LAST));
     TEST_ASSERT_EQUAL(U_SOCK_ADDRESS_TYPE_V4, ipAddr.type);
     TEST_ASSERT_EQUAL(0x00102030, ipAddr.address.ipv4);
+}
+
+void test_uCxAtUtilHexToBinary_withValidValues_expectSuccess(void)
+{
+    uint8_t buffer[32];
+    const char *seq1[] = {
+        "",
+        "00",
+        "000102030405060708090A0B0C0D0E0F",
+        "000102030405060708090a0b0c0d0e0f",
+        NULL
+    };
+    const char *seq2[] = {
+        "00102030405060708090A0B0C0D0E0F0",
+        "00102030405060708090a0b0c0d0e0f0",
+        NULL
+    };
+
+    for (int i = 0; seq1[i] != NULL; i++) {
+        memset(buffer, 0xFF, sizeof(buffer));
+        uint32_t ret = uCxAtUtilHexToBinary(seq1[i], buffer, sizeof(buffer));
+        TEST_ASSERT_EQUAL_UINT(strlen(seq1[i]) / 2, ret);
+        for (uint32_t j; j < ret; j++) {
+            TEST_ASSERT_EQUAL_INT(j, buffer[j]);
+        }
+    }
+
+    for (int i = 0; seq2[i] != NULL; i++) {
+        memset(buffer, 0xFF, sizeof(buffer));
+        uint32_t ret = uCxAtUtilHexToBinary(seq2[i], buffer, sizeof(buffer));
+        TEST_ASSERT_EQUAL_UINT(strlen(seq2[i]) / 2, ret);
+        for (uint32_t j = 0; j < ret; j++) {
+            TEST_ASSERT_EQUAL_INT(j * 16, buffer[j]);
+        }
+    }
+}
+
+void test_uCxAtUtilHexToBinary_withInvalidValues_expectFailure(void)
+{
+    uint8_t buffer[32];
+    const char *seq1[] = { "0", "0G", "0x", "0+", NULL };
+    const char *seq2[] = { "+0", "00+0", "0001+", "0001020+", NULL };
+
+    // seq1 should return 0 bytes
+    for (int i = 0; seq1[i] != NULL; i++) {
+        memset(buffer, 0xFF, sizeof(buffer));
+        uint32_t ret = uCxAtUtilHexToBinary(seq1[i], buffer, sizeof(buffer));
+        TEST_ASSERT_EQUAL_UINT(0, ret);
+        TEST_ASSERT_EQUAL_UINT8(0xFF, buffer[0]);
+    }
+
+    for (int i = 0; seq2[i] != NULL; i++) {
+        memset(buffer, 0xFF, sizeof(buffer));
+        uint32_t ret = uCxAtUtilHexToBinary(seq2[i], buffer, sizeof(buffer));
+        TEST_ASSERT_EQUAL_UINT(i, ret);
+        for (uint32_t j = 0; j < ret; j++) {
+            TEST_ASSERT_EQUAL_INT(j, buffer[j]);
+        }
+    }
+}
+
+void test_uCxAtUtilHexToBinary_withTightBuffer_expectSuccess(void)
+{
+    // uStringHexToBinary() should only output bufSize number of bytes
+    uint8_t buffer[32];
+    const char seq[] = "000102030405060708090A0B0C0D0E0F";
+    for (int i = 0; i < 16; i++) {
+        memset(buffer, 0xFF, sizeof(buffer));
+        uint32_t ret = uCxAtUtilHexToBinary(seq, buffer, i);
+        TEST_ASSERT_EQUAL_UINT(i, ret);
+        for (uint32_t j = 0; j < ret; j++) {
+            TEST_ASSERT_EQUAL_INT(j, buffer[j]);
+        }
+        TEST_ASSERT_EQUAL_UINT8(0xFF, buffer[ret]);
+    }
+}
+
+void test_uCxAtUtilBinaryToHex_withValidData_expectSuccess(void)
+{
+    char buf[(sizeof(gBinarySeq) * 2) + 1] = { 0 };
+    TEST_ASSERT(uCxAtUtilBinaryToHex(gBinarySeq, sizeof(gBinarySeq), buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_STRING(gHexSeq, buf);
+
+}
+
+void test_uCxAtUtilBinaryToHex_withNull_expectNullString(void)
+{
+    char buf[16];
+    TEST_ASSERT(uCxAtUtilBinaryToHex(NULL, 1, buf, sizeof(buf)));
+    TEST_ASSERT_EQUAL_STRING("(null)", buf);
+
+    TEST_ASSERT_FALSE(uCxAtUtilBinaryToHex(NULL, 1, buf, 2));
+}
+
+void test_uCxAtUtilBinaryToHex_withTooSmallBuffer_expectFailure(void)
+{
+    char buf[sizeof(gBinarySeq)];
+    TEST_ASSERT_FALSE(uCxAtUtilBinaryToHex(gBinarySeq, sizeof(gBinarySeq), buf, sizeof(buf)));
+    TEST_ASSERT_FALSE(uCxAtUtilBinaryToHex(NULL, 1, buf, 2));
 }
