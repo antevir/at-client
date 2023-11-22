@@ -34,6 +34,12 @@ typedef struct
 
 typedef struct
 {
+    int32_t status_id;
+    uSockIpAddress_t status_val; /**< IP address */
+} uCxWifiStationGetNetworkStatus_t;
+
+typedef struct
+{
     const char * ssid; /**< SSID */
     int32_t channel;   /**< channel */
 } uCxWifiApGetConnectionParams_t;
@@ -175,6 +181,18 @@ int32_t uCxWifiStationConnect(uCxHandle_t * puCxHandle, int32_t wlan_handle);
  * @param[in]  puCxHandle: uCX API handle
  */
 int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle);
+
+/**
+ * Show current status of Wi-Fi station network interface
+ * 
+ * Output AT command:
+ * > AT+UWSNST=<status_id>
+ *
+ * @param[in]  puCxHandle:                      uCX API handle
+ * @param      status_id:                       
+ * @param[out] pWifiStationGetNetworkStatusRsp: Please see \ref uCxWifiStationGetNetworkStatus_t
+ */
+int32_t uCxBeginWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
 
 /**
  * Start an access point with the current access point configuration.

@@ -25,6 +25,20 @@ int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle)
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT&W", "", U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxBeginSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * pAddress)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+USYLA=", "d", interface_id, U_CX_AT_UTIL_PARAM_LAST);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress);
+}
+
+int32_t uCxBeginSystemGetLocalAddress2(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * address, uMacAddress_t * pAddress)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+USYLA=", "dm", interface_id, address, U_CX_AT_UTIL_PARAM_LAST);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress);
+}
+
 int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;

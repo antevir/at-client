@@ -26,6 +26,13 @@ extern "C" {
 
 typedef enum
 {
+    U_INTERFACE_ID_BLUETOOTH,         /**< Bluetooth */
+    U_INTERFACE_ID_WI_FI_STATION = 1, /**< Wifi station */
+    U_INTERFACE_ID_WIFI_AP = 2        /**< Wifi Accesspoint */
+} uInterfaceId_t;
+
+typedef enum
+{
     U_BOOTLOADER_MODE_XMODEM,          /**< Enter xmodem mode for u-connect software update using serial port. */
     U_BOOTLOADER_MODE_COMMAND_LINE = 1 /**< Enter the bootloader command line mode using serial port. */
 } uBootloaderMode_t;
@@ -41,6 +48,16 @@ typedef enum
     U_WPA_THRESHOLD_WPA2,    /**< Only connect to access points that support WPA2 or up */
     U_WPA_THRESHOLD_WPA3 = 1 /**< Only connect to access points that support WPA3 */
 } uWpaThreshold_t;
+
+typedef enum
+{
+    U_STATUS_ID_IPV4,         /**< The current IPv4 address. */
+    U_STATUS_ID_SUBNET = 1,   /**< The current subnet mask */
+    U_STATUS_ID_GATE_WAY = 2, /**< The current gateway */
+    U_STATUS_ID_PRIM_DNS = 3, /**< The current primary DNS server */
+    U_STATUS_ID_SEC_DNS = 4,  /**< The current secondary DNS server */
+    U_STATUS_ID_IPV6 = 5      /**< The current IPv6 link local address */
+} uStatusId_t;
 
 typedef enum
 {
@@ -154,7 +171,7 @@ typedef void (*uUESPSDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDS_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, const char * string_data);
 typedef void (*uUESPSDB_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDA_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t number_bytes);
-typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, const char * bssid, int32_t channel);
+typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, uMacAddress_t * bssid, int32_t channel);
 typedef void (*uUEWLD_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, int32_t reason);
 typedef void (*uUEWSNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWSND_t)(struct uCxHandle *puCxHandle);
@@ -162,8 +179,8 @@ typedef void (*uUEWAPNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPND_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPD_t)(struct uCxHandle *puCxHandle);
-typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, const char * mac);
-typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, const char * mac);
+typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
+typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
 typedef void (*uUESOC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
 typedef void (*uUESODA_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, int32_t number_bytes);
 typedef void (*uUESODS_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, const char * string_data);

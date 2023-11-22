@@ -41,6 +41,15 @@ typedef struct
 
 typedef struct
 {
+    int32_t socket_handle;      /**< Socket identifier to be used for any future operation on that socket. */
+    uSockIpAddress_t remote_ip; /**< The ip address of the remote peer. */
+    int32_t remote_port;        /**< The port of the remote peer. */
+    int32_t length;             /**< Number of bytes to read. */
+    const char * string_data;   /**< Data encoded as ascii chars. */
+} uCxSocketReceiveFrom_t;
+
+typedef struct
+{
     int32_t socket_handle; /**< Socket identifier to be used for any future operation on that socket. */
     int32_t protocol;      /**< IP protocol. */
     int32_t socket_status;
@@ -169,6 +178,19 @@ int32_t uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle
  *                            usually reserved
  */
 int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t port);
+
+/**
+ * Reads the specified amount of data from the specified UDP socket.
+ * 
+ * Output AT command:
+ * > AT+USORF=<socket_handle>,<length>
+ *
+ * @param[in]  puCxHandle:            uCX API handle
+ * @param      socket_handle:         Socket identifier to be used for any future operation on that socket.
+ * @param      length:                Number of bytes to read.
+ * @param[out] pSocketReceiveFromRsp: Please see \ref uCxSocketReceiveFrom_t
+ */
+int32_t uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReceiveFrom_t * pSocketReceiveFromRsp);
 
 /**
  * List status for all created sockets.

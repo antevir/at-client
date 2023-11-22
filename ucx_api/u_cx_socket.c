@@ -72,6 +72,13 @@ int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USOL=", "dd", socket_handle, port, U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReceiveFrom_t * pSocketReceiveFromRsp)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+USORF=", "dd", socket_handle, length, U_CX_AT_UTIL_PARAM_LAST);
+    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USORF:", "didds", &pSocketReceiveFromRsp->socket_handle, &pSocketReceiveFromRsp->remote_ip, &pSocketReceiveFromRsp->remote_port, &pSocketReceiveFromRsp->length, &pSocketReceiveFromRsp->string_data);
+}
+
 int32_t uCxBeginSocketStatus(uCxHandle_t * puCxHandle, uCxSocketStatus_t * pSocketStatusRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;

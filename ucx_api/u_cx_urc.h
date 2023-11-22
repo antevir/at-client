@@ -47,6 +47,8 @@ void uCxUrcRegisterSocketDataAvailable(struct uCxHandle * puCxHandle, uUESODA_t 
 
 void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callback);
 
+void uCxUrcRegisterSocketIncommingConnection(struct uCxHandle * puCxHandle, uUESOIC_t callback);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -197,12 +197,12 @@ static int32_t parseUESPSDA(uCxHandle_t * puCxHandle, char * pParams, size_t par
 static int32_t parseUEWLU(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
     int32_t wlan_handle;
-    const char * bssid;
+    uMacAddress_t bssid;
     int32_t channel;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "dsd", &wlan_handle, &bssid, &channel, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "dmd", &wlan_handle, &bssid, &channel, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEWLU) {
-        puCxHandle->callbacks.UEWLU(puCxHandle, wlan_handle, bssid, channel);
+        puCxHandle->callbacks.UEWLU(puCxHandle, wlan_handle, &bssid, channel);
     }
     return ret;
 }
@@ -281,22 +281,22 @@ static int32_t parseUEWAPD(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUEWAPSA(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    const char * mac;
+    uMacAddress_t mac;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "s", &mac, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "m", &mac, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEWAPSA) {
-        puCxHandle->callbacks.UEWAPSA(puCxHandle, mac);
+        puCxHandle->callbacks.UEWAPSA(puCxHandle, &mac);
     }
     return ret;
 }
 
 static int32_t parseUEWAPSDA(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    const char * mac;
+    uMacAddress_t mac;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "s", &mac, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "m", &mac, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEWAPSDA) {
-        puCxHandle->callbacks.UEWAPSDA(puCxHandle, mac);
+        puCxHandle->callbacks.UEWAPSDA(puCxHandle, &mac);
     }
     return ret;
 }
@@ -640,5 +640,10 @@ void uCxUrcRegisterSocketDataAvailable(struct uCxHandle * puCxHandle, uUESODA_t 
 void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callback)
 {
     puCxHandle->callbacks.UESOCL = callback;
+}
+
+void uCxUrcRegisterSocketIncommingConnection(struct uCxHandle * puCxHandle, uUESOIC_t callback)
+{
+    puCxHandle->callbacks.UESOIC = callback;
 }
 

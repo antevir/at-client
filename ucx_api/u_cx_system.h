@@ -66,6 +66,37 @@ int32_t uCxSystemReboot(uCxHandle_t * puCxHandle);
 int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle);
 
 /**
+ * get and set interface address
+ * 
+ * Output AT command:
+ * > AT+USYLA=<interface_id>
+ *
+ * @param[in]  puCxHandle:   uCX API handle
+ * @param      interface_id: 
+ * @param[out] pAddress:     MAC address of the interface id. If the address is set to 000000000000, the local address
+ *                           will be restored to factory-programmed value. A reboot is required The least significant
+ *                           bit of the first octet of the <address> must be 0.
+ */
+int32_t uCxBeginSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * pAddress);
+
+/**
+ * get and set interface address
+ * 
+ * Output AT command:
+ * > AT+USYLA=<interface_id>,<address>
+ *
+ * @param[in]  puCxHandle:   uCX API handle
+ * @param      interface_id: 
+ * @param      address:      MAC address of the interface id. If the address is set to 000000000000, the local address
+ *                           will be restored to factory-programmed value. A reboot is required The least significant
+ *                           bit of the first octet of the <address> must be 0.
+ * @param[out] pAddress:     MAC address of the interface id. If the address is set to 000000000000, the local address
+ *                           will be restored to factory-programmed value. A reboot is required The least significant
+ *                           bit of the first octet of the <address> must be 0.
+ */
+int32_t uCxBeginSystemGetLocalAddress2(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * address, uMacAddress_t * pAddress);
+
+/**
  * The module is completely restored to factory defaults. All settings are reset to default values.
  * All certificates and Bluetooth bonding information will be removed.
  * A reboot is required before using the new settings.
