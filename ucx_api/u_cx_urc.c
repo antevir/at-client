@@ -20,8 +20,14 @@
 
 static int32_t parseUEBTC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    int32_t conn_handle;
+    uBtLeAddress_t bd_addr;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "db", &conn_handle, &bd_addr, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTC) {
+        puCxHandle->callbacks.UEBTC(puCxHandle, conn_handle, &bd_addr);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTDC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -37,26 +43,49 @@ static int32_t parseUEBTDC(uCxHandle_t * puCxHandle, char * pParams, size_t para
 
 static int32_t parseUEBTB(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    uBtLeAddress_t bd_addr;
+    int32_t bond_status;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &bond_status, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTB) {
+        puCxHandle->callbacks.UEBTB(puCxHandle, &bd_addr, bond_status);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTUC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    uBtLeAddress_t bd_addr;
+    int32_t nummeric_value;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &nummeric_value, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTUC) {
+        puCxHandle->callbacks.UEBTUC(puCxHandle, &bd_addr, nummeric_value);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTUPD(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    uBtLeAddress_t bd_addr;
+    int32_t nummeric_value;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &nummeric_value, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTUPD) {
+        puCxHandle->callbacks.UEBTUPD(puCxHandle, &bd_addr, nummeric_value);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTUPE(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
-    // Unsupported param types
-    return -1;
+    uBtLeAddress_t bd_addr;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "b", &bd_addr, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEBTUPE) {
+        puCxHandle->callbacks.UEBTUPE(puCxHandle, &bd_addr);
+    }
+    return ret;
 }
 
 static int32_t parseUEBTPHYU(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
@@ -587,6 +616,76 @@ int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pPar
     return -1;
 }
 
+void uCxUrcRegisterBluetoothConnect(struct uCxHandle * puCxHandle, uUEBTC_t callback)
+{
+    puCxHandle->callbacks.UEBTC = callback;
+}
+
+void uCxUrcRegisterBluetoothDisconnect(struct uCxHandle * puCxHandle, uUEBTDC_t callback)
+{
+    puCxHandle->callbacks.UEBTDC = callback;
+}
+
+void uCxUrcRegisterBluetoothBondStatus(struct uCxHandle * puCxHandle, uUEBTB_t callback)
+{
+    puCxHandle->callbacks.UEBTB = callback;
+}
+
+void uCxUrcRegisterBluetoothUserConfirmation(struct uCxHandle * puCxHandle, uUEBTUC_t callback)
+{
+    puCxHandle->callbacks.UEBTUC = callback;
+}
+
+void uCxUrcRegisterBluetoothPasskeyRequest(struct uCxHandle * puCxHandle, uUEBTUPE_t callback)
+{
+    puCxHandle->callbacks.UEBTUPE = callback;
+}
+
+void uCxUrcRegisterBluetoothPhyUpdate(struct uCxHandle * puCxHandle, uUEBTPHYU_t callback)
+{
+    puCxHandle->callbacks.UEBTPHYU = callback;
+}
+
+void uCxUrcRegisterGATTclientNotification(struct uCxHandle * puCxHandle, uUEBTGCN_t callback)
+{
+    puCxHandle->callbacks.UEBTGCN = callback;
+}
+
+void uCxUrcRegisterGATTclientIndication(struct uCxHandle * puCxHandle, uUEBTGCI_t callback)
+{
+    puCxHandle->callbacks.UEBTGCI = callback;
+}
+
+void uCxUrcRegisterGATTServerNotification(struct uCxHandle * puCxHandle, uUEBTGCW_t callback)
+{
+    puCxHandle->callbacks.UEBTGCW = callback;
+}
+
+void uCxUrcRegisterGATTServerReadAttribute(struct uCxHandle * puCxHandle, uUEBTGRR_t callback)
+{
+    puCxHandle->callbacks.UEBTGRR = callback;
+}
+
+void uCxUrcRegisterGATTServerIndicationAck(struct uCxHandle * puCxHandle, uUEBTGIC_t callback)
+{
+    puCxHandle->callbacks.UEBTGIC = callback;
+}
+
+void uCxUrcRegisterSPSConnect(struct uCxHandle * puCxHandle, uUESPSC_t callback)
+{
+    puCxHandle->callbacks.UESPSC = callback;
+}
+
+void uCxUrcRegisterSPSDisconnect(struct uCxHandle * puCxHandle, uUESPSDC_t callback)
+{
+    puCxHandle->callbacks.UESPSDC = callback;
+}
+
+void uCxUrcRegisterSPSDataAvailable(struct uCxHandle * puCxHandle, uUESPSDA_t callback)
+{
+    puCxHandle->callbacks.UESPSDA = callback;
+}
+
 void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback)
 {
     puCxHandle->callbacks.UEWLU = callback;
@@ -645,5 +744,15 @@ void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callbac
 void uCxUrcRegisterSocketIncommingConnection(struct uCxHandle * puCxHandle, uUESOIC_t callback)
 {
     puCxHandle->callbacks.UESOIC = callback;
+}
+
+void uCxUrcRegisterDiagnosticsPingComplete(struct uCxHandle * puCxHandle, uUEDGPC_t callback)
+{
+    puCxHandle->callbacks.UEDGPC = callback;
+}
+
+void uCxUrcRegisterDiagnosticsPingResponse(struct uCxHandle * puCxHandle, uUEDGP_t callback)
+{
+    puCxHandle->callbacks.UEDGP = callback;
 }
 
