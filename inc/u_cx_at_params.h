@@ -60,6 +60,11 @@ typedef struct {
     uint8_t address[U_MAC_ADDR_LEN];
 } uMacAddress_t;
 
+typedef struct {
+    uint8_t *pData;
+    size_t length;
+} uByteArray_t;
+
 /* ----------------------------------------------------------------
  * VARIABLES
  * -------------------------------------------------------------- */

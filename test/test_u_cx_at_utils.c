@@ -16,6 +16,17 @@ static char gHexSeq[(sizeof(gBinarySeq) * 2) + 1] = {0};
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
 
+static int uCxAtUtilParseParamsVaList_wrapper(char *pParamsLine, const char *pParamFmt, ...)
+{
+    char data[strlen(pParamsLine) + 1];
+    strcpy(data, pParamsLine);
+    va_list args;
+    va_start(args, pParamFmt);
+    int ret = uCxAtUtilParseParamsVaList(data, pParamFmt, args);
+    va_end(args);
+    return ret;
+}
+
 /* ----------------------------------------------------------------
  * TEST FUNCTIONS
  * -------------------------------------------------------------- */
@@ -263,4 +274,15 @@ void test_uCxAtUtilBinaryToHex_withTooSmallBuffer_expectFailure(void)
     char buf[sizeof(gBinarySeq)];
     TEST_ASSERT_FALSE(uCxAtUtilBinaryToHex(gBinarySeq, sizeof(gBinarySeq), buf, sizeof(buf)));
     TEST_ASSERT_FALSE(uCxAtUtilBinaryToHex(NULL, 1, buf, 2));
+}
+
+
+void test_uCxAtUtilParseParamsVaList_withByteArray(void)
+{
+    uByteArray_t byteArray;
+    uint8_t expData[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+    int32_t ret = uCxAtUtilParseParamsVaList_wrapper("001122334455", "h", &byteArray);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(byteArray.pData, expData, sizeof(expData));
+    TEST_ASSERT_EQUAL(sizeof(expData), byteArray.length);
+    TEST_ASSERT_EQUAL(1, ret);
 }

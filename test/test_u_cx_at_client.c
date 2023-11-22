@@ -135,3 +135,11 @@ void test_uCxAtClientSendCmdVaList_withBdAddress(void)
                                    &btLeAddr, U_CX_AT_UTIL_PARAM_LAST);
     TEST_ASSERT_EQUAL_STRING("AT+FOO=001122334455p\r", &gTxBuffer[0]);
 }
+
+void test_uCxAtClientSendCmdVaList_withByteArray(void)
+{
+    uint8_t data[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+    uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "h",
+                                   &data[0], sizeof(data), U_CX_AT_UTIL_PARAM_LAST);
+    TEST_ASSERT_EQUAL_STRING("AT+FOO=001122334455\r", &gTxBuffer[0]);
+}

@@ -227,19 +227,17 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
             }
             break;
             case 'h': {
-                int32_t *pLen = va_arg(args, int32_t *);
-                uint8_t **ppData = va_arg(args, uint8_t **);
+                uByteArray_t *pByteArray = va_arg(args, uByteArray_t *);
+                U_CX_AT_PORT_ASSERT(pByteArray != U_CX_AT_UTIL_PARAM_LAST);
                 uint8_t *pBytes;
                 size_t len = strlen(pParam);
-                U_CX_AT_PORT_ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
-                U_CX_AT_PORT_ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
                 if ((len % 2) != 0) {
                     return -ret;
                 }
-                *pLen = len / 2;
+                pByteArray->length = len / 2;
                 pBytes = (uint8_t *)pParam;
-                *ppData = pBytes;
-                for (int32_t i = 0; i < *pLen; i++) {
+                pByteArray->pData = pBytes;
+                for (size_t i = 0; i < pByteArray->length; i++) {
                     if (uCxAtUtilHexToByte(&pParam[i * 2], pBytes) < 0) {
                         return -ret;
                     }

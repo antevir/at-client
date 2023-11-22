@@ -279,8 +279,8 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'h': {
-                int32_t len = va_arg(args, int32_t);
                 uint8_t *pData = va_arg(args, uint8_t *);
+                int32_t len = va_arg(args, int32_t);
                 for (int32_t i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
                     writeAndLog(pClient, buf, 2);
