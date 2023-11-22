@@ -206,3 +206,62 @@ void test_uCxMacAddressToString_withTooSmallBuffer_expectError(void)
     int32_t ret = uCxMacAddressToString(&macAddress, &buffer[0], sizeof(buffer));
     TEST_ASSERT_LESS_THAN(0, ret);
 }
+
+void test_uCxStringToBdAddress_withPublicAddrStr_expectPublicAddr(void)
+{
+    uBdAddress_t bdAddress;
+    const uint8_t expData[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+
+    TEST_ASSERT_EQUAL(0, uCxStringToBdAddress("001122334455p", &bdAddress));
+    TEST_ASSERT_EQUAL(U_BD_ADDRESS_TYPE_PUBLIC, bdAddress.type);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expData, bdAddress.address, U_BD_ADDR_LEN);
+
+    memset(&bdAddress, 0, sizeof(bdAddress));
+    TEST_ASSERT_EQUAL(0, uCxStringToBdAddress("001122334455", &bdAddress));
+    TEST_ASSERT_EQUAL(U_BD_ADDRESS_TYPE_PUBLIC, bdAddress.type);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expData, bdAddress.address, U_BD_ADDR_LEN);
+}
+
+void test_uCxStringToBdAddress_withRandomAddrStr_expectRandomAddr(void)
+{
+    uBdAddress_t bdAddress;
+    const uint8_t expData[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+
+    TEST_ASSERT_EQUAL(0, uCxStringToBdAddress("001122334455r", &bdAddress));
+    TEST_ASSERT_EQUAL(U_BD_ADDRESS_TYPE_RANDOM, bdAddress.type);
+    TEST_ASSERT_EQUAL_UINT8_ARRAY(expData, bdAddress.address, U_BD_ADDR_LEN);
+}
+
+void test_uCxBdAddressToString_withPublicAddr_expectPublicAddrStr(void)
+{
+    const uBdAddress_t bdAddress = {
+        .type = U_BD_ADDRESS_TYPE_PUBLIC,
+        .address = {0x00,0x11,0x22,0x33,0x44,0x55}
+    };
+    char buffer[U_BD_STRING_MAX_LENGTH_BYTES];
+    int32_t ret = uCxBdAddressToString(&bdAddress, &buffer[0], sizeof(buffer));
+    TEST_ASSERT_EQUAL(13, ret);
+    TEST_ASSERT_EQUAL_STRING("001122334455p", buffer);
+}
+
+void test_uCxBdAddressToString_withRandomAddr_expectRandomAddrStr(void)
+{
+    const uBdAddress_t bdAddress = {
+        .type = U_BD_ADDRESS_TYPE_RANDOM,
+        .address = {0x00,0x11,0x22,0x33,0x44,0x55}
+    };
+    char buffer[U_BD_STRING_MAX_LENGTH_BYTES];
+    int32_t ret = uCxBdAddressToString(&bdAddress, &buffer[0], sizeof(buffer));
+    TEST_ASSERT_EQUAL(13, ret);
+    TEST_ASSERT_EQUAL_STRING("001122334455r", buffer);
+}
+
+void test_uCxBdAddressToString_withTooSmallBuffer_expectError(void)
+{
+    const uBdAddress_t bdAddress = {
+        .address = {0}
+    };
+    char buffer[U_BD_STRING_MAX_LENGTH_BYTES - 1];
+    int32_t ret = uCxBdAddressToString(&bdAddress, &buffer[0], sizeof(buffer));
+    TEST_ASSERT_LESS_THAN(0, ret);
+}

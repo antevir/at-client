@@ -219,6 +219,14 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
             }
             break;
             case 'b': {
+                uBdAddress_t *pBdAddr = va_arg(args, uBdAddress_t *);
+                U_CX_AT_PORT_ASSERT(pBdAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToBdAddress(pParam, pBdAddr) < 0) {
+                    return -ret;
+                }
+            }
+            break;
+            case 'h': {
                 int32_t *pLen = va_arg(args, int32_t *);
                 uint8_t **ppData = va_arg(args, uint8_t **);
                 uint8_t *pBytes;

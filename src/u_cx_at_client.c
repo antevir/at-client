@@ -252,12 +252,6 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 writeAndLog(pClient, buf, len);
             }
             break;
-            case 'h': {
-                int32_t i = va_arg(args, int32_t);
-                int32_t len = snprintf(buf, sizeof(buf), "%x", i);
-                writeAndLog(pClient, buf, len);
-            }
-            break;
             case 's': {
                 char *pStr = va_arg(args, char *);
                 writeAndLog(pClient, pStr, strlen(pStr));
@@ -278,6 +272,13 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'b': {
+                uBdAddress_t *pBdAddr = va_arg(args, uBdAddress_t *);
+                int32_t len = uCxBdAddressToString(pBdAddr, buf, sizeof(buf));
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeAndLog(pClient, buf, len);
+            }
+            break;
+            case 'h': {
                 int32_t len = va_arg(args, int32_t);
                 uint8_t *pData = va_arg(args, uint8_t *);
                 for (int32_t i = 0; i < len; i++) {

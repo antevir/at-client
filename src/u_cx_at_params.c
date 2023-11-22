@@ -139,6 +139,33 @@ static bool ipv6StringToIpAddress(const char *pAddressString,
     return true;
 }
 
+static int32_t findBdAddressType(const char *pStr,
+                                 uBdAddressType_t *pBdAddressType)
+{
+    uint32_t length = strlen(pStr);
+
+    switch (pStr[length - 1]) {
+        case 'r':
+            *pBdAddressType = U_BD_ADDRESS_TYPE_RANDOM;
+            break;
+        case 'p':
+            *pBdAddressType = U_BD_ADDRESS_TYPE_PUBLIC;
+            break;
+        default:
+            if (length == 12) {
+                //the input address has only 12 hexadecimal characters without any suffix
+                //default address type is public
+                *pBdAddressType = U_BD_ADDRESS_TYPE_PUBLIC;
+            } else {
+                //the input address has a suffix other than 'p' or 'r'
+                return -1;
+            }
+            break;
+    }
+
+    return 0;
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -215,6 +242,32 @@ int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
     }
 
     return ret;
+}
+
+int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr)
+{
+    int32_t ret = findBdAddressType(pBdAddrString, &pBdAddr->type);
+    if (ret == 0) {
+        uint32_t len = uCxAtUtilHexToBinary(pBdAddrString, pBdAddr->address, U_BD_ADDR_LEN);
+        if (len != U_BD_ADDR_LEN) {
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+int32_t uCxBdAddressToString(const uBdAddress_t *pBdAddr, char *pBuffer, size_t sizeBytes)
+{
+    if (sizeBytes < U_BD_STRING_MAX_LENGTH_BYTES) {
+        return -1;
+    }
+    if (!uCxAtUtilBinaryToHex(&pBdAddr->address[0], U_BD_ADDR_LEN, pBuffer, sizeBytes)) {
+        return -1;
+    }
+    size_t pos = strlen(pBuffer);
+    pBuffer[pos++] = (pBdAddr->type == U_BD_ADDRESS_TYPE_RANDOM) ? 'r' : 'p';
+    pBuffer[pos] = 0;
+    return pos;
 }
 
 int32_t uCxStringToMacAddress(const char *pMacString, uMacAddress_t *pMac)

@@ -15,9 +15,11 @@
  * -------------------------------------------------------------- */
 
 #define U_IP_STRING_MAX_LENGTH_BYTES  (41 + 1)
-#define U_MAC_STRING_MAX_LENGTH_BYTES  (12 + 1)
+#define U_MAC_STRING_MAX_LENGTH_BYTES (12 + 1)
+#define U_BD_STRING_MAX_LENGTH_BYTES  (12 + 1 + 1)
 
 #define U_MAC_ADDR_LEN  6
+#define U_BD_ADDR_LEN   6
 
 /* ----------------------------------------------------------------
  * TYPES
@@ -42,6 +44,17 @@ typedef struct {
 } uSockIpAddress_t;
 
 #endif // U_UCONNECT_GEN2
+
+typedef enum {
+    U_BD_ADDRESS_TYPE_RANDOM,
+    U_BD_ADDRESS_TYPE_PUBLIC,
+    U_BD_ADDRESS_TYPE_UNKNOWN,
+} uBdAddressType_t;
+
+typedef struct {
+    uint8_t address[U_BD_ADDR_LEN];
+    uBdAddressType_t type;
+} uBdAddress_t;
 
 typedef struct {
     uint8_t address[U_MAC_ADDR_LEN];
@@ -80,6 +93,29 @@ int32_t uCxStringToIpAddress(const char *pAddressString,
  */
 int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
                              char *pBuffer, size_t sizeBytes);
+
+/** Convert a Bluetooth Device address string into a struct.
+ *
+ * @param pBdAddrString     the null terminated string to convert.
+ * @param[out] pBdAddr      a pointer to a place to put the address.
+ * @return                  zero on success else negative error code.
+ */
+int32_t uCxStringToBdAddress(const char *pBdAddrString, uBdAddress_t *pBdAddr);
+
+/** Convert a Bluetooth Device address struct into a string.
+ *
+ * @param pBdAddr       a pointer to the MAC address to convert.
+ * @param[out] pBuffer  a buffer in which to place the string.
+ *                      Allow U_MAC_STRING_MAX_LENGTH_BYTES
+ *                      for a MAC address and terminator.
+ * @param sizeBytes     the amount of memory pointed to by
+ *                      pBuffer.
+ * @return              on success the length of the string, not
+ *                      including the terminator (i.e. what
+ *                      strlen() would return) else negative
+ *                      error code.
+ */
+int32_t uCxBdAddressToString(const uBdAddress_t *pBdAddr, char *pBuffer, size_t sizeBytes);
 
 /** Convert a MAC address string into a struct.
  *
