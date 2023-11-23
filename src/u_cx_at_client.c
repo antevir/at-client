@@ -223,7 +223,7 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
     U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
-void uCxAtClientDeinit(void)
+void uCxAtClientDeinit(uCxAtClient_t *pClient)
 {
     U_CX_MUTEX_DELETE(pClient->cmdMutex);
 }
