@@ -85,6 +85,14 @@ typedef struct uCxAtClientConfig {
 void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient);
 
 /**
+  * @brief  AT client deinit
+  *
+  * Calling this will release any resources allocated by uCxAtClientInit().
+  *
+  */
+void uCxAtClientDeinit(void);
+
+/**
   * @brief  Set URC callback
   *
   * @param[in]  pClient:      the AT client from uCxAtClientInit().

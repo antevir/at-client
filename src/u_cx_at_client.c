@@ -223,6 +223,11 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
     U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
+void uCxAtClientDeinit(void)
+{
+    U_CX_MUTEX_DELETE(pClient->cmdMutex);
+}
+
 void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
 {
     pClient->urcCallback = urcCallback;
