@@ -746,6 +746,16 @@ void uCxUrcRegisterSocketIncommingConnection(struct uCxHandle * puCxHandle, uUES
     puCxHandle->callbacks.UESOIC = callback;
 }
 
+void uCxUrcRegisterMqttConnect(struct uCxHandle * puCxHandle, uUEMQC_t callback)
+{
+    puCxHandle->callbacks.UEMQC = callback;
+}
+
+void uCxUrcRegisterMqttDisconnect(struct uCxHandle * puCxHandle, uUEMQDC_t callback)
+{
+    puCxHandle->callbacks.UEMQDC = callback;
+}
+
 void uCxUrcRegisterDiagnosticsPingComplete(struct uCxHandle * puCxHandle, uUEDGPC_t callback)
 {
     puCxHandle->callbacks.UEDGPC = callback;

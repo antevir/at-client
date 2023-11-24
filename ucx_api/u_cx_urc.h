@@ -77,6 +77,10 @@ void uCxUrcRegisterSocketClosed(struct uCxHandle * puCxHandle, uUESOCL_t callbac
 
 void uCxUrcRegisterSocketIncommingConnection(struct uCxHandle * puCxHandle, uUESOIC_t callback);
 
+void uCxUrcRegisterMqttConnect(struct uCxHandle * puCxHandle, uUEMQC_t callback);
+
+void uCxUrcRegisterMqttDisconnect(struct uCxHandle * puCxHandle, uUEMQDC_t callback);
+
 void uCxUrcRegisterDiagnosticsPingComplete(struct uCxHandle * puCxHandle, uUEDGPC_t callback);
 
 void uCxUrcRegisterDiagnosticsPingResponse(struct uCxHandle * puCxHandle, uUEDGP_t callback);
