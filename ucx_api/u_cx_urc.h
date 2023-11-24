@@ -81,6 +81,8 @@ void uCxUrcRegisterMqttConnect(struct uCxHandle * puCxHandle, uUEMQC_t callback)
 
 void uCxUrcRegisterMqttDisconnect(struct uCxHandle * puCxHandle, uUEMQDC_t callback);
 
+void uCxUrcRegisterMqttDataAvailable(struct uCxHandle * puCxHandle, uUEMQDA_t callback);
+
 void uCxUrcRegisterDiagnosticsPingComplete(struct uCxHandle * puCxHandle, uUEDGPC_t callback);
 
 void uCxUrcRegisterDiagnosticsPingResponse(struct uCxHandle * puCxHandle, uUEDGP_t callback);
