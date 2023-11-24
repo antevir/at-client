@@ -69,6 +69,10 @@ void uCxUrcRegisterWiFiApUp(struct uCxHandle * puCxHandle, uUEWAPU_t callback);
 
 void uCxUrcRegisterWiFiApDown(struct uCxHandle * puCxHandle, uUEWAPD_t callback);
 
+void uCxUrcRegisterWiFiApStationAssociated(struct uCxHandle * puCxHandle, uUEWAPSA_t callback);
+
+void uCxUrcRegisterWiFiApStationDisassociated(struct uCxHandle * puCxHandle, uUEWAPSDA_t callback);
+
 void uCxUrcRegisterSocketConnect(struct uCxHandle * puCxHandle, uUESOC_t callback);
 
 void uCxUrcRegisterSocketDataAvailable(struct uCxHandle * puCxHandle, uUESODA_t callback);
