@@ -82,7 +82,7 @@ int32_t uCxBluetoothSetMode(uCxHandle_t * puCxHandle, uBtMode_t bt_mode);
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] pBtMode:    
  */
-int32_t uCxBeginBluetoothGetMode(uCxHandle_t * puCxHandle, uBtMode_t * pBtMode);
+int32_t uCxBluetoothGetMode(uCxHandle_t * puCxHandle, uBtMode_t * pBtMode);
 
 /**
  * Initiate connection.
@@ -197,7 +197,7 @@ int32_t uCxBluetoothSetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscover
  * @param[in]  puCxHandle:               uCX API handle
  * @param[out] pBackgroundDiscoveryMode: 
  */
-int32_t uCxBeginBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscoveryMode_t * pBackgroundDiscoveryMode);
+int32_t uCxBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscoveryMode_t * pBackgroundDiscoveryMode);
 
 /**
  * Returns the current RSSI for a specified Bluetooth connection.
@@ -209,7 +209,7 @@ int32_t uCxBeginBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDis
  * @param      conn_handle: Connection handle of the Bluetooth low energy connection.
  * @param[out] pRssi:       Recieved signal strength in dBm.
  */
-int32_t uCxBeginBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi);
+int32_t uCxBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi);
 
 /**
  * Read propertie(s) of an existing Bluetooth low energy ACL connection. If <property_id> is ommited all properties will be
@@ -222,7 +222,7 @@ int32_t uCxBeginBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int
  * @param      conn_handle:                   Connection handle of the Bluetooth low energy connection.
  * @param[out] pBluetoothConnectionStatusRsp: Please see \ref uCxBluetoothConnectionStatus_t
  */
-int32_t uCxBeginBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
+int32_t uCxBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
 
 /**
  * Read propertie(s) of an existing Bluetooth low energy ACL connection. If <property_id> is ommited all properties will be
@@ -236,7 +236,7 @@ int32_t uCxBeginBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t con
  * @param      property_id:                   
  * @param[out] pBluetoothConnectionStatusRsp: Please see \ref uCxBluetoothConnectionStatus_t
  */
-int32_t uCxBeginBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
+int32_t uCxBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
 
 /**
  * Write custom advertising data.
@@ -304,7 +304,7 @@ int32_t uCxBluetoothSetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t adv_m
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] pAdvMode:   
  */
-int32_t uCxBeginBluetoothGetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t * pAdvMode);
+int32_t uCxBluetoothGetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t * pAdvMode);
 
 /**
  * Starts directed advertisements to Bluetooth Address. If bd_addr is FFFFFFFFFFFF, direct advertisements will be disabled.
@@ -357,7 +357,7 @@ int32_t uCxBluetoothSetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_
  * @param[in]  puCxHandle:      uCX API handle
  * @param[out] pIoCapabilities: 
  */
-int32_t uCxBeginBluetoothGetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_t * pIoCapabilities);
+int32_t uCxBluetoothGetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_t * pIoCapabilities);
 
 /**
  * Writes the security mode
@@ -379,7 +379,7 @@ int32_t uCxBluetoothSetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t 
  * @param[in]  puCxHandle:      uCX API handle
  * @param[out] pBtSecurityMode: 
  */
-int32_t uCxBeginBluetoothGetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t * pBtSecurityMode);
+int32_t uCxBluetoothGetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t * pBtSecurityMode);
 
 /**
  * Writes the pairing mode.
@@ -401,7 +401,7 @@ int32_t uCxBluetoothSetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t pair
  * @param[in]  puCxHandle:   uCX API handle
  * @param[out] pPairingMode: 
  */
-int32_t uCxBeginBluetoothGetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t * pPairingMode);
+int32_t uCxBluetoothGetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t * pPairingMode);
 
 /**
  * Respond to +UEUBTUC and confirm/deny bonding.
@@ -496,7 +496,7 @@ int32_t uCxBluetoothRequestPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, in
  * @param      conn_handle:         Connection handle of the Bluetooth low energy connection.
  * @param[out] pBluetoothGetPhyRsp: Please see \ref uCxBluetoothGetPhy_t
  */
-int32_t uCxBeginBluetoothGetPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothGetPhy_t * pBluetoothGetPhyRsp);
+int32_t uCxBluetoothGetPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothGetPhy_t * pBluetoothGetPhyRsp);
 
 
 #ifdef __cplusplus

@@ -80,7 +80,7 @@ int32_t uCxSpsSetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t sps
  * @param[in]  puCxHandle:        uCX API handle
  * @param[out] pSpsServiceOption: 
  */
-int32_t uCxBeginSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * pSpsServiceOption);
+int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * pSpsServiceOption);
 
 /**
  * Write SPS data
@@ -114,7 +114,7 @@ int32_t uCxSpsSetDataMode(uCxHandle_t * puCxHandle, uReadMode_t read_mode);
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] pReadMode:  Modes to read data in AT
  */
-int32_t uCxBeginSpsGetDataMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
+int32_t uCxSpsGetDataMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
 
 /**
  * Reads the specified amount of data from given connection handle.

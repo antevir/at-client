@@ -54,7 +54,7 @@ typedef struct
  * @param      uuid_len:   length of uuid
  * @param[out] pSerHandle: Handle of the created service.
  */
-int32_t uCxBeginGattServerServiceDefine(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, int32_t * pSerHandle);
+int32_t uCxGattServerServiceDefine(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, int32_t * pSerHandle);
 
 /**
  * Create a new characteristic in the GATT table for a GATT server. The CCCD for the characteristic, if applicable, is
@@ -87,7 +87,7 @@ int32_t uCxBeginGattServerServiceDefine(uCxHandle_t * puCxHandle, const uint8_t 
  * @param      value_len:                length of value
  * @param[out] pGattServerCharDefineRsp: Please see \ref uCxGattServerCharDefine_t
  */
-int32_t uCxBeginGattServerCharDefine5(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, uCxGattServerCharDefine_t * pGattServerCharDefineRsp);
+int32_t uCxGattServerCharDefine5(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, uCxGattServerCharDefine_t * pGattServerCharDefineRsp);
 
 /**
  * Create a new characteristic in the GATT table for a GATT server. The CCCD for the characteristic, if applicable, is
@@ -122,7 +122,7 @@ int32_t uCxBeginGattServerCharDefine5(uCxHandle_t * puCxHandle, const uint8_t * 
  * @param      max_length:               Maximum length of the characteristic in bytes. The maximum value is 244 bytes.
  * @param[out] pGattServerCharDefineRsp: Please see \ref uCxGattServerCharDefine_t
  */
-int32_t uCxBeginGattServerCharDefine6(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t max_length, uCxGattServerCharDefine_t * pGattServerCharDefineRsp);
+int32_t uCxGattServerCharDefine6(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t max_length, uCxGattServerCharDefine_t * pGattServerCharDefineRsp);
 
 /**
  * Define a characteristic.
@@ -151,7 +151,7 @@ int32_t uCxBeginGattServerCharDefine6(uCxHandle_t * puCxHandle, const uint8_t * 
  * @param      security_write:               
  * @param[out] pGattServerHostCharDefineRsp: Please see \ref uCxGattServerHostCharDefine_t
  */
-int32_t uCxBeginGattServerHostCharDefine(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, uCxGattServerHostCharDefine_t * pGattServerHostCharDefineRsp);
+int32_t uCxGattServerHostCharDefine(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, const uint8_t * properties, int32_t properties_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, uCxGattServerHostCharDefine_t * pGattServerHostCharDefineRsp);
 
 /**
  * Define descriptor.
@@ -168,7 +168,7 @@ int32_t uCxBeginGattServerHostCharDefine(uCxHandle_t * puCxHandle, const uint8_t
  * @param      value_len:      length of value
  * @param[out] pDescHandle:    Handle of the created descriptor.
  */
-int32_t uCxBeginGattServerDescriptorDefine4(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t * pDescHandle);
+int32_t uCxGattServerDescriptorDefine4(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t * pDescHandle);
 
 /**
  * Define descriptor.
@@ -186,7 +186,7 @@ int32_t uCxBeginGattServerDescriptorDefine4(uCxHandle_t * puCxHandle, const uint
  * @param      max_length:     Maximum length of the descriptor in bytes. The maximum value is 23 bytes.
  * @param[out] pDescHandle:    Handle of the created descriptor.
  */
-int32_t uCxBeginGattServerDescriptorDefine5(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t max_length, int32_t * pDescHandle);
+int32_t uCxGattServerDescriptorDefine5(uCxHandle_t * puCxHandle, const uint8_t * uuid, int32_t uuid_len, uSecurityRead_t security_read, uSecurityWrite_t security_write, const uint8_t * value, int32_t value_len, int32_t max_length, int32_t * pDescHandle);
 
 /**
  * Activate current defined service.

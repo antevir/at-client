@@ -56,11 +56,15 @@ int32_t uCxMqttSetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, int32_t k
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UMQKA=", "dd", mqtt_id, keep_alive, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginMqttGetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetKeepAlive_t * pMqttGetKeepAliveRsp)
+int32_t uCxMqttGetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetKeepAlive_t * pMqttGetKeepAliveRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQKA=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQKA:", "dd", &pMqttGetKeepAliveRsp->mqtt_id, &pMqttGetKeepAliveRsp->keep_alive);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQKA:", "dd", &pMqttGetKeepAliveRsp->mqtt_id, &pMqttGetKeepAliveRsp->keep_alive);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxMqttSetLastWillAndTestament3(uCxHandle_t * puCxHandle, int32_t mqtt_id, const char * topic, const char * will_msg)

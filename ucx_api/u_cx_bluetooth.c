@@ -19,11 +19,15 @@ int32_t uCxBluetoothSetMode(uCxHandle_t * puCxHandle, uBtMode_t bt_mode)
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTM=", "d", bt_mode, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetMode(uCxHandle_t * puCxHandle, uBtMode_t * pBtMode)
+int32_t uCxBluetoothGetMode(uCxHandle_t * puCxHandle, uBtMode_t * pBtMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTM?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTM:", "d", pBtMode);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTM:", "d", pBtMode);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothConnect(uCxHandle_t * puCxHandle, uBtLeAddress_t * bd_addr)
@@ -84,32 +88,48 @@ int32_t uCxBluetoothSetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscover
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTBGD=", "d", background_discovery_mode, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscoveryMode_t * pBackgroundDiscoveryMode)
+int32_t uCxBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscoveryMode_t * pBackgroundDiscoveryMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTBGD?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTBGD:", "d", pBackgroundDiscoveryMode);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTBGD:", "d", pBackgroundDiscoveryMode);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
-int32_t uCxBeginBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi)
+int32_t uCxBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTRSS=", "d", conn_handle, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTRSS:", "d", pRssi);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTRSS:", "d", pRssi);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
-int32_t uCxBeginBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
+int32_t uCxBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTCST=", "d", conn_handle, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
-int32_t uCxBeginBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
+int32_t uCxBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTCST=", "dd", conn_handle, property_id, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothSetAdvertiseData(uCxHandle_t * puCxHandle, const uint8_t * adv_data, int32_t adv_data_len)
@@ -144,11 +164,15 @@ int32_t uCxBluetoothSetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t adv_m
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTA=", "d", adv_mode, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t * pAdvMode)
+int32_t uCxBluetoothGetAdvertisements(uCxHandle_t * puCxHandle, uAdvMode_t * pAdvMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTA?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTA:", "d", pAdvMode);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTA:", "d", pAdvMode);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothDirectedAdvertisement1(uCxHandle_t * puCxHandle, uBtLeAddress_t * bd_addr)
@@ -169,11 +193,15 @@ int32_t uCxBluetoothSetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTIOC=", "d", io_capabilities, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_t * pIoCapabilities)
+int32_t uCxBluetoothGetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_t * pIoCapabilities)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTIOC?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTIOC:", "d", pIoCapabilities);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTIOC:", "d", pIoCapabilities);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothSetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t bt_security_mode)
@@ -182,11 +210,15 @@ int32_t uCxBluetoothSetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t 
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTBSM=", "d", bt_security_mode, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t * pBtSecurityMode)
+int32_t uCxBluetoothGetSecurityMode(uCxHandle_t * puCxHandle, uBtSecurityMode_t * pBtSecurityMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTBSM?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTBSM:", "d", pBtSecurityMode);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTBSM:", "d", pBtSecurityMode);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothSetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t pairing_mode)
@@ -195,11 +227,15 @@ int32_t uCxBluetoothSetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t pair
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTPM=", "d", pairing_mode, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t * pPairingMode)
+int32_t uCxBluetoothGetPairingMode(uCxHandle_t * puCxHandle, uPairingMode_t * pPairingMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTPM?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTPM:", "d", pPairingMode);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTPM:", "d", pPairingMode);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothUserConfirmation(uCxHandle_t * puCxHandle, uBtLeAddress_t * bd_addr, uYesNo_t yes_no)
@@ -238,9 +274,13 @@ int32_t uCxBluetoothRequestPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, in
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTPHYR=", "ddd", conn_handle, tx_phy, rx_phy, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginBluetoothGetPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothGetPhy_t * pBluetoothGetPhyRsp)
+int32_t uCxBluetoothGetPhy(uCxHandle_t * puCxHandle, int32_t conn_handle, uCxBluetoothGetPhy_t * pBluetoothGetPhyRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTPHYR=", "d", conn_handle, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTPHYR:", "ddd", &pBluetoothGetPhyRsp->conn_handle, &pBluetoothGetPhyRsp->tx_phy, &pBluetoothGetPhyRsp->rx_phy);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTPHYR:", "ddd", &pBluetoothGetPhyRsp->conn_handle, &pBluetoothGetPhyRsp->tx_phy, &pBluetoothGetPhyRsp->rx_phy);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }

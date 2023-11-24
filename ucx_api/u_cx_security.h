@@ -73,7 +73,7 @@ int32_t uCxSecuritySetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] pEnabled:   
  */
-int32_t uCxBeginSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled);
+int32_t uCxSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled);
 
 /**
  * Turn Handshake Fragmentation TLS extension on and off on a system level
@@ -95,7 +95,7 @@ int32_t uCxSecuritySetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t enab
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] pEnabled:   
  */
-int32_t uCxBeginSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled);
+int32_t uCxSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled);
 
 
 #ifdef __cplusplus

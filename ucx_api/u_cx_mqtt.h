@@ -180,7 +180,7 @@ int32_t uCxMqttSetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, int32_t k
  * @param      mqtt_id:              MQTT Config ID
  * @param[out] pMqttGetKeepAliveRsp: Please see \ref uCxMqttGetKeepAlive_t
  */
-int32_t uCxBeginMqttGetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetKeepAlive_t * pMqttGetKeepAliveRsp);
+int32_t uCxMqttGetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetKeepAlive_t * pMqttGetKeepAliveRsp);
 
 /**
  * Add last will and testament configuration for the client

@@ -31,11 +31,15 @@ int32_t uCxSecuritySetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USETE0=", "d", enabled, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled)
+int32_t uCxSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE0?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", "d", pEnabled);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", "d", pEnabled);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxSecuritySetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t enabled)
@@ -44,9 +48,13 @@ int32_t uCxSecuritySetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t enab
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USETE1=", "d", enabled, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-int32_t uCxBeginSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled)
+int32_t uCxSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pEnabled)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE1?", "", U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", "d", pEnabled);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", "d", pEnabled);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }

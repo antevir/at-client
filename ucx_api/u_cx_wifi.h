@@ -248,7 +248,7 @@ int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle);
  * @param      status_id:                       
  * @param[out] pWifiStationGetNetworkStatusRsp: Please see \ref uCxWifiStationGetNetworkStatus_t
  */
-int32_t uCxBeginWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
+int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
 
 /**
  * Start an access point with the current access point configuration.
