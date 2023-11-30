@@ -82,6 +82,8 @@ static void uAtClientSendCmdVaList_wrapper(uCxAtClient_t *pClient, const char *p
     va_start(args, pParamFmt);
     uCxAtClientSendCmdVaList(pClient, pCmd, pParamFmt, args);
     va_end(args);
+
+    gTxBuffer[gTxBufferPos] = 0;
 }
 
 /* ----------------------------------------------------------------
@@ -109,4 +111,35 @@ void test_uCxAtClientSendCmdVaList_withIpAddress(void)
     };
     uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "i",
                                    &ipAddr, U_CX_AT_UTIL_PARAM_LAST);
+    TEST_ASSERT_EQUAL_STRING("AT+FOO=0.16.32.48\r", &gTxBuffer[0]);
+}
+
+
+void test_uCxAtClientSendCmdVaList_withMacAddress(void)
+{
+    uMacAddress_t macAddr = {
+        .address = {0x00,0x11,0x22,0x33,0x44,0x55}
+    };
+    uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "m",
+                                   &macAddr, U_CX_AT_UTIL_PARAM_LAST);
+    TEST_ASSERT_EQUAL_STRING("AT+FOO=001122334455\r", &gTxBuffer[0]);
+}
+
+void test_uCxAtClientSendCmdVaList_withBdAddress(void)
+{
+    uBtLeAddress_t btLeAddr = {
+        .type = U_BD_ADDRESS_TYPE_PUBLIC,
+        .address = {0x00,0x11,0x22,0x33,0x44,0x55}
+    };
+    uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "b",
+                                   &btLeAddr, U_CX_AT_UTIL_PARAM_LAST);
+    TEST_ASSERT_EQUAL_STRING("AT+FOO=001122334455p\r", &gTxBuffer[0]);
+}
+
+void test_uCxAtClientSendCmdVaList_withByteArray(void)
+{
+    uint8_t data[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+    uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "h",
+                                   &data[0], sizeof(data), U_CX_AT_UTIL_PARAM_LAST);
+    TEST_ASSERT_EQUAL_STRING("AT+FOO=001122334455\r", &gTxBuffer[0]);
 }

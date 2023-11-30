@@ -69,6 +69,30 @@ int32_t uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t
     return uCxAtClientCmdGetRspParamsF(pAtClient, "+UWSCP=", "ds", &pWifiStationGetConnectionParamsRsp->wlan_handle, &pWifiStationGetConnectionParamsRsp->ssid);
 }
 
+int32_t uCxWifiStationSetIpConfigStatic4(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSIPS=", "diii", wlan_handle, ip_addr, subnet_mask, gateway, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxWifiStationSetIpConfigStatic5(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway, uSockIpAddress_t * prim_dns)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSIPS=", "diiii", wlan_handle, ip_addr, subnet_mask, gateway, prim_dns, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxWifiStationSetIpConfigStatic6(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway, uSockIpAddress_t * prim_dns, uSockIpAddress_t * sec_dns)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSIPS=", "diiiii", wlan_handle, ip_addr, subnet_mask, gateway, prim_dns, sec_dns, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxWifiStationSetIpConfigDhcp(uCxHandle_t * puCxHandle, int32_t wlan_handle)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSIPD=", "d", wlan_handle, U_CX_AT_UTIL_PARAM_LAST);
+}
+
 int32_t uCxWifiStationConnect(uCxHandle_t * puCxHandle, int32_t wlan_handle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
@@ -79,6 +103,17 @@ int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UWSDC", "", U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UWSNST=", "d", status_id, U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UWSNST:", "di", &pWifiStationGetNetworkStatusRsp->status_id, &pWifiStationGetNetworkStatusRsp->status_val);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxWifiApActivate(uCxHandle_t * puCxHandle)

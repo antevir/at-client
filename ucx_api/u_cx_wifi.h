@@ -34,6 +34,12 @@ typedef struct
 
 typedef struct
 {
+    int32_t status_id;
+    uSockIpAddress_t status_val; /**< IP address */
+} uCxWifiStationGetNetworkStatus_t;
+
+typedef struct
+{
     const char * ssid; /**< SSID */
     int32_t channel;   /**< channel */
 } uCxWifiApGetConnectionParams_t;
@@ -156,6 +162,62 @@ int32_t uCxWifiStationSetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan
 int32_t uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationGetConnectionParams_t * pWifiStationGetConnectionParamsRsp);
 
 /**
+ * Sets ip configuration to use static ip
+ * 
+ * Output AT command:
+ * > AT+UWSIPS=<wlan_handle>,<ip_addr>,<subnet_mask>,<gateway>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      wlan_handle: Handle to use for Wi-Fi config and connection
+ * @param      ip_addr:     Static IPv4 address
+ * @param      subnet_mask: Subnet mask
+ * @param      gateway:     IPv4 gateway address
+ */
+int32_t uCxWifiStationSetIpConfigStatic4(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway);
+
+/**
+ * Sets ip configuration to use static ip
+ * 
+ * Output AT command:
+ * > AT+UWSIPS=<wlan_handle>,<ip_addr>,<subnet_mask>,<gateway>,<prim_dns>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      wlan_handle: Handle to use for Wi-Fi config and connection
+ * @param      ip_addr:     Static IPv4 address
+ * @param      subnet_mask: Subnet mask
+ * @param      gateway:     IPv4 gateway address
+ * @param      prim_dns:    IPv4 primary dns address
+ */
+int32_t uCxWifiStationSetIpConfigStatic5(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway, uSockIpAddress_t * prim_dns);
+
+/**
+ * Sets ip configuration to use static ip
+ * 
+ * Output AT command:
+ * > AT+UWSIPS=<wlan_handle>,<ip_addr>,<subnet_mask>,<gateway>,<prim_dns>,<sec_dns>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      wlan_handle: Handle to use for Wi-Fi config and connection
+ * @param      ip_addr:     Static IPv4 address
+ * @param      subnet_mask: Subnet mask
+ * @param      gateway:     IPv4 gateway address
+ * @param      prim_dns:    IPv4 primary dns address
+ * @param      sec_dns:     IPv4 secondary dns address
+ */
+int32_t uCxWifiStationSetIpConfigStatic6(uCxHandle_t * puCxHandle, int32_t wlan_handle, uSockIpAddress_t * ip_addr, uSockIpAddress_t * subnet_mask, uSockIpAddress_t * gateway, uSockIpAddress_t * prim_dns, uSockIpAddress_t * sec_dns);
+
+/**
+ * Sets ip configuration to receive ip address via dhcp
+ * 
+ * Output AT command:
+ * > AT+UWSIPD=<wlan_handle>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      wlan_handle: Handle to use for Wi-Fi config and connection
+ */
+int32_t uCxWifiStationSetIpConfigDhcp(uCxHandle_t * puCxHandle, int32_t wlan_handle);
+
+/**
  * Initiate connection to Wi-Fi network
  * 
  * Output AT command:
@@ -175,6 +237,18 @@ int32_t uCxWifiStationConnect(uCxHandle_t * puCxHandle, int32_t wlan_handle);
  * @param[in]  puCxHandle: uCX API handle
  */
 int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle);
+
+/**
+ * Show current status of Wi-Fi station network interface
+ * 
+ * Output AT command:
+ * > AT+UWSNST=<status_id>
+ *
+ * @param[in]  puCxHandle:                      uCX API handle
+ * @param      status_id:                       
+ * @param[out] pWifiStationGetNetworkStatusRsp: Please see \ref uCxWifiStationGetNetworkStatus_t
+ */
+int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
 
 /**
  * Start an access point with the current access point configuration.

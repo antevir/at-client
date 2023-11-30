@@ -223,6 +223,11 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
     U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
+void uCxAtClientDeinit(uCxAtClient_t *pClient)
+{
+    U_CX_MUTEX_DELETE(pClient->cmdMutex);
+}
+
 void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallback, void *pTag)
 {
     pClient->urcCallback = urcCallback;
@@ -252,12 +257,6 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 writeAndLog(pClient, buf, len);
             }
             break;
-            case 'h': {
-                int32_t i = va_arg(args, int32_t);
-                int32_t len = snprintf(buf, sizeof(buf), "%x", i);
-                writeAndLog(pClient, buf, len);
-            }
-            break;
             case 's': {
                 char *pStr = va_arg(args, char *);
                 writeAndLog(pClient, pStr, strlen(pStr));
@@ -270,9 +269,23 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 writeAndLog(pClient, buf, len);
             }
             break;
+            case 'm': {
+                uMacAddress_t *pMacAddr = va_arg(args, uMacAddress_t *);
+                int32_t len = uCxMacAddressToString(pMacAddr, buf, sizeof(buf));
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeAndLog(pClient, buf, len);
+            }
+            break;
             case 'b': {
-                int32_t len = va_arg(args, int32_t);
+                uBtLeAddress_t *pBtLeAddr = va_arg(args, uBtLeAddress_t *);
+                int32_t len = uCxBdAddressToString(pBtLeAddr, buf, sizeof(buf));
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeAndLog(pClient, buf, len);
+            }
+            break;
+            case 'h': {
                 uint8_t *pData = va_arg(args, uint8_t *);
+                int32_t len = va_arg(args, int32_t);
                 for (int32_t i = 0; i < len; i++) {
                     uCxAtUtilByteToHex(pData[i], buf);
                     writeAndLog(pClient, buf, 2);

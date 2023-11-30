@@ -50,6 +50,34 @@ static inline int32_t hexToNibble(char hexChar)
     return -1;
 }
 
+static bool binaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf,
+                        size_t bufSize, bool reverse)
+{
+    uint32_t i;
+
+    U_CX_AT_PORT_ASSERT(pBuf != NULL);
+    U_CX_AT_PORT_ASSERT(bufSize > 0);
+
+    // Check that the hex string can be fitted into the buffer (don't forget null termination)
+    if (bufSize < (2 * dataLen) + 1) {
+        pBuf[0] = 0;
+        return false;
+    }
+    pBuf[2 * dataLen] = 0;
+
+    if (pData != NULL) {
+        for (i = 0; i < dataLen; i++) {
+            uint32_t dataIndex = reverse ? dataLen - i - 1 : i;
+            pBuf[i * 2] = nibbleToHex(pData[dataIndex] >> 4);
+            pBuf[(i * 2) + 1] = nibbleToHex(pData[dataIndex] & 0x0F);
+        }
+    } else {
+        strncpy(pBuf, "(null)", bufSize);
+    }
+
+    return true;
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -61,7 +89,7 @@ void uCxAtUtilByteToHex(uint8_t byte, char *pOutPtr)
     pOutPtr[2] = 0;
 }
 
-int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
+int32_t uCxAtUtilHexToByte(const char *pHex, uint8_t *pOutByte)
 {
     int32_t highNibble = hexToNibble(pHex[0]);
     int32_t lowNibble = hexToNibble(pHex[1]);
@@ -70,6 +98,37 @@ int32_t uCxAtUtilHexToByte(char *pHex, uint8_t *pOutByte)
     }
     *pOutByte = (highNibble << 4) | lowNibble;
     return 0;
+}
+
+uint32_t uCxAtUtilHexToBinary(const char *pHexString, uint8_t *pBuf, size_t bufSize)
+{
+    uint32_t i = 0;
+    uint32_t len;
+    uint32_t toIndex = 0;
+
+    len = strlen(pHexString);
+
+    while ((toIndex < bufSize) && ((i + 1) < len)) {
+        int32_t ret = uCxAtUtilHexToByte(&pHexString[i], &pBuf[toIndex]);
+        if (ret < 0) {
+            // Invalid byte array return converted size
+            return toIndex;
+        }
+        toIndex++;
+        i += 2;
+    }
+
+    return toIndex;
+}
+
+bool uCxAtUtilBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize)
+{
+    return binaryToHex(pData, dataLen, pBuf, bufSize, false);
+}
+
+bool uCxAtUtilReverseBinaryToHex(const uint8_t *pData, size_t dataLen, char *pBuf, size_t bufSize)
+{
+    return binaryToHex(pData, dataLen, pBuf, bufSize, true);
 }
 
 char *uCxAtUtilFindParamEnd(char *pStr)
@@ -151,20 +210,34 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
                 }
             }
             break;
+            case 'm': {
+                uMacAddress_t *pMacAddr = va_arg(args, uMacAddress_t *);
+                U_CX_AT_PORT_ASSERT(pMacAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToMacAddress(pParam, pMacAddr) < 0) {
+                    return -ret;
+                }
+            }
+            break;
             case 'b': {
-                int32_t *pLen = va_arg(args, int32_t *);
-                uint8_t **ppData = va_arg(args, uint8_t **);
+                uBtLeAddress_t *pBtLeAddr = va_arg(args, uBtLeAddress_t *);
+                U_CX_AT_PORT_ASSERT(pBtLeAddr != U_CX_AT_UTIL_PARAM_LAST);
+                if (uCxStringToBdAddress(pParam, pBtLeAddr) < 0) {
+                    return -ret;
+                }
+            }
+            break;
+            case 'h': {
+                uByteArray_t *pByteArray = va_arg(args, uByteArray_t *);
+                U_CX_AT_PORT_ASSERT(pByteArray != U_CX_AT_UTIL_PARAM_LAST);
                 uint8_t *pBytes;
                 size_t len = strlen(pParam);
-                U_CX_AT_PORT_ASSERT(pLen != U_CX_AT_UTIL_PARAM_LAST);
-                U_CX_AT_PORT_ASSERT(ppData != U_CX_AT_UTIL_PARAM_LAST);
                 if ((len % 2) != 0) {
                     return -ret;
                 }
-                *pLen = len / 2;
+                pByteArray->length = len / 2;
                 pBytes = (uint8_t *)pParam;
-                *ppData = pBytes;
-                for (int32_t i = 0; i < *pLen; i++) {
+                pByteArray->pData = pBytes;
+                for (size_t i = 0; i < pByteArray->length; i++) {
                     if (uCxAtUtilHexToByte(&pParam[i * 2], pBytes) < 0) {
                         return -ret;
                     }

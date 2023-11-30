@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "u_cx_at_params.h"
+#include "u_cx_at_util.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -138,6 +139,33 @@ static bool ipv6StringToIpAddress(const char *pAddressString,
     return true;
 }
 
+static int32_t findBdAddressType(const char *pStr,
+                                 uBdAddressType_t *pBdAddressType)
+{
+    uint32_t length = strlen(pStr);
+
+    switch (pStr[length - 1]) {
+        case 'r':
+            *pBdAddressType = U_BD_ADDRESS_TYPE_RANDOM;
+            break;
+        case 'p':
+            *pBdAddressType = U_BD_ADDRESS_TYPE_PUBLIC;
+            break;
+        default:
+            if (length == 12) {
+                //the input address has only 12 hexadecimal characters without any suffix
+                //default address type is public
+                *pBdAddressType = U_BD_ADDRESS_TYPE_PUBLIC;
+            } else {
+                //the input address has a suffix other than 'p' or 'r'
+                return -1;
+            }
+            break;
+    }
+
+    return 0;
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -214,4 +242,49 @@ int32_t uCxIpAddressToString(const uSockIpAddress_t *pIpAddress,
     }
 
     return ret;
+}
+
+int32_t uCxStringToBdAddress(const char *pBtLeAddrString, uBtLeAddress_t *pBtLeAddr)
+{
+    int32_t ret = findBdAddressType(pBtLeAddrString, &pBtLeAddr->type);
+    if (ret == 0) {
+        uint32_t len = uCxAtUtilHexToBinary(pBtLeAddrString, pBtLeAddr->address, U_BD_ADDR_LEN);
+        if (len != U_BD_ADDR_LEN) {
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+int32_t uCxBdAddressToString(const uBtLeAddress_t *pBtLeAddr, char *pBuffer, size_t sizeBytes)
+{
+    if (sizeBytes < U_BD_STRING_MAX_LENGTH_BYTES) {
+        return -1;
+    }
+    if (!uCxAtUtilBinaryToHex(&pBtLeAddr->address[0], U_BD_ADDR_LEN, pBuffer, sizeBytes)) {
+        return -1;
+    }
+    size_t pos = strlen(pBuffer);
+    pBuffer[pos++] = (pBtLeAddr->type == U_BD_ADDRESS_TYPE_RANDOM) ? 'r' : 'p';
+    pBuffer[pos] = 0;
+    return pos;
+}
+
+int32_t uCxStringToMacAddress(const char *pMacString, uMacAddress_t *pMac)
+{
+    if (strlen(pMacString) != U_MAC_ADDR_LEN * 2) {
+        return -1;
+    }
+    if (uCxAtUtilHexToBinary(pMacString, &pMac->address[0], U_MAC_ADDR_LEN) != U_MAC_ADDR_LEN) {
+        return -1;
+    }
+    return 0;
+}
+
+int32_t uCxMacAddressToString(const uMacAddress_t *pMac, char *pBuffer, size_t sizeBytes)
+{
+    if (!uCxAtUtilBinaryToHex(&pMac->address[0], U_MAC_ADDR_LEN, pBuffer, sizeBytes)) {
+        return -1;
+    }
+    return strlen(pBuffer);
 }

@@ -26,6 +26,13 @@ extern "C" {
 
 typedef enum
 {
+    U_INTERFACE_ID_BLUETOOTH,         /**< Bluetooth */
+    U_INTERFACE_ID_WI_FI_STATION = 1, /**< Wifi station */
+    U_INTERFACE_ID_WIFI_AP = 2        /**< Wifi Accesspoint */
+} uInterfaceId_t;
+
+typedef enum
+{
     U_BOOTLOADER_MODE_XMODEM,          /**< Enter xmodem mode for u-connect software update using serial port. */
     U_BOOTLOADER_MODE_COMMAND_LINE = 1 /**< Enter the bootloader command line mode using serial port. */
 } uBootloaderMode_t;
@@ -38,9 +45,163 @@ typedef enum
 
 typedef enum
 {
+    U_BT_MODE_DISABLED,              /**< Disabled. This is the factory default for NORA-W36. */
+    U_BT_MODE_CENTRAL = 1,           /**< Bluetooth Low Energy Central.
+                                          In this mode, starting advertisements, direct advertisements and other functions
+                                          associated
+                                          with the Peripheral role is not possible. */
+    U_BT_MODE_PERIPHERAL = 2,        /**< Bluetooth Low Energy Peripheral.
+                                          In this mode, initiating connections, discovery and other functions associated with
+                                          the Central role is not possible. */
+    U_BT_MODE_CENTRAL_PERIPHERAL = 3 /**< Bluetooth Low Energy Simultaneous Central and Peripheral. */
+} uBtMode_t;
+
+typedef enum
+{
+    U_DISCOVERY_TYPE_DISCOVER_ALL,                  /**< All with no filter. Displays all found devices; devices can be displayed multiple times. */
+    U_DISCOVERY_TYPE_DISCOVER_ALL_NO_DUPLICATES = 1 /**< General inquiry. Displays devices in General or Limited discoverability mode; each device
+                                                         is displayed only once. */
+} uDiscoveryType_t;
+
+typedef enum
+{
+    U_DATA_TYPE_SCAN_RESPONSE,     /**< Scan response data. */
+    U_DATA_TYPE_ADVERTISE_DATA = 1 /**< Advertise data. */
+} uDataType_t;
+
+typedef enum
+{
+    U_DISCOVERY_MODE_ACTIVE,     /**< Active discovery. */
+    U_DISCOVERY_MODE_PASSIVE = 1 /**< Passive, no scan reponse data will be recieved. */
+} uDiscoveryMode_t;
+
+typedef enum
+{
+    U_BACKGROUND_DISCOVERY_MODE_BACKGROUND_DISCOVERY_OFF,   /**< Set background discovery off */
+    U_BACKGROUND_DISCOVERY_MODE_BACKGROUND_DISCOVERY_ON = 1 /**< Set background discovery on */
+} uBackgroundDiscoveryMode_t;
+
+typedef enum
+{
+    U_PROPERTY_ID_CONNECTION_INTERVAL = 1,   /**< Connection inteval used on this connection.
+                                                   Range: 6 to 3200
+                                                   Time = status_val * 1.25 ms
+                                                   Time range: 7.5 ms to 4000 ms */
+    U_PROPERTY_ID_PERIPHERAL_LATENCY = 2,    /**< Peripheral latency for the connection in number of connection events. Range: 0 to 499 */
+    U_PROPERTY_ID_SUPERVISION_TIMEOUT = 3,   /**< Supervision timeout (in ms) for this connections. Range: 100 ms to 32000 ms */
+    U_PROPERTY_ID_MTU_SIZE = 4,              /**< MTU size for this connections. */
+    U_PROPERTY_ID_PDU_TX_PAYLOAD_LENGTH = 5, /**< Data Channel TX PDU Payload Length. */
+    U_PROPERTY_ID_PDU_RX_PAYLOAD_LENGTH = 6, /**< Data Channel RX PDU Payload Length. */
+    U_PROPERTY_ID_DATA_LENGTH_EXTENSION = 7, /**< Data Length Extension state. 0: Data Length Extension Off \ 1: Data Length Extension On */
+    U_PROPERTY_ID_LOCAL_ROLE = 8,            /**< Local role in this connection. 1: Low Energy Central \ 2: Low Energy Peripheral */
+    U_PROPERTY_ID_L2CAP_MODE = 9             /**< Current L2CAP mode. Possible values are: 1: Basic L2CAP mode \ 2: LE Credit Based Flow
+                                                  Control Mode */
+} uPropertyId_t;
+
+typedef enum
+{
+    U_ADV_MODE_ADVERTISEMENTS_OFF,   /**< Set Bluetooth Advertisements off */
+    U_ADV_MODE_ADVERTISEMENTS_ON = 1 /**< Set Bluetooth Advertisements on */
+} uAdvMode_t;
+
+typedef enum
+{
+    U_IO_CAPABILITIES_NO_INPUT_NO_OUTPUT,  /**< Set I/O Capabilities to No Input No Output. */
+    U_IO_CAPABILITIES_DISPLAY_ONLY = 1,    /**< Set I/O Capabilities to Display Only. */
+    U_IO_CAPABILITIES_DISPLAY_YES_NO = 2,  /**< Set I/O Capabilities to Display Yes/No */
+    U_IO_CAPABILITIES_KEYBOARD_ONLY = 3,   /**< Set I/O Capabilities to Keyboard Only. */
+    U_IO_CAPABILITIES_KEYBOARD_DISPLAY = 4 /**< Set I/O Capabilities to Keyboard Display. */
+} uIoCapabilities_t;
+
+typedef enum
+{
+    U_BT_SECURITY_MODE_NONE,                                    /**< Security Disabled. */
+    U_BT_SECURITY_MODE_UNAUTHENTICATED = 1,                     /**< Allow unauthenticated bonding. */
+    U_BT_SECURITY_MODE_AUTHENTICATED = 2,                       /**< Only allow authenticated bonding. */
+    U_BT_SECURITY_MODE_AUTHENTICATED_SECURE_CONNECTION = 3,     /**< Only allow authenticated bonding with encrypted Bluetooth link. Fallback to simple pairing
+                                                                     if the remote side does not support secure connections. */
+    U_BT_SECURITY_MODE_AUTHENTICATED_SECURE_CONNECTION_ONLY = 4 /**< Only allow authenticated bonding with encrypted Bluetooth link. Strictly uses secure
+                                                                     connections. */
+} uBtSecurityMode_t;
+
+typedef enum
+{
+    U_PAIRING_MODE_PAIRING_MODE_DISABLE,   /**< Disable pairing mode. */
+    U_PAIRING_MODE_PAIRING_MODE_ENABLE = 1 /**< Enable pairing mode. */
+} uPairingMode_t;
+
+typedef enum
+{
+    U_YES_NO_NO,     /**< Deny bonding. */
+    U_YES_NO_YES = 1 /**< Confirm bonding. */
+} uYesNo_t;
+
+typedef enum
+{
+    U_CONFIG_NONE,                     /**< None */
+    U_CONFIG_ENABLE_NOTIFICATIONS = 1, /**< Enable notifications */
+    U_CONFIG_ENABLE_INDICATIONS = 2,   /**< Enable indications */
+    U_CONFIG_ENABLE_NOT_IND = 3        /**< Enable notifications and indications */
+} uConfig_t;
+
+typedef enum
+{
+    U_RELIABLE_NOT_RELIABLE, /**< Not reliable */
+    U_RELIABLE_RELIABLE = 1  /**< Reliable */
+} uReliable_t;
+
+typedef enum
+{
+    U_FLAG_FINAL_DATA,             /**< Final data */
+    U_FLAG_MORE_DATA = 1,          /**< More data */
+    U_FLAG_CANCEL_DATA_WRITING = 2 /**< Cancel */
+} uFlag_t;
+
+typedef enum
+{
+    U_SECURITY_READ_NONE = 1,            /**< No encryption required. */
+    U_SECURITY_READ_UNAUTHENTICATED = 2, /**< Unauthenticated encryption required. */
+    U_SECURITY_READ_AUTHENTICATED = 3    /**< Authenticated encryption required. */
+} uSecurityRead_t;
+
+typedef enum
+{
+    U_SECURITY_WRITE_NONE = 1,            /**< No encryption required. */
+    U_SECURITY_WRITE_UNAUTHENTICATED = 2, /**< Unauthenticated encryption required. */
+    U_SECURITY_WRITE_AUTHENTICATED = 3    /**< Authenticated encryption required. */
+} uSecurityWrite_t;
+
+typedef enum
+{
+    U_SPS_SERVICE_OPTION_DISABLE_SPS_SERVICE,   /**< This option disables the SPS service after saving the configuration and restarting the
+                                                     device. (Default) */
+    U_SPS_SERVICE_OPTION_ENABLE_SPS_SERVICE = 1 /**< This option enables the SPS service directly.
+                                                     If this option is set, and the configuration is saved,
+                                                     SPS will be enabled after reboot. */
+} uSpsServiceOption_t;
+
+typedef enum
+{
+    U_READ_MODE_BUFFERED,          /**< Buffered mode */
+    U_READ_MODE_DIRECT_STRING = 1, /**< Direct String mode */
+    U_READ_MODE_DIRECT_BINARY = 2  /**< Direct Binary Mode */
+} uReadMode_t;
+
+typedef enum
+{
     U_WPA_THRESHOLD_WPA2,    /**< Only connect to access points that support WPA2 or up */
     U_WPA_THRESHOLD_WPA3 = 1 /**< Only connect to access points that support WPA3 */
 } uWpaThreshold_t;
+
+typedef enum
+{
+    U_STATUS_ID_IPV4,         /**< The current IPv4 address. */
+    U_STATUS_ID_SUBNET = 1,   /**< The current subnet mask */
+    U_STATUS_ID_GATE_WAY = 2, /**< The current gateway */
+    U_STATUS_ID_PRIM_DNS = 3, /**< The current primary DNS server */
+    U_STATUS_ID_SEC_DNS = 4,  /**< The current secondary DNS server */
+    U_STATUS_ID_IPV6 = 5      /**< The current IPv6 link local address */
+} uStatusId_t;
 
 typedef enum
 {
@@ -77,13 +238,6 @@ typedef enum
     U_PREFERRED_PROTOCOL_TYPE_IP_V4,    /**< IPv4 address. */
     U_PREFERRED_PROTOCOL_TYPE_IP_V6 = 1 /**< IPv6 address. */
 } uPreferredProtocolType_t;
-
-typedef enum
-{
-    U_READ_MODE_BUFFERED,          /**< Buffered mode */
-    U_READ_MODE_DIRECT_STRING = 1, /**< Direct String mode */
-    U_READ_MODE_DIRECT_BINARY = 2  /**< Direct Binary Mode */
-} uReadMode_t;
 
 typedef enum
 {
@@ -126,6 +280,93 @@ typedef enum
 
 typedef enum
 {
+    U_QOS_AT_MOST_ONCE,
+    U_QOS_AT_LEAST_ONCE = 1,
+    U_QOS_EXACTLY_ONCE = 2
+} uQos_t;
+
+typedef enum
+{
+    U_RETAIN_NO_RETAIN, /**< Do not retain message on broker */
+    U_RETAIN_RETAIN = 1 /**< Retain message on broker */
+} uRetain_t;
+
+typedef enum
+{
+    U_TLS_VERSION_NO_TLS,
+    U_TLS_VERSION_TLS1_2 = 1
+} uTlsVersion_t;
+
+typedef enum
+{
+    U_SUBSCRIBE_ACTION_SUBSCRIBE,      /**< Subscribe to topic */
+    U_SUBSCRIBE_ACTION_UNSUBSCRIBE = 1 /**< Unsubscribe from topic */
+} uSubscribeAction_t;
+
+typedef enum
+{
+    U_ALL_ONE,    /**< Read the oldest message */
+    U_ALL_ALL = 1 /**< Read all available MQTT messages, beginning with the oldest */
+} uAll_t;
+
+typedef enum
+{
+    U_CERT_TYPEROOT,       /**< Root certificate */
+    U_CERT_TYPECLIENT = 1, /**< Client certificate */
+    U_CERT_TYPEKEY = 2     /**< Client private key */
+} uCertType_t;
+
+typedef enum
+{
+    U_REMOVE_ALL_REMOVE_ALL = -1 /**< Remove all certificates */
+} uRemoveAll_t;
+
+typedef enum
+{
+    U_ENABLED_DISABLED,   /**< Disabled */
+    U_ENABLED_ENABLED = 1 /**< Enabled */
+} uEnabled_t;
+
+typedef enum
+{
+    U_IPERF_ACTION_START = 1, /**< Start iperf */
+    U_IPERF_ACTION_STOP = 2   /**< Stop iperf */
+} uIperfAction_t;
+
+typedef enum
+{
+    U_PROTOCOL_TYPE_TCP = 1, /**< TCP */
+    U_PROTOCOL_TYPE_UDP = 2  /**< UDP */
+} uProtocolType_t;
+
+typedef enum
+{
+    U_ROLE_SERVER = 1, /**< Server */
+    U_ROLE_CLIENT = 2  /**< Client */
+} uRole_t;
+
+typedef enum
+{
+    U_BIDIRECTIONAL_OFF,   /**< Off */
+    U_BIDIRECTIONAL_ON = 1 /**< On
+                                When starting bidirectional TCP test, start a server on both tester and DUT, then start a
+                                client with bidirectional flag on the DUT.
+                                If doing bidirectional UDP test, start a server on both DUT and tester and then start a
+                                client with a bidirectional flag on both. */
+} uBidirectional_t;
+
+typedef enum
+{
+    U_BOND_STATUS_BONDING_SUCCEEDED,          /**< Bonding procedure succeeded. */
+    U_BOND_STATUS_BONDING_FAILED_TIMEOUT = 1, /**< Bonding procedure failed due to page timeout. */
+    U_BOND_STATUS_BONDING_FAILED_AUTH = 2,    /**< Bonding failed because of authentication or pairing failed. This could be due to incorrect
+                                                   PIN/passkey. */
+    U_BOND_STATUS_BONDING_FAILED_MITM = 3     /**< Bonding failed becuase the protection against Man-In-The-Middle attack could not be
+                                                   guaranteed; the generated link key was too weak. */
+} uBondStatus_t;
+
+typedef enum
+{
     U_OPTIONS_WRITE_WITH_OUT_RESPONSE, /**< Write without Response performed */
     U_OPTIONS_WRITE_WITH_RESPONSE = 1, /**< Write with Response performed */
     U_OPTIONS_WRITE_LONG = 2           /**< Write long performed */
@@ -142,7 +383,12 @@ typedef enum
  * ---------------------------------------------------------- */
 
 struct uCxHandle;
+typedef void (*uUEBTC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, uBtLeAddress_t * bd_addr);
 typedef void (*uUEBTDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
+typedef void (*uUEBTB_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, uBondStatus_t bond_status);
+typedef void (*uUEBTUC_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, int32_t nummeric_value);
+typedef void (*uUEBTUPD_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, int32_t nummeric_value);
+typedef void (*uUEBTUPE_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr);
 typedef void (*uUEBTPHYU_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t phy_status, int32_t tx_phy, int32_t rx_phy);
 typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
 typedef void (*uUEBTGCI_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
@@ -154,7 +400,7 @@ typedef void (*uUESPSDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDS_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, const char * string_data);
 typedef void (*uUESPSDB_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDA_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t number_bytes);
-typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, const char * bssid, int32_t channel);
+typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, uMacAddress_t * bssid, int32_t channel);
 typedef void (*uUEWLD_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, int32_t reason);
 typedef void (*uUEWSNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWSND_t)(struct uCxHandle *puCxHandle);
@@ -162,8 +408,8 @@ typedef void (*uUEWAPNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPND_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPD_t)(struct uCxHandle *puCxHandle);
-typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, const char * mac);
-typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, const char * mac);
+typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
+typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
 typedef void (*uUESOC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
 typedef void (*uUESODA_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, int32_t number_bytes);
 typedef void (*uUESODS_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, const char * string_data);
@@ -184,7 +430,12 @@ typedef void (*uUEDGP_t)(struct uCxHandle *puCxHandle, uPingResponse_t ping_resp
 
 typedef struct
 {
+    uUEBTC_t UEBTC;
     uUEBTDC_t UEBTDC;
+    uUEBTB_t UEBTB;
+    uUEBTUC_t UEBTUC;
+    uUEBTUPD_t UEBTUPD;
+    uUEBTUPE_t UEBTUPE;
     uUEBTPHYU_t UEBTPHYU;
     uUEBTGCN_t UEBTGCN;
     uUEBTGCI_t UEBTGCI;
