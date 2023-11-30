@@ -28,6 +28,12 @@ extern "C" {
 
 typedef struct
 {
+    int32_t conn_handle;    /**< Connection handle of remote peer which has SPS enabled */
+    int32_t written_length; /**< Data length that was written. */
+} uCxSpsWriteString_t;
+
+typedef struct
+{
     int32_t conn_handle;      /**< Connection handle of remote peer */
     int32_t length;           /**< Data bytes to read. */
     const char * string_data; /**< SPS data in string format */
@@ -88,11 +94,12 @@ int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * p
  * Output AT command:
  * > AT+USPSWS=<conn_handle>,<string_data>
  *
- * @param[in]  puCxHandle:  uCX API handle
- * @param      conn_handle: Connection handle of remote peer which has SPS enabled
- * @param      string_data: Data to send, max 244 bytes
+ * @param[in]  puCxHandle:         uCX API handle
+ * @param      conn_handle:        Connection handle of remote peer which has SPS enabled
+ * @param      string_data:        Data encoded as ascii chars.
+ * @param[out] pSpsWriteStringRsp: Please see \ref uCxSpsWriteString_t
  */
-int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data);
+int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data, uCxSpsWriteString_t * pSpsWriteStringRsp);
 
 /**
  * Set the mode in which to receive SPS data in AT mode.

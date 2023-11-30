@@ -42,10 +42,15 @@ int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * p
     return ret;
 }
 
-int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data)
+int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data, uCxSpsWriteString_t * pSpsWriteStringRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USPSWS=", "ds", conn_handle, string_data, U_CX_AT_UTIL_PARAM_LAST);
+    uCxAtClientCmdBeginF(pAtClient, "AT+USPSWS=", "ds", conn_handle, string_data, U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSWS:", "dd", &pSpsWriteStringRsp->conn_handle, &pSpsWriteStringRsp->written_length);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxSpsSetDataMode(uCxHandle_t * puCxHandle, uReadMode_t read_mode)

@@ -28,20 +28,20 @@ extern "C" {
 
 typedef struct
 {
-    int32_t socket_handle;  /**< Socket identifier to be used for any future operation on that socket. */
+    int32_t socket_handle;  /**< Socket identifier be used for any operation on that socket. */
     int32_t written_length; /**< Data length that was written. */
 } uCxSocketWriteString_t;
 
 typedef struct
 {
-    int32_t socket_handle;    /**< Socket identifier to be used for any future operation on that socket. */
+    int32_t socket_handle;    /**< Socket identifier be used for any operation on that socket. */
     int32_t length;           /**< Number of bytes to read. */
     const char * string_data; /**< Data encoded as ascii chars. */
 } uCxSocketReadString_t;
 
 typedef struct
 {
-    int32_t socket_handle;      /**< Socket identifier to be used for any future operation on that socket. */
+    int32_t socket_handle;      /**< Socket identifier be used for any operation on that socket. */
     uSockIpAddress_t remote_ip; /**< The ip address of the remote peer. */
     int32_t remote_port;        /**< The port of the remote peer. */
     int32_t length;             /**< Number of bytes to read. */
@@ -50,10 +50,17 @@ typedef struct
 
 typedef struct
 {
-    int32_t socket_handle; /**< Socket identifier to be used for any future operation on that socket. */
+    int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
     int32_t protocol;      /**< IP protocol. */
     int32_t socket_status;
 } uCxSocketStatus_t;
+
+typedef struct
+{
+    int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
+    int32_t option;        /**< Available options to set */
+    int32_t value;         /**< See option parameter */
+} uCxSocketGetOption_t;
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -67,7 +74,7 @@ typedef struct
  *
  * @param[in]  puCxHandle:    uCX API handle
  * @param      protocol:      IP protocol.
- * @param[out] pSocketHandle: Socket identifier to be used for any future operation on that socket.
+ * @param[out] pSocketHandle: Socket identifier be used for any operation on that socket.
  */
 int32_t uCxSocketCreate1(uCxHandle_t * puCxHandle, uProtocol_t protocol, int32_t * pSocketHandle);
 
@@ -80,7 +87,7 @@ int32_t uCxSocketCreate1(uCxHandle_t * puCxHandle, uProtocol_t protocol, int32_t
  * @param[in]  puCxHandle:              uCX API handle
  * @param      protocol:                IP protocol.
  * @param      preferred_protocol_type: Selects the IP address type to use.
- * @param[out] pSocketHandle:           Socket identifier to be used for any future operation on that socket.
+ * @param[out] pSocketHandle:           Socket identifier be used for any operation on that socket.
  */
 int32_t uCxSocketCreate2(uCxHandle_t * puCxHandle, uProtocol_t protocol, uPreferredProtocolType_t preferred_protocol_type, int32_t * pSocketHandle);
 
@@ -91,7 +98,7 @@ int32_t uCxSocketCreate2(uCxHandle_t * puCxHandle, uProtocol_t protocol, uPrefer
  * > AT+USOC=<socket_handle>,<host_address>,<remote_port>
  *
  * @param[in]  puCxHandle:    uCX API handle
- * @param      socket_handle: Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
  * @param      host_address:  Remote host IP address or domain name of the remote host.
  * @param      remote_port:   The port of the remote peer.
  */
@@ -131,7 +138,7 @@ int32_t uCxSocketGetReadMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
  * > AT+USOWS=<socket_handle>,<string_data>
  *
  * @param[in]  puCxHandle:            uCX API handle
- * @param      socket_handle:         Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle:         Socket identifier be used for any operation on that socket.
  * @param      string_data:           Data encoded as ascii chars.
  * @param[out] pSocketWriteStringRsp: Please see \ref uCxSocketWriteString_t
  */
@@ -159,7 +166,7 @@ int32_t uCxSocketClose(uCxHandle_t * puCxHandle, int32_t socket_handle);
  * > AT+USORS=<socket_handle>,<length>
  *
  * @param[in]  puCxHandle:           uCX API handle
- * @param      socket_handle:        Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle:        Socket identifier be used for any operation on that socket.
  * @param      length:               Number of bytes to read.
  * @param[out] pSocketReadStringRsp: Please see \ref uCxSocketReadString_t
  */
@@ -173,7 +180,7 @@ int32_t uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle
  * > AT+USOL=<socket_handle>,<port>
  *
  * @param[in]  puCxHandle:    uCX API handle
- * @param      socket_handle: Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
  * @param      port:          Port of service, range 1-65535. Port numbers below 1024 are not recommended since they are
  *                            usually reserved
  */
@@ -186,7 +193,7 @@ int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t
  * > AT+USORF=<socket_handle>,<length>
  *
  * @param[in]  puCxHandle:            uCX API handle
- * @param      socket_handle:         Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle:         Socket identifier be used for any operation on that socket.
  * @param      length:                Number of bytes to read.
  * @param[out] pSocketReceiveFromRsp: Please see \ref uCxSocketReceiveFrom_t
  */
@@ -210,11 +217,24 @@ int32_t uCxSocketStatus(uCxHandle_t * puCxHandle, uCxSocketStatus_t * pSocketSta
  * > AT+USOO=<socket_handle>,<option>,<value>
  *
  * @param[in]  puCxHandle:    uCX API handle
- * @param      socket_handle: Socket identifier to be used for any future operation on that socket.
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
  * @param      option:        Available options to set
  * @param      value:         See option parameter
  */
 int32_t uCxSocketSetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, int32_t value);
+
+/**
+ * Read a socket option for a socket
+ * 
+ * Output AT command:
+ * > AT+USOO=<socket_handle>,<option>
+ *
+ * @param[in]  puCxHandle:          uCX API handle
+ * @param      socket_handle:       Socket identifier be used for any operation on that socket.
+ * @param      option:              Available options to set
+ * @param[out] pSocketGetOptionRsp: Please see \ref uCxSocketGetOption_t
+ */
+int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, uCxSocketGetOption_t * pSocketGetOptionRsp);
 
 /**
  * Does a DNS lookup of a host name and returns the IP address.

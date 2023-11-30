@@ -338,6 +338,230 @@ int32_t uCxBluetoothDirectedAdvertisement1(uCxHandle_t * puCxHandle, uBtLeAddres
 int32_t uCxBluetoothDirectedAdvertisement2(uCxHandle_t * puCxHandle, uBtLeAddress_t * bd_addr, int32_t timeout);
 
 /**
+ * Write connection interval minimum.
+ * 
+ * Output AT command:
+ * > AT+UBTCS0=<connection_interval_minimum>
+ *
+ * @param[in]  puCxHandle:                  uCX API handle
+ * @param      connection_interval_minimum: Connection inteval minimum (must be <= Connection interval maximum). Final results will be
+ *                                          a result of negotiation between devices.
+ *                                           Default: 24.
+ *                                           Calculation: connection_interval_minimum * 1.25. ms
+ */
+int32_t uCxBluetoothSetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t connection_interval_minimum);
+
+/**
+ * Read Connection Interval miniumum.
+ * 
+ * Output AT command:
+ * > AT+UBTCS0?
+ *
+ * @param[in]  puCxHandle:                 uCX API handle
+ * @param[out] pConnectionIntervalMinimum: Connection inteval minimum (must be <= Connection interval maximum). Final results will be
+ *                                         a result of negotiation between devices.
+ *                                          Default: 24.
+ *                                          Calculation: connection_interval_minimum * 1.25. ms
+ */
+int32_t uCxBluetoothGetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t * pConnectionIntervalMinimum);
+
+/**
+ * Write connection interval maximum.
+ * 
+ * Output AT command:
+ * > AT+UBTCS1=<connection_interval_maximum>
+ *
+ * @param[in]  puCxHandle:                  uCX API handle
+ * @param      connection_interval_maximum: Connection inteval maximum (must be >= Connection interval minimum). Final results will be
+ *                                          a result of negotiation between devices.
+ *                                           Default: 40.
+ *                                           Calculation: connection_interval_maximum * 1.25 ms.
+ */
+int32_t uCxBluetoothSetConnectionIntervalMax(uCxHandle_t * puCxHandle, int32_t connection_interval_maximum);
+
+/**
+ * Read Connection Interval maximum.
+ * 
+ * Output AT command:
+ * > AT+UBTCS1?
+ *
+ * @param[in]  puCxHandle:                 uCX API handle
+ * @param[out] pConnectionIntervalMaximum: Connection inteval maximum (must be >= Connection interval minimum). Final results will be
+ *                                         a result of negotiation between devices.
+ *                                          Default: 40.
+ *                                          Calculation: connection_interval_maximum * 1.25 ms.
+ */
+int32_t uCxBluetoothGetConnectionIntervalMax(uCxHandle_t * puCxHandle, int32_t * pConnectionIntervalMaximum);
+
+/**
+ * Write connection peripheral latency.
+ * 
+ * Output AT command:
+ * > AT+UBTCS2=<connection_peripheral_latency>
+ *
+ * @param[in]  puCxHandle:                    uCX API handle
+ * @param      connection_peripheral_latency: Connection peripheral latency.
+ *                                             Default: 0
+ *                                             Calculation: Number of connection events.
+ */
+int32_t uCxBluetoothSetConnectionPeripheralLatency(uCxHandle_t * puCxHandle, int32_t connection_peripheral_latency);
+
+/**
+ * Read connection peripheral latency.
+ * 
+ * Output AT command:
+ * > AT+UBTCS2?
+ *
+ * @param[in]  puCxHandle:                   uCX API handle
+ * @param[out] pConnectionPeripheralLatency: Connection peripheral latency.
+ *                                            Default: 0
+ *                                            Calculation: Number of connection events.
+ */
+int32_t uCxBluetoothGetConnectionPeripheralLatency(uCxHandle_t * puCxHandle, int32_t * pConnectionPeripheralLatency);
+
+/**
+ * Write connection linkloss timeout.
+ * 
+ * Output AT command:
+ * > AT+UBTCS3=<connection_linkloss_timeout>
+ *
+ * @param[in]  puCxHandle:                  uCX API handle
+ * @param      connection_linkloss_timeout: Connection linkloss timeout.
+ *                                           Default: 2000
+ *                                           Calculation: connection_linkloss_timeout ms
+ */
+int32_t uCxBluetoothSetConnectionLinklossTimeout(uCxHandle_t * puCxHandle, int32_t connection_linkloss_timeout);
+
+/**
+ * Read connection linkloss timeout.
+ * 
+ * Output AT command:
+ * > AT+UBTCS3?
+ *
+ * @param[in]  puCxHandle:                 uCX API handle
+ * @param[out] pConnectionLinklossTimeout: Connection linkloss timeout.
+ *                                          Default: 2000
+ *                                          Calculation: connection_linkloss_timeout ms
+ */
+int32_t uCxBluetoothGetConnectionLinklossTimeout(uCxHandle_t * puCxHandle, int32_t * pConnectionLinklossTimeout);
+
+/**
+ * Write Preferred TX PHY.
+ * 
+ * Output AT command:
+ * > AT+UBTCS4=<preferred_tx_phy>
+ *
+ * @param[in]  puCxHandle:       uCX API handle
+ * @param      preferred_tx_phy: Preferred Transmitter PHY
+ *                               0: Let other side decide
+ *                               OR a bit field with three bits:
+ *                               Bit 0: 1 Mbps preferred
+ *                               Bit 1: 2 Mbps preferred
+ *                               Bit 2: reserved for future use
+ */
+int32_t uCxBluetoothSetPreferredTxPhy(uCxHandle_t * puCxHandle, int32_t preferred_tx_phy);
+
+/**
+ * Read Preferred TX PHY.
+ * 
+ * Output AT command:
+ * > AT+UBTCS4?
+ *
+ * @param[in]  puCxHandle:      uCX API handle
+ * @param[out] pPreferredTxPhy: Preferred Transmitter PHY
+ *                              0: Let other side decide
+ *                              OR a bit field with three bits:
+ *                              Bit 0: 1 Mbps preferred
+ *                              Bit 1: 2 Mbps preferred
+ *                              Bit 2: reserved for future use
+ */
+int32_t uCxBluetoothGetPreferredTxPhy(uCxHandle_t * puCxHandle, int32_t * pPreferredTxPhy);
+
+/**
+ * Write Preferred RX PHY.
+ * 
+ * Output AT command:
+ * > AT+UBTCS5=<preferred_rx_phy>
+ *
+ * @param[in]  puCxHandle:       uCX API handle
+ * @param      preferred_rx_phy: Preferred Receiver PHY
+ *                               0: Let other side decide
+ *                               OR a bit field with three bits:
+ *                               Bit 0: 1 Mbps preferred
+ *                               Bit 1: 2 Mbps preferred
+ *                               Bit 2: reserved for future use
+ */
+int32_t uCxBluetoothSetPreferredRxPhy(uCxHandle_t * puCxHandle, int32_t preferred_rx_phy);
+
+/**
+ * Read Preferred RX PHY.
+ * 
+ * Output AT command:
+ * > AT+UBTCS5?
+ *
+ * @param[in]  puCxHandle:      uCX API handle
+ * @param[out] pPreferredRxPhy: Preferred Receiver PHY
+ *                              0: Let other side decide
+ *                              OR a bit field with three bits:
+ *                              Bit 0: 1 Mbps preferred
+ *                              Bit 1: 2 Mbps preferred
+ *                              Bit 2: reserved for future use
+ */
+int32_t uCxBluetoothGetPreferredRxPhy(uCxHandle_t * puCxHandle, int32_t * pPreferredRxPhy);
+
+/**
+ * Write advertisement interval minimum.
+ * 
+ * Output AT command:
+ * > AT+UBTAS0=<advertisement_interval_minimum>
+ *
+ * @param[in]  puCxHandle:                     uCX API handle
+ * @param      advertisement_interval_minimum: Advertising interval minimum (must be <= Advertising interval maximum. 
+ *                                              Default: 1600.
+ *                                              Calculation: advertisement_interval_minimum * 0.625 ms)
+ */
+int32_t uCxBluetoothSetAdvIntervalMin(uCxHandle_t * puCxHandle, int32_t advertisement_interval_minimum);
+
+/**
+ * Read advertisement Interval miniumum.
+ * 
+ * Output AT command:
+ * > AT+UBTAS0?
+ *
+ * @param[in]  puCxHandle:                    uCX API handle
+ * @param[out] pAdvertisementIntervalMinimum: Advertising interval minimum (must be <= Advertising interval maximum. 
+ *                                             Default: 1600.
+ *                                             Calculation: advertisement_interval_minimum * 0.625 ms)
+ */
+int32_t uCxBluetoothGetAdvIntervalMin(uCxHandle_t * puCxHandle, int32_t * pAdvertisementIntervalMinimum);
+
+/**
+ * Write advertisement interval maximum.
+ * 
+ * Output AT command:
+ * > AT+UBTAS1=<advertisement_interval_maximum>
+ *
+ * @param[in]  puCxHandle:                     uCX API handle
+ * @param      advertisement_interval_maximum: Advertising interval maximum (must be >= Advertising interval minimum. 
+ *                                              Default: 2000.
+ *                                              Calculation: advertisement_interval_maximum * 0.625 ms)
+ */
+int32_t uCxBluetoothSetAdvIntervalMax(uCxHandle_t * puCxHandle, int32_t advertisement_interval_maximum);
+
+/**
+ * Read advertisement Interval maximum.
+ * 
+ * Output AT command:
+ * > AT+UBTAS1?
+ *
+ * @param[in]  puCxHandle:                    uCX API handle
+ * @param[out] pAdvertisementIntervalMaximum: Advertising interval maximum (must be >= Advertising interval minimum. 
+ *                                             Default: 2000.
+ *                                             Calculation: advertisement_interval_maximum * 0.625 ms)
+ */
+int32_t uCxBluetoothGetAdvIntervalMax(uCxHandle_t * puCxHandle, int32_t * pAdvertisementIntervalMaximum);
+
+/**
  * Set I/O Capabilities
  * 
  * Output AT command:

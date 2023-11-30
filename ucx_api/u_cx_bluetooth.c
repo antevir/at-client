@@ -187,6 +187,142 @@ int32_t uCxBluetoothDirectedAdvertisement2(uCxHandle_t * puCxHandle, uBtLeAddres
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTDA=", "bd", bd_addr, timeout, U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxBluetoothSetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t connection_interval_minimum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS0=", "d", connection_interval_minimum, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t * pConnectionIntervalMinimum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS0?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS0:", "d", pConnectionIntervalMinimum);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetConnectionIntervalMax(uCxHandle_t * puCxHandle, int32_t connection_interval_maximum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS1=", "d", connection_interval_maximum, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetConnectionIntervalMax(uCxHandle_t * puCxHandle, int32_t * pConnectionIntervalMaximum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS1?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS1:", "d", pConnectionIntervalMaximum);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetConnectionPeripheralLatency(uCxHandle_t * puCxHandle, int32_t connection_peripheral_latency)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS2=", "d", connection_peripheral_latency, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetConnectionPeripheralLatency(uCxHandle_t * puCxHandle, int32_t * pConnectionPeripheralLatency)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS2?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS2:", "d", pConnectionPeripheralLatency);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetConnectionLinklossTimeout(uCxHandle_t * puCxHandle, int32_t connection_linkloss_timeout)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS3=", "d", connection_linkloss_timeout, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetConnectionLinklossTimeout(uCxHandle_t * puCxHandle, int32_t * pConnectionLinklossTimeout)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS3?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS3:", "d", pConnectionLinklossTimeout);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetPreferredTxPhy(uCxHandle_t * puCxHandle, int32_t preferred_tx_phy)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS4=", "d", preferred_tx_phy, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetPreferredTxPhy(uCxHandle_t * puCxHandle, int32_t * pPreferredTxPhy)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS4?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS4:", "d", pPreferredTxPhy);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetPreferredRxPhy(uCxHandle_t * puCxHandle, int32_t preferred_rx_phy)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTCS5=", "d", preferred_rx_phy, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetPreferredRxPhy(uCxHandle_t * puCxHandle, int32_t * pPreferredRxPhy)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTCS5?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCS5:", "d", pPreferredRxPhy);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetAdvIntervalMin(uCxHandle_t * puCxHandle, int32_t advertisement_interval_minimum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTAS0=", "d", advertisement_interval_minimum, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetAdvIntervalMin(uCxHandle_t * puCxHandle, int32_t * pAdvertisementIntervalMinimum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTAS0?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTAS0:", "d", pAdvertisementIntervalMinimum);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
+int32_t uCxBluetoothSetAdvIntervalMax(uCxHandle_t * puCxHandle, int32_t advertisement_interval_maximum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UBTAS1=", "d", advertisement_interval_maximum, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxBluetoothGetAdvIntervalMax(uCxHandle_t * puCxHandle, int32_t * pAdvertisementIntervalMaximum)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+UBTAS1?", "", U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTAS1:", "d", pAdvertisementIntervalMaximum);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
 int32_t uCxBluetoothSetIoCapabilities(uCxHandle_t * puCxHandle, uIoCapabilities_t io_capabilities)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;

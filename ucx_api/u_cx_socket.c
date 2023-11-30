@@ -112,6 +112,17 @@ int32_t uCxSocketSetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOpt
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USOO=", "ddd", socket_handle, option, value, U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, uCxSocketGetOption_t * pSocketGetOptionRsp)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    uCxAtClientCmdBeginF(pAtClient, "AT+USOO=", "dd", socket_handle, option, U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOO:", "ddd", &pSocketGetOptionRsp->socket_handle, &pSocketGetOptionRsp->option, &pSocketGetOptionRsp->value);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
+}
+
 int32_t uCxSocketGetHostByName(uCxHandle_t * puCxHandle, const char * host_name, uSockIpAddress_t * pHostIp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;

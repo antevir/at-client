@@ -257,7 +257,7 @@ typedef enum
                                   Integer flag: 0 = off, 1 = on.
                                   Sockets are non-blocking by default (Note that read/write will always be non-blocking).
                                   Can only be set while the socket is in a non connected state.
-                                  Note: Only valid for TCP sockets, will have no effect on UDP sockets */
+                                  Note: Only valid for non-persistent TCP sockets, will have no effect on UDP sockets */
     U_OPTION_KEEP_ALIVE = 2, /**< Keep connections alive by sending keepalive probes.
                                   Integer flag: 0 = off, 1 = on.
                                   To calculate the keepalive time us this formula KeepIdle + (KeepIntvl * KeepCnt).
