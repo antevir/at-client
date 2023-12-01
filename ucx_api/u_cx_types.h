@@ -205,6 +205,21 @@ typedef enum
 
 typedef enum
 {
+    U_SCAN_MODE_ACTIVE,     /**< Active */
+    U_SCAN_MODE_PASSIVE = 1 /**< Passive */
+} uScanMode_t;
+
+typedef enum
+{
+    U_WIFI_STATUS_ID_SSID,           /**< SSID of the connected AP */
+    U_WIFI_STATUS_ID_BSSID = 1,      /**< BSSID of the connected AP */
+    U_WIFI_STATUS_ID_CHANNEL = 2,    /**< Active channel */
+    U_WIFI_STATUS_ID_CONNECTION = 3, /**< Connection status, 1 = not connected, 2 = Connected */
+    U_WIFI_STATUS_ID_RSSI = 4        /**< RSSI value of the current connection; will return -32768, if not connected. */
+} uWifiStatusId_t;
+
+typedef enum
+{
     U_CHANNEL1 = 1,   /**< 1 */
     U_CHANNEL2 = 2,   /**< 2 */
     U_CHANNEL3 = 3,   /**< 3 */
@@ -383,16 +398,16 @@ typedef enum
  * ---------------------------------------------------------- */
 
 struct uCxHandle;
-typedef void (*uUEBTC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, uBtLeAddress_t * bd_addr);
+typedef void (*uUEBTC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, uBtLeAddress_t *bd_addr);
 typedef void (*uUEBTDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
-typedef void (*uUEBTB_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, uBondStatus_t bond_status);
-typedef void (*uUEBTUC_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, int32_t nummeric_value);
-typedef void (*uUEBTUPD_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr, int32_t nummeric_value);
-typedef void (*uUEBTUPE_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t * bd_addr);
+typedef void (*uUEBTB_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, uBondStatus_t bond_status);
+typedef void (*uUEBTUC_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t nummeric_value);
+typedef void (*uUEBTUPD_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t nummeric_value);
+typedef void (*uUEBTUPE_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr);
 typedef void (*uUEBTPHYU_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t phy_status, int32_t tx_phy, int32_t rx_phy);
-typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
-typedef void (*uUEBTGCI_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * hex_data);
-typedef void (*uUEBTGCW_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, const char * value, uOptions_t options);
+typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, uByteArray_t *hex_data);
+typedef void (*uUEBTGCI_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, uByteArray_t *hex_data);
+typedef void (*uUEBTGCW_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, uByteArray_t *value, uOptions_t options);
 typedef void (*uUEBTGRR_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle);
 typedef void (*uUEBTGIC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t char_handle);
 typedef void (*uUESPSC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
@@ -400,7 +415,7 @@ typedef void (*uUESPSDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDS_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, const char * string_data);
 typedef void (*uUESPSDB_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUESPSDA_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t number_bytes);
-typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, uMacAddress_t * bssid, int32_t channel);
+typedef void (*uUEWLU_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, uMacAddress_t *bssid, int32_t channel);
 typedef void (*uUEWLD_t)(struct uCxHandle *puCxHandle, int32_t wlan_handle, int32_t reason);
 typedef void (*uUEWSNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWSND_t)(struct uCxHandle *puCxHandle);
@@ -408,16 +423,16 @@ typedef void (*uUEWAPNU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPND_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPU_t)(struct uCxHandle *puCxHandle);
 typedef void (*uUEWAPD_t)(struct uCxHandle *puCxHandle);
-typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
-typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, uMacAddress_t * mac);
+typedef void (*uUEWAPSA_t)(struct uCxHandle *puCxHandle, uMacAddress_t *mac);
+typedef void (*uUEWAPSDA_t)(struct uCxHandle *puCxHandle, uMacAddress_t *mac);
 typedef void (*uUESOC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
 typedef void (*uUESODA_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, int32_t number_bytes);
 typedef void (*uUESODS_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, const char * string_data);
-typedef void (*uUESODSF_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t * remote_ip, int32_t remote_port, const char * string_data);
+typedef void (*uUESODSF_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t *remote_ip, int32_t remote_port, const char * string_data);
 typedef void (*uUESODB_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
-typedef void (*uUESODBF_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t * remote_ip, int32_t remote_port);
+typedef void (*uUESODBF_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t *remote_ip, int32_t remote_port);
 typedef void (*uUESOCL_t)(struct uCxHandle *puCxHandle, int32_t socket_handle);
-typedef void (*uUESOIC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t * remote_ip, int32_t listening_socket_handle);
+typedef void (*uUESOIC_t)(struct uCxHandle *puCxHandle, int32_t socket_handle, uSockIpAddress_t *remote_ip, int32_t listening_socket_handle);
 typedef void (*uUEMQC_t)(struct uCxHandle *puCxHandle, int32_t mqtt_id);
 typedef void (*uUEMQDC_t)(struct uCxHandle *puCxHandle, int32_t mqtt_id, int32_t disconnect_reason);
 typedef void (*uUEMQDA_t)(struct uCxHandle *puCxHandle, int32_t mqtt_id, int32_t message_len);

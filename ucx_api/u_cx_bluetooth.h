@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -34,6 +34,12 @@ typedef struct
     int32_t data_type;
     uByteArray_t data;        /**< Complete advertise/scan response data recieved from the remote device. */
 } uCxBluetoothDiscoveryEx_t;
+
+typedef struct
+{
+    int32_t conn_handle;    /**< Connection handle of the Bluetooth low energy connection. */
+    uBtLeAddress_t bd_addr; /**< Bluetooth device address of the remote device. */
+} uCxBluetoothConnectionList_t;
 
 typedef struct
 {
@@ -57,6 +63,7 @@ typedef struct
                               Bit 1: 2 Mbps preferred
                               Bit 2: Coded PHY (S=8). Not supported by NORA-W36 */
 } uCxBluetoothGetPhy_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -144,11 +151,18 @@ int32_t uCxBluetoothDiscovery(uCxHandle_t * puCxHandle);
  * Output AT command:
  * > AT+UBTD=<discovery_type>
  *
+ * @param[in]  puCxHandle:     uCX API handle
+ * @param      discovery_type: 
+ */
+void uCxBeginBluetoothDiscoveryEx1(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type);
+
+/**
+ * 
+ *
  * @param[in]  puCxHandle:               uCX API handle
- * @param      discovery_type:           
  * @param[out] pBluetoothDiscoveryExRsp: Please see \ref uCxBluetoothDiscoveryEx_t
  */
-int32_t uCxBeginBluetoothDiscoveryEx1(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
+int32_t uCxBluetoothDiscoveryExGetResponse1(uCxHandle_t * puCxHandle, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
 
 /**
  * Start discovery.
@@ -156,12 +170,19 @@ int32_t uCxBeginBluetoothDiscoveryEx1(uCxHandle_t * puCxHandle, uDiscoveryType_t
  * Output AT command:
  * > AT+UBTD=<discovery_type>,<discovery_mode>
  *
+ * @param[in]  puCxHandle:     uCX API handle
+ * @param      discovery_type: 
+ * @param      discovery_mode: 
+ */
+void uCxBeginBluetoothDiscoveryEx2(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type, uDiscoveryMode_t discovery_mode);
+
+/**
+ * 
+ *
  * @param[in]  puCxHandle:               uCX API handle
- * @param      discovery_type:           
- * @param      discovery_mode:           
  * @param[out] pBluetoothDiscoveryExRsp: Please see \ref uCxBluetoothDiscoveryEx_t
  */
-int32_t uCxBeginBluetoothDiscoveryEx2(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type, uDiscoveryMode_t discovery_mode, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
+int32_t uCxBluetoothDiscoveryExGetResponse2(uCxHandle_t * puCxHandle, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
 
 /**
  * Start discovery.
@@ -169,13 +190,20 @@ int32_t uCxBeginBluetoothDiscoveryEx2(uCxHandle_t * puCxHandle, uDiscoveryType_t
  * Output AT command:
  * > AT+UBTD=<discovery_type>,<discovery_mode>,<discovery_length>
  *
+ * @param[in]  puCxHandle:       uCX API handle
+ * @param      discovery_type:   
+ * @param      discovery_mode:   
+ * @param      discovery_length: Timeout measured in milliseconds. Time range: 10 ms - 40 s
+ */
+void uCxBeginBluetoothDiscoveryEx3(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type, uDiscoveryMode_t discovery_mode, int32_t discovery_length);
+
+/**
+ * 
+ *
  * @param[in]  puCxHandle:               uCX API handle
- * @param      discovery_type:           
- * @param      discovery_mode:           
- * @param      discovery_length:         Timeout measured in milliseconds. Time range: 10 ms - 40 s
  * @param[out] pBluetoothDiscoveryExRsp: Please see \ref uCxBluetoothDiscoveryEx_t
  */
-int32_t uCxBeginBluetoothDiscoveryEx3(uCxHandle_t * puCxHandle, uDiscoveryType_t discovery_type, uDiscoveryMode_t discovery_mode, int32_t discovery_length, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
+int32_t uCxBluetoothDiscoveryExGetResponse3(uCxHandle_t * puCxHandle, uCxBluetoothDiscoveryEx_t * pBluetoothDiscoveryExRsp);
 
 /**
  * Start/Stop background discovery
@@ -210,6 +238,24 @@ int32_t uCxBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscover
  * @param[out] pRssi:       Recieved signal strength in dBm.
  */
 int32_t uCxBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi);
+
+/**
+ * List all Bluetooth low energy ACL connections.
+ * 
+ * Output AT command:
+ * > AT+UBTCL
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginBluetoothConnectionList(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                  uCX API handle
+ * @param[out] pBluetoothConnectionListRsp: Please see \ref uCxBluetoothConnectionList_t
+ */
+int32_t uCxBluetoothConnectionListGetResponse(uCxHandle_t * puCxHandle, uCxBluetoothConnectionList_t * pBluetoothConnectionListRsp);
 
 /**
  * Read propertie(s) of an existing Bluetooth low energy ACL connection. If <property_id> is ommited all properties will be

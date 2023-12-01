@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -39,6 +39,7 @@ typedef struct
     int32_t value_handle;  /**< Attribute handle of the characteristic value. */
     uByteArray_t hex_data; /**< Characteristic data in hexadecimal form. For example, 070809AABBCC */
 } uCxGattClientReadByUuid_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS

@@ -16,15 +16,19 @@
 int32_t uCxBeginGattClientRead(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t value_handle, uCxGattClientRead_t * pGattClientReadRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTGR=", "dd", conn_handle, value_handle, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTGR:", "ddh", &pGattClientReadRsp->conn_handle, &pGattClientReadRsp->value_handle, &pGattClientReadRsp->hex_data);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTGR:", "ddh", &pGattClientReadRsp->conn_handle, &pGattClientReadRsp->value_handle, &pGattClientReadRsp->hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    return ret;
 }
 
 int32_t uCxBeginGattClientReadByUuid(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t start, int32_t end, const uint8_t * uuid, int32_t uuid_len, uCxGattClientReadByUuid_t * pGattClientReadByUuidRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTGRU=", "dddh", conn_handle, start, end, uuid, uuid_len, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTGRU:", "ddh", &pGattClientReadByUuidRsp->conn_handle, &pGattClientReadByUuidRsp->value_handle, &pGattClientReadByUuidRsp->hex_data);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTGRU:", "ddh", &pGattClientReadByUuidRsp->conn_handle, &pGattClientReadByUuidRsp->value_handle, &pGattClientReadByUuidRsp->hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    return ret;
 }
 
 int32_t uCxGattClientWrite(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t value_handle, const uint8_t * hex_data, int32_t hex_data_len)

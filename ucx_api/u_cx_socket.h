@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -61,6 +61,7 @@ typedef struct
     int32_t option;        /**< Available options to set */
     int32_t value;         /**< See option parameter */
 } uCxSocketGetOption_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS

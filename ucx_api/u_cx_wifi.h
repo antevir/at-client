@@ -23,8 +23,36 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
+typedef enum
+{
+    U_CX_WIFI_STATION_STATUS_RSP_TYPE_WIFI_STATUS_ID_STR,
+    U_CX_WIFI_STATION_STATUS_RSP_TYPE_WIFI_STATUS_ID_MAC,
+    U_CX_WIFI_STATION_STATUS_RSP_TYPE_WIFI_STATUS_ID_INT
+} uCxWifiStationStatusRspType_t;
+
+typedef struct {
+    uCxWifiStationStatusRspType_t type;
+    union {
+        struct
+        {
+            int32_t wifi_status_id;
+            const char * ssid;      /**< SSID */
+        } rspWifiStatusIdStr;
+        struct
+        {
+            int32_t wifi_status_id;
+            uMacAddress_t bssid;    /**< BSSID of the connected access point */
+        } rspWifiStatusIdMac;
+        struct
+        {
+            int32_t wifi_status_id;
+            int32_t int_val;        /**< RSSI, Connection status  or Channel */
+        } rspWifiStatusIdInt;
+    };
+} uCxWifiStationStatus_t;
+
 
 typedef struct
 {
@@ -40,9 +68,34 @@ typedef struct
 
 typedef struct
 {
+    uMacAddress_t bssid;           /**< BSSID */
+    const char * ssid;             /**< SSID */
+    int32_t channel;               /**< Channel */
+    int32_t rssi;                  /**< RSSI */
+    int32_t authentication_suites; /**< Authentication suites. Bit 0 = shared secret, 1 = PSK, 2 = EAP, 3 = WPA, 4 = WPA2, 5 =
+                                        WPA3 */
+    int32_t unicast_ciphers;       /**< unicast ciphers. Bit 0 = WEP64, 1 = WEP128, 2 = TKIP, 3 = AES/CCMP */
+    int32_t group_ciphers;         /**< group ciphers. Bit 0 = WEP64, 1 = WEP128, 2 = TKIP, 3 = AES/CCMP */
+} uCxWifiStationScan_t;
+
+typedef struct
+{
+    uMacAddress_t bssid;           /**< BSSID */
+    const char * ssid;             /**< SSID */
+    int32_t channel;               /**< Channel */
+    int32_t rssi;                  /**< RSSI */
+    int32_t authentication_suites; /**< Authentication suites. Bit 0 = shared secret, 1 = PSK, 2 = EAP, 3 = WPA, 4 = WPA2, 5 =
+                                        WPA3 */
+    int32_t unicast_ciphers;       /**< unicast ciphers. Bit 0 = WEP64, 1 = WEP128, 2 = TKIP, 3 = AES/CCMP */
+    int32_t group_ciphers;         /**< group ciphers. Bit 0 = WEP64, 1 = WEP128, 2 = TKIP, 3 = AES/CCMP */
+} uCxWifiStationScanEx_t;
+
+typedef struct
+{
     const char * ssid; /**< SSID */
     int32_t channel;   /**< channel */
 } uCxWifiApGetConnectionParams_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -249,6 +302,75 @@ int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle);
  * @param[out] pWifiStationGetNetworkStatusRsp: Please see \ref uCxWifiStationGetNetworkStatus_t
  */
 int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
+
+/**
+ * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
+ * 
+ * Output AT command:
+ * > AT+UWSSC
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginWifiStationScan(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:          uCX API handle
+ * @param[out] pWifiStationScanRsp: Please see \ref uCxWifiStationScan_t
+ */
+int32_t uCxWifiStationScanGetResponse(uCxHandle_t * puCxHandle, uCxWifiStationScan_t * pWifiStationScanRsp);
+
+/**
+ * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
+ * 
+ * Output AT command:
+ * > AT+UWSSC=<scan_mode>
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      scan_mode:  Choose how to scan
+ */
+void uCxBeginWifiStationScanEx1(uCxHandle_t * puCxHandle, uScanMode_t scan_mode);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:            uCX API handle
+ * @param[out] pWifiStationScanExRsp: Please see \ref uCxWifiStationScanEx_t
+ */
+int32_t uCxWifiStationScanExGetResponse1(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
+
+/**
+ * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
+ * 
+ * Output AT command:
+ * > AT+UWSSC=<scan_mode>,<ssid>
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      scan_mode:  Choose how to scan
+ * @param      ssid:       SSID
+ */
+void uCxBeginWifiStationScanEx2(uCxHandle_t * puCxHandle, uScanMode_t scan_mode, const char * ssid);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:            uCX API handle
+ * @param[out] pWifiStationScanExRsp: Please see \ref uCxWifiStationScanEx_t
+ */
+int32_t uCxWifiStationScanExGetResponse2(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
+
+/**
+ * Read status
+ * 
+ * Output AT command:
+ * > AT+UWSST=<wifi_status_id>
+ *
+ * @param[in]  puCxHandle:            uCX API handle
+ * @param      wifi_status_id:        
+ * @param[out] pWifiStationStatusRsp: Please see \ref uCxWifiStationStatus_t
+ */
+int32_t uCxBeginWifiStationStatus(uCxHandle_t * puCxHandle, uWifiStatusId_t wifi_status_id, uCxWifiStationStatus_t * pWifiStationStatusRsp);
 
 /**
  * Start an access point with the current access point configuration.

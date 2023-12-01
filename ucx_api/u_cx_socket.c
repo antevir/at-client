@@ -16,8 +16,9 @@
 int32_t uCxSocketCreate1(uCxHandle_t * puCxHandle, uProtocol_t protocol, int32_t * pSocketHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOCR=", "d", protocol, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOCR:", "d", pSocketHandle);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOCR:", "d", pSocketHandle, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -27,8 +28,9 @@ int32_t uCxSocketCreate1(uCxHandle_t * puCxHandle, uProtocol_t protocol, int32_t
 int32_t uCxSocketCreate2(uCxHandle_t * puCxHandle, uProtocol_t protocol, uPreferredProtocolType_t preferred_protocol_type, int32_t * pSocketHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOCR=", "dd", protocol, preferred_protocol_type, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOCR:", "d", pSocketHandle);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOCR:", "d", pSocketHandle, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -50,8 +52,9 @@ int32_t uCxSocketSetReadMode(uCxHandle_t * puCxHandle, uReadMode_t read_mode)
 int32_t uCxSocketGetReadMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USORM?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USORM:", "d", pReadMode);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USORM:", "d", pReadMode, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -61,8 +64,9 @@ int32_t uCxSocketGetReadMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode)
 int32_t uCxSocketWriteString(uCxHandle_t * puCxHandle, int32_t socket_handle, const char * string_data, uCxSocketWriteString_t * pSocketWriteStringRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOWS=", "ds", socket_handle, string_data, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOWS:", "dd", &pSocketWriteStringRsp->socket_handle, &pSocketWriteStringRsp->written_length);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOWS:", "dd", &pSocketWriteStringRsp->socket_handle, &pSocketWriteStringRsp->written_length, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -78,8 +82,10 @@ int32_t uCxSocketClose(uCxHandle_t * puCxHandle, int32_t socket_handle)
 int32_t uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReadString_t * pSocketReadStringRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USORS=", "dd", socket_handle, length, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USORS:", "dds", &pSocketReadStringRsp->socket_handle, &pSocketReadStringRsp->length, &pSocketReadStringRsp->string_data);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USORS:", "dds", &pSocketReadStringRsp->socket_handle, &pSocketReadStringRsp->length, &pSocketReadStringRsp->string_data, U_CX_AT_UTIL_PARAM_LAST);
+    return ret;
 }
 
 int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t port)
@@ -91,15 +97,18 @@ int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t
 int32_t uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReceiveFrom_t * pSocketReceiveFromRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USORF=", "dd", socket_handle, length, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USORF:", "didds", &pSocketReceiveFromRsp->socket_handle, &pSocketReceiveFromRsp->remote_ip, &pSocketReceiveFromRsp->remote_port, &pSocketReceiveFromRsp->length, &pSocketReceiveFromRsp->string_data);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USORF:", "didds", &pSocketReceiveFromRsp->socket_handle, &pSocketReceiveFromRsp->remote_ip, &pSocketReceiveFromRsp->remote_port, &pSocketReceiveFromRsp->length, &pSocketReceiveFromRsp->string_data, U_CX_AT_UTIL_PARAM_LAST);
+    return ret;
 }
 
 int32_t uCxSocketStatus(uCxHandle_t * puCxHandle, uCxSocketStatus_t * pSocketStatusRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOST?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOST:", "ddd", &pSocketStatusRsp->socket_handle, &pSocketStatusRsp->protocol, &pSocketStatusRsp->socket_status);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOST:", "ddd", &pSocketStatusRsp->socket_handle, &pSocketStatusRsp->protocol, &pSocketStatusRsp->socket_status, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -115,8 +124,9 @@ int32_t uCxSocketSetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOpt
 int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, uCxSocketGetOption_t * pSocketGetOptionRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOO=", "dd", socket_handle, option, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOO:", "ddd", &pSocketGetOptionRsp->socket_handle, &pSocketGetOptionRsp->option, &pSocketGetOptionRsp->value);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOO:", "ddd", &pSocketGetOptionRsp->socket_handle, &pSocketGetOptionRsp->option, &pSocketGetOptionRsp->value, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -126,8 +136,9 @@ int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOpt
 int32_t uCxSocketGetHostByName(uCxHandle_t * puCxHandle, const char * host_name, uSockIpAddress_t * pHostIp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USOH=", "s", host_name, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOH:", "i", pHostIp);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USOH:", "i", pHostIp, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }

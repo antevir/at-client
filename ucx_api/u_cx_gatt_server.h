@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -38,6 +38,7 @@ typedef struct
     int32_t cccd_handle;  /**< Client Characteristic Configuration Descriptor (CCCD) handle of the added characteristic.
                                This value is zero if there is no CCCD. */
 } uCxGattServerHostCharDefine_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS

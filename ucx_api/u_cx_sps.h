@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -38,6 +38,7 @@ typedef struct
     int32_t length;           /**< Data bytes to read. */
     const char * string_data; /**< SPS data in string format */
 } uCxSpsReadString_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS

@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -40,6 +40,7 @@ typedef struct
                                  default: 1000 */
     int32_t escape_timeout; /**< Maximum time interval (ms) between escape characters. Factory default: 200 */
 } uCxSystemGetEscSequenceSettings_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS

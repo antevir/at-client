@@ -23,7 +23,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -67,6 +67,7 @@ typedef struct
     int32_t message_len;  /**< Length of the MQTT message */
     const char * message; /**< MQTT message */
 } uCxMqttReadMessage_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
