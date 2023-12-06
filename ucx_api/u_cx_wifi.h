@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -68,6 +69,12 @@ typedef struct
 
 typedef struct
 {
+    int32_t status_id;
+    uSockIpAddress_t status_val; /**< IP address */
+} uCxWifiStationListNetworkStatus_t;
+
+typedef struct
+{
     uMacAddress_t bssid;           /**< BSSID */
     const char * ssid;             /**< SSID */
     int32_t channel;               /**< Channel */
@@ -96,6 +103,18 @@ typedef struct
     int32_t channel;   /**< channel */
 } uCxWifiApGetConnectionParams_t;
 
+typedef struct
+{
+    int32_t status_id;
+    uSockIpAddress_t status_val; /**< IP address */
+} uCxWifiApGetNetworkStatus_t;
+
+typedef struct
+{
+    int32_t status_id;
+    uSockIpAddress_t status_val; /**< IP address */
+} uCxWifiApListNetworkStatus_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -121,7 +140,7 @@ int32_t uCxWifiSetHostname(uCxHandle_t * puCxHandle, const char * host_name);
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] ppHostName: 
  */
-int32_t uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char ** ppHostName);
+bool uCxBeginWifiGetHostname(uCxHandle_t * puCxHandle, const char ** ppHostName);
 
 /**
  * Set the EAP-TLS connection parameters to use.
@@ -212,7 +231,7 @@ int32_t uCxWifiStationSetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan
  * @param      wlan_handle:                        Handle to use for Wi-Fi config and connection
  * @param[out] pWifiStationGetConnectionParamsRsp: Please see \ref uCxWifiStationGetConnectionParams_t
  */
-int32_t uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationGetConnectionParams_t * pWifiStationGetConnectionParamsRsp);
+bool uCxBeginWifiStationGetConnectionParams(uCxHandle_t * puCxHandle, int32_t wlan_handle, uCxWifiStationGetConnectionParams_t * pWifiStationGetConnectionParamsRsp);
 
 /**
  * Sets ip configuration to use static ip
@@ -304,6 +323,24 @@ int32_t uCxWifiStationDisconnect(uCxHandle_t * puCxHandle);
 int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiStationGetNetworkStatus_t * pWifiStationGetNetworkStatusRsp);
 
 /**
+ * Show current status of Wi-Fi station network interface
+ * 
+ * Output AT command:
+ * > AT+UWSNST?
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginWifiStationListNetworkStatus(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                       uCX API handle
+ * @param[out] pWifiStationListNetworkStatusRsp: Please see \ref uCxWifiStationListNetworkStatus_t
+ */
+bool uCxWifiStationListNetworkStatusGetResponse(uCxHandle_t * puCxHandle, uCxWifiStationListNetworkStatus_t * pWifiStationListNetworkStatusRsp);
+
+/**
  * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
  * 
  * Output AT command:
@@ -319,7 +356,7 @@ void uCxBeginWifiStationScan(uCxHandle_t * puCxHandle);
  * @param[in]  puCxHandle:          uCX API handle
  * @param[out] pWifiStationScanRsp: Please see \ref uCxWifiStationScan_t
  */
-int32_t uCxWifiStationScanGetResponse(uCxHandle_t * puCxHandle, uCxWifiStationScan_t * pWifiStationScanRsp);
+bool uCxWifiStationScanGetResponse(uCxHandle_t * puCxHandle, uCxWifiStationScan_t * pWifiStationScanRsp);
 
 /**
  * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
@@ -338,7 +375,7 @@ void uCxBeginWifiStationScanEx1(uCxHandle_t * puCxHandle, uScanMode_t scan_mode)
  * @param[in]  puCxHandle:            uCX API handle
  * @param[out] pWifiStationScanExRsp: Please see \ref uCxWifiStationScanEx_t
  */
-int32_t uCxWifiStationScanExGetResponse1(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
+bool uCxWifiStationScanExGetResponse1(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
 
 /**
  * Initiate synchronous Wi-Fi scan (will lock AT interface until scan has finished)
@@ -358,7 +395,7 @@ void uCxBeginWifiStationScanEx2(uCxHandle_t * puCxHandle, uScanMode_t scan_mode,
  * @param[in]  puCxHandle:            uCX API handle
  * @param[out] pWifiStationScanExRsp: Please see \ref uCxWifiStationScanEx_t
  */
-int32_t uCxWifiStationScanExGetResponse2(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
+bool uCxWifiStationScanExGetResponse2(uCxHandle_t * puCxHandle, uCxWifiStationScanEx_t * pWifiStationScanExRsp);
 
 /**
  * Read status
@@ -370,7 +407,7 @@ int32_t uCxWifiStationScanExGetResponse2(uCxHandle_t * puCxHandle, uCxWifiStatio
  * @param      wifi_status_id:        
  * @param[out] pWifiStationStatusRsp: Please see \ref uCxWifiStationStatus_t
  */
-int32_t uCxBeginWifiStationStatus(uCxHandle_t * puCxHandle, uWifiStatusId_t wifi_status_id, uCxWifiStationStatus_t * pWifiStationStatusRsp);
+bool uCxBeginWifiStationStatus(uCxHandle_t * puCxHandle, uWifiStatusId_t wifi_status_id, uCxWifiStationStatus_t * pWifiStationStatusRsp);
 
 /**
  * Start an access point with the current access point configuration.
@@ -424,7 +461,7 @@ int32_t uCxWifiApSetConnectionParams2(uCxHandle_t * puCxHandle, const char * ssi
  * @param[in]  puCxHandle:                    uCX API handle
  * @param[out] pWifiApGetConnectionParamsRsp: Please see \ref uCxWifiApGetConnectionParams_t
  */
-int32_t uCxBeginWifiApGetConnectionParams(uCxHandle_t * puCxHandle, uCxWifiApGetConnectionParams_t * pWifiApGetConnectionParamsRsp);
+bool uCxBeginWifiApGetConnectionParams(uCxHandle_t * puCxHandle, uCxWifiApGetConnectionParams_t * pWifiApGetConnectionParamsRsp);
 
 /**
  * Sets WPA parameters for the AP config
@@ -458,6 +495,54 @@ int32_t uCxWifiApSetSecurityWpa2(uCxHandle_t * puCxHandle, const char * passphra
  * @param[in]  puCxHandle: uCX API handle
  */
 int32_t uCxWifiApSetSecurityOpen(uCxHandle_t * puCxHandle);
+
+/**
+ * Get a list of connected stations. One response will be sent for each connected station
+ * 
+ * Output AT command:
+ * > AT+UWAPCS?
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginWifiApListStations(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param[out] pMac:       MAC address of the connected Wi-Fi Station
+ */
+bool uCxWifiApListStationsGetResponse(uCxHandle_t * puCxHandle, uMacAddress_t * pMac);
+
+/**
+ * Show current status of Wi-Fi station network interface
+ * 
+ * Output AT command:
+ * > AT+UWAPNST=<status_id>
+ *
+ * @param[in]  puCxHandle:                 uCX API handle
+ * @param      status_id:                  
+ * @param[out] pWifiApGetNetworkStatusRsp: Please see \ref uCxWifiApGetNetworkStatus_t
+ */
+int32_t uCxWifiApGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_id, uCxWifiApGetNetworkStatus_t * pWifiApGetNetworkStatusRsp);
+
+/**
+ * Show current status of Wi-Fi station network interface
+ * 
+ * Output AT command:
+ * > AT+UWAPNST?
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginWifiApListNetworkStatus(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                  uCX API handle
+ * @param[out] pWifiApListNetworkStatusRsp: Please see \ref uCxWifiApListNetworkStatus_t
+ */
+bool uCxWifiApListNetworkStatusGetResponse(uCxHandle_t * puCxHandle, uCxWifiApListNetworkStatus_t * pWifiApListNetworkStatusRsp);
 
 
 #ifdef __cplusplus

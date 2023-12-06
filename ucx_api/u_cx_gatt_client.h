@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -25,6 +26,38 @@ extern "C" {
 /* ------------------------------------------------------------
  * RESPONSES
  * ---------------------------------------------------------- */
+
+typedef struct
+{
+    int32_t conn_handle;  /**< Bluetooth Low Energy connection handle. */
+    int32_t start_handle; /**< Service start handle. */
+    int32_t end_handle;   /**< Service end handle. */
+    uByteArray_t uuid;    /**< UUID of attribute. Either 16-bit or 128-bit. */
+} uCxGattClientDiscoverPrimaryServices_t;
+
+typedef struct
+{
+    int32_t conn_handle;  /**< Bluetooth Low Energy connection handle. */
+    int32_t start_handle; /**< Service start handle. */
+    int32_t end_handle;   /**< Service end handle. */
+} uCxGattClientDiscoverPrimaryServicesByUuid_t;
+
+typedef struct
+{
+    int32_t conn_handle;     /**< Bluetooth Low Energy connection handle. */
+    int32_t attr_handle;     /**< Attribute handle of the characteristic */
+    uByteArray_t properties; /**< Bit mask describing the properties of the characteristic */
+    int32_t value_handle;    /**< Attribute handle of the characteristic value. */
+    uByteArray_t uuid;       /**< UUID of attribute. Either 16-bit or 128-bit. */
+} uCxGattClientDiscoverServiceChars_t;
+
+typedef struct
+{
+    int32_t conn_handle; /**< Bluetooth Low Energy connection handle. */
+    int32_t char_handle; /**< Characteristic handle. */
+    int32_t desc_handle; /**< Descriptor handle. */
+    uByteArray_t uuid;   /**< UUID of attribute. Either 16-bit or 128-bit. */
+} uCxGattClientDiscoverCharDescriptors_t;
 
 typedef struct
 {
@@ -46,6 +79,88 @@ typedef struct
  * ---------------------------------------------------------- */
 
 /**
+ * Discover all primary services on the remote device.
+ * 
+ * Output AT command:
+ * > AT+UBTGPSD=<conn_handle>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      conn_handle: Bluetooth Low Energy connection handle.
+ */
+void uCxBeginGattClientDiscoverPrimaryServices(uCxHandle_t * puCxHandle, int32_t conn_handle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                            uCX API handle
+ * @param[out] pGattClientDiscoverPrimaryServicesRsp: Please see \ref uCxGattClientDiscoverPrimaryServices_t
+ */
+bool uCxGattClientDiscoverPrimaryServicesGetResponse(uCxHandle_t * puCxHandle, uCxGattClientDiscoverPrimaryServices_t * pGattClientDiscoverPrimaryServicesRsp);
+
+/**
+ * Start discovery.
+ * 
+ * Output AT command:
+ * > AT+UBTGPSDU=<conn_handle>,<uuid>,<uuid_len>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      conn_handle: Bluetooth Low Energy connection handle.
+ * @param      uuid:        UUID of attribute. Either 16-bit or 128-bit.
+ * @param      uuid_len:    length of uuid
+ */
+void uCxBeginGattClientDiscoverPrimaryServicesByUuid(uCxHandle_t * puCxHandle, int32_t conn_handle, const uint8_t * uuid, int32_t uuid_len);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                                  uCX API handle
+ * @param[out] pGattClientDiscoverPrimaryServicesByUuidRsp: Please see \ref uCxGattClientDiscoverPrimaryServicesByUuid_t
+ */
+bool uCxGattClientDiscoverPrimaryServicesByUuidGetResponse(uCxHandle_t * puCxHandle, uCxGattClientDiscoverPrimaryServicesByUuid_t * pGattClientDiscoverPrimaryServicesByUuidRsp);
+
+/**
+ * Discover all characteristics of a service.
+ * 
+ * Output AT command:
+ * > AT+UBTGSCD=<conn_handle>,<start>,<end>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      conn_handle: Bluetooth Low Energy connection handle.
+ * @param      start:       Service start handle.
+ * @param      end:         Service end handle.
+ */
+void uCxBeginGattClientDiscoverServiceChars(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t start, int32_t end);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                         uCX API handle
+ * @param[out] pGattClientDiscoverServiceCharsRsp: Please see \ref uCxGattClientDiscoverServiceChars_t
+ */
+bool uCxGattClientDiscoverServiceCharsGetResponse(uCxHandle_t * puCxHandle, uCxGattClientDiscoverServiceChars_t * pGattClientDiscoverServiceCharsRsp);
+
+/**
+ * Discover all descriptors of a characteristic.
+ * 
+ * Output AT command:
+ * > AT+UBTGCDD=<conn_handle>,<value_handle>,<characteristic_end_handle>
+ *
+ * @param[in]  puCxHandle:                uCX API handle
+ * @param      conn_handle:               Bluetooth Low Energy connection handle.
+ * @param      value_handle:              Attribute handle of the characteristic value.
+ * @param      characteristic_end_handle: End handle of characteristic to which descriptor discovery is being performed.
+ */
+void uCxBeginGattClientDiscoverCharDescriptors(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t value_handle, int32_t characteristic_end_handle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                            uCX API handle
+ * @param[out] pGattClientDiscoverCharDescriptorsRsp: Please see \ref uCxGattClientDiscoverCharDescriptors_t
+ */
+bool uCxGattClientDiscoverCharDescriptorsGetResponse(uCxHandle_t * puCxHandle, uCxGattClientDiscoverCharDescriptors_t * pGattClientDiscoverCharDescriptorsRsp);
+
+/**
  * Reads the characteristic; all bytes included.
  * 
  * Output AT command:
@@ -56,7 +171,7 @@ typedef struct
  * @param      value_handle:       Attribute handle of the characteristic value.
  * @param[out] pGattClientReadRsp: Please see \ref uCxGattClientRead_t
  */
-int32_t uCxBeginGattClientRead(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t value_handle, uCxGattClientRead_t * pGattClientReadRsp);
+bool uCxBeginGattClientRead(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t value_handle, uCxGattClientRead_t * pGattClientReadRsp);
 
 /**
  * Read all the characteristics by UUID. It will read all the bytes in each characteristic.
@@ -72,7 +187,7 @@ int32_t uCxBeginGattClientRead(uCxHandle_t * puCxHandle, int32_t conn_handle, in
  * @param      uuid_len:                 length of uuid
  * @param[out] pGattClientReadByUuidRsp: Please see \ref uCxGattClientReadByUuid_t
  */
-int32_t uCxBeginGattClientReadByUuid(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t start, int32_t end, const uint8_t * uuid, int32_t uuid_len, uCxGattClientReadByUuid_t * pGattClientReadByUuidRsp);
+bool uCxBeginGattClientReadByUuid(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t start, int32_t end, const uint8_t * uuid, int32_t uuid_len, uCxGattClientReadByUuid_t * pGattClientReadByUuidRsp);
 
 /**
  * Write the characteristic value.

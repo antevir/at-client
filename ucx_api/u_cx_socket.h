@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -53,7 +54,14 @@ typedef struct
     int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
     int32_t protocol;      /**< IP protocol. */
     int32_t socket_status;
-} uCxSocketStatus_t;
+} uCxSocketListStatus_t;
+
+typedef struct
+{
+    int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
+    int32_t protocol;      /**< IP protocol. */
+    int32_t socket_status;
+} uCxSocketGetStatus_t;
 
 typedef struct
 {
@@ -91,6 +99,46 @@ int32_t uCxSocketCreate1(uCxHandle_t * puCxHandle, uProtocol_t protocol, int32_t
  * @param[out] pSocketHandle:           Socket identifier be used for any operation on that socket.
  */
 int32_t uCxSocketCreate2(uCxHandle_t * puCxHandle, uProtocol_t protocol, uPreferredProtocolType_t preferred_protocol_type, int32_t * pSocketHandle);
+
+/**
+ * Add a TLS context to a socket. This is only valid for TCP client sockets.
+ * 
+ * Output AT command:
+ * > AT+USOTLS=<socket_handle>,<tls_version>
+ *
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
+ * @param      tls_version:   Minimum TLS version to use
+ */
+int32_t uCxSocketSetTLS2(uCxHandle_t * puCxHandle, int32_t socket_handle, uTlsVersion_t tls_version);
+
+/**
+ * Add a TLS context to a socket. This is only valid for TCP client sockets.
+ * 
+ * Output AT command:
+ * > AT+USOTLS=<socket_handle>,<tls_version>,<ca_name>
+ *
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
+ * @param      tls_version:   Minimum TLS version to use
+ * @param      ca_name:       Name of the certificate authority (CA) certificate to use
+ */
+int32_t uCxSocketSetTLS3(uCxHandle_t * puCxHandle, int32_t socket_handle, uTlsVersion_t tls_version, const char * ca_name);
+
+/**
+ * Add a TLS context to a socket. This is only valid for TCP client sockets.
+ * 
+ * Output AT command:
+ * > AT+USOTLS=<socket_handle>,<tls_version>,<ca_name>,<client_cert_name>,<client_key_name>
+ *
+ * @param[in]  puCxHandle:       uCX API handle
+ * @param      socket_handle:    Socket identifier be used for any operation on that socket.
+ * @param      tls_version:      Minimum TLS version to use
+ * @param      ca_name:          Name of the certificate authority (CA) certificate to use
+ * @param      client_cert_name: Name of the client certificate to use
+ * @param      client_key_name:  Name of the private key for client certificate
+ */
+int32_t uCxSocketSetTLS5(uCxHandle_t * puCxHandle, int32_t socket_handle, uTlsVersion_t tls_version, const char * ca_name, const char * client_cert_name, const char * client_key_name);
 
 /**
  * Establish a peer-to-peer connection to the specified remote host on the given remote port.
@@ -171,7 +219,7 @@ int32_t uCxSocketClose(uCxHandle_t * puCxHandle, int32_t socket_handle);
  * @param      length:               Number of bytes to read.
  * @param[out] pSocketReadStringRsp: Please see \ref uCxSocketReadString_t
  */
-int32_t uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReadString_t * pSocketReadStringRsp);
+bool uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReadString_t * pSocketReadStringRsp);
 
 /**
  * Sets the specified socket in listening mode on the specified port of service, waiting for incoming connections (TCP) or
@@ -198,7 +246,7 @@ int32_t uCxSocketListen(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t
  * @param      length:                Number of bytes to read.
  * @param[out] pSocketReceiveFromRsp: Please see \ref uCxSocketReceiveFrom_t
  */
-int32_t uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReceiveFrom_t * pSocketReceiveFromRsp);
+bool uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReceiveFrom_t * pSocketReceiveFromRsp);
 
 /**
  * List status for all created sockets.
@@ -206,10 +254,29 @@ int32_t uCxBeginSocketReceiveFrom(uCxHandle_t * puCxHandle, int32_t socket_handl
  * Output AT command:
  * > AT+USOST?
  *
- * @param[in]  puCxHandle:       uCX API handle
- * @param[out] pSocketStatusRsp: Please see \ref uCxSocketStatus_t
+ * @param[in]  puCxHandle: uCX API handle
  */
-int32_t uCxSocketStatus(uCxHandle_t * puCxHandle, uCxSocketStatus_t * pSocketStatusRsp);
+void uCxBeginSocketListStatus(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:           uCX API handle
+ * @param[out] pSocketListStatusRsp: Please see \ref uCxSocketListStatus_t
+ */
+bool uCxSocketListStatusGetResponse(uCxHandle_t * puCxHandle, uCxSocketListStatus_t * pSocketListStatusRsp);
+
+/**
+ * Get the status of a specific socket.
+ * 
+ * Output AT command:
+ * > AT+USOST=<socket_handle>
+ *
+ * @param[in]  puCxHandle:          uCX API handle
+ * @param      socket_handle:       Socket identifier be used for any operation on that socket.
+ * @param[out] pSocketGetStatusRsp: Please see \ref uCxSocketGetStatus_t
+ */
+int32_t uCxSocketGetStatus(uCxHandle_t * puCxHandle, int32_t socket_handle, uCxSocketGetStatus_t * pSocketGetStatusRsp);
 
 /**
  * Set a socket option. See available options below.

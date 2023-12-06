@@ -58,16 +58,16 @@ typedef enum
 
 typedef enum
 {
+    U_DATA_TYPE_SCAN_RESPONSE,     /**< Scan response data. */
+    U_DATA_TYPE_ADVERTISE_DATA = 1 /**< Advertise data. */
+} uDataType_t;
+
+typedef enum
+{
     U_DISCOVERY_TYPE_DISCOVER_ALL,                  /**< All with no filter. Displays all found devices; devices can be displayed multiple times. */
     U_DISCOVERY_TYPE_DISCOVER_ALL_NO_DUPLICATES = 1 /**< General inquiry. Displays devices in General or Limited discoverability mode; each device
                                                          is displayed only once. */
 } uDiscoveryType_t;
-
-typedef enum
-{
-    U_DATA_TYPE_SCAN_RESPONSE,     /**< Scan response data. */
-    U_DATA_TYPE_ADVERTISE_DATA = 1 /**< Advertise data. */
-} uDataType_t;
 
 typedef enum
 {
@@ -135,6 +135,14 @@ typedef enum
     U_YES_NO_NO,     /**< Deny bonding. */
     U_YES_NO_YES = 1 /**< Confirm bonding. */
 } uYesNo_t;
+
+typedef enum
+{
+    U_CHARACTERISTIC_ID_MANUFACTURER_NAME,     /**< Manufacturer name string. Maximum length of the custom string is 31 characters. */
+    U_CHARACTERISTIC_ID_MODEL_NAME = 1,        /**< Model name string. Maximum length of the custom string is 20 characters. */
+    U_CHARACTERISTIC_ID_FIRMWARE_REVISION = 2, /**< Firmware revision string. Maximum length of the custom string is 20 characters. */
+    U_CHARACTERISTIC_ID_SOFTWARE_REVISION = 3  /**< Software revision string. Maximum length of the custom string is 20 characters. */
+} uCharacteristicId_t;
 
 typedef enum
 {
@@ -256,6 +264,12 @@ typedef enum
 
 typedef enum
 {
+    U_TLS_VERSION_NO_TLS,
+    U_TLS_VERSION_TLS1_2 = 1
+} uTlsVersion_t;
+
+typedef enum
+{
     U_SOCKET_STATUS_NOT_CONNECTED, /**< Not Connected */
     U_SOCKET_STATUS_LISTENING = 1, /**< Listening */
     U_SOCKET_STATUS_CONNECTED = 2  /**< Connected */
@@ -308,12 +322,6 @@ typedef enum
 
 typedef enum
 {
-    U_TLS_VERSION_NO_TLS,
-    U_TLS_VERSION_TLS1_2 = 1
-} uTlsVersion_t;
-
-typedef enum
-{
     U_SUBSCRIBE_ACTION_SUBSCRIBE,      /**< Subscribe to topic */
     U_SUBSCRIBE_ACTION_UNSUBSCRIBE = 1 /**< Unsubscribe from topic */
 } uSubscribeAction_t;
@@ -335,6 +343,12 @@ typedef enum
 {
     U_REMOVE_ALL_REMOVE_ALL = -1 /**< Remove all certificates */
 } uRemoveAll_t;
+
+typedef enum
+{
+    U_EXTENSION_SNI,              /**< Server Name Extension */
+    U_EXTENSION_FRAGMENTATION = 1 /**< Handshake fragmentation */
+} uExtension_t;
 
 typedef enum
 {
@@ -438,6 +452,7 @@ typedef void (*uUEMQDC_t)(struct uCxHandle *puCxHandle, int32_t mqtt_id, int32_t
 typedef void (*uUEMQDA_t)(struct uCxHandle *puCxHandle, int32_t mqtt_id, int32_t message_len);
 typedef void (*uUEDGPC_t)(struct uCxHandle *puCxHandle, int32_t transmitted_packets, int32_t received_packets, int32_t packet_loss_rate, int32_t avg_response_time);
 typedef void (*uUEDGP_t)(struct uCxHandle *puCxHandle, uPingResponse_t ping_response, int32_t response_time);
+typedef void (*uUEDGI_t)(struct uCxHandle *puCxHandle, const char * iperf_output);
 
 /* ------------------------------------------------------------
  * INTERNAL CALLBACK STRUCT
@@ -485,6 +500,7 @@ typedef struct
     uUEMQDA_t UEMQDA;
     uUEDGPC_t UEDGPC;
     uUEDGP_t UEDGP;
+    uUEDGI_t UEDGI;
 } uUrcCallbacks;
 #ifdef __cplusplus
 }

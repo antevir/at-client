@@ -488,6 +488,17 @@ static int32_t parseUEDGP(uCxHandle_t * puCxHandle, char * pParams, size_t param
     return ret;
 }
 
+static int32_t parseUEDGI(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
+{
+    const char * iperf_output;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "s", &iperf_output, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEDGI) {
+        puCxHandle->callbacks.UEDGI(puCxHandle, iperf_output);
+    }
+    return ret;
+}
+
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
@@ -612,6 +623,9 @@ int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pPar
     }
     if (strcmp(pUrcName, "+UEDGP") == 0) {
         return parseUEDGP(puCxHandle, pParams, paramsLength);
+    }
+    if (strcmp(pUrcName, "+UEDGI") == 0) {
+        return parseUEDGI(puCxHandle, pParams, paramsLength);
     }
     return -1;
 }
