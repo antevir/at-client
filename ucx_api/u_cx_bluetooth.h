@@ -55,7 +55,13 @@ typedef struct
 {
     int32_t property_id;
     int32_t status_val;  /**< Value of the preceding property. */
-} uCxBluetoothConnectionStatus_t;
+} uCxBluetoothListConnectionStatus_t;
+
+typedef struct
+{
+    int32_t property_id;
+    int32_t status_val;  /**< Value of the preceding property. */
+} uCxBluetoothGetConnectionStatus_t;
 
 typedef struct
 {
@@ -288,8 +294,7 @@ void uCxBeginBluetoothListConnections(uCxHandle_t * puCxHandle);
 bool uCxBluetoothListConnectionsGetResponse(uCxHandle_t * puCxHandle, uCxBluetoothListConnections_t * pBluetoothListConnectionsRsp);
 
 /**
- * Read propertie(s) of an existing Bluetooth low energy ACL connection. If <property_id> is ommited all properties will be
- * listed.
+ * Read all properties of an existing Bluetooth low energy ACL connection.
  * 
  * Output AT command:
  * > AT+UBTCST=<conn_handle>
@@ -297,36 +302,28 @@ bool uCxBluetoothListConnectionsGetResponse(uCxHandle_t * puCxHandle, uCxBluetoo
  * @param[in]  puCxHandle:  uCX API handle
  * @param      conn_handle: Connection handle of the Bluetooth low energy connection.
  */
-void uCxBeginBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle);
+void uCxBeginBluetoothListConnectionStatus(uCxHandle_t * puCxHandle, int32_t conn_handle);
 
 /**
  * 
  *
- * @param[in]  puCxHandle:                    uCX API handle
- * @param[out] pBluetoothConnectionStatusRsp: Please see \ref uCxBluetoothConnectionStatus_t
+ * @param[in]  puCxHandle:                        uCX API handle
+ * @param[out] pBluetoothListConnectionStatusRsp: Please see \ref uCxBluetoothListConnectionStatus_t
  */
-bool uCxBluetoothConnectionStatusGetResponse1(uCxHandle_t * puCxHandle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
+bool uCxBluetoothListConnectionStatusGetResponse(uCxHandle_t * puCxHandle, uCxBluetoothListConnectionStatus_t * pBluetoothListConnectionStatusRsp);
 
 /**
- * Read propertie(s) of an existing Bluetooth low energy ACL connection. If <property_id> is ommited all properties will be
- * listed.
+ * Read a specific property of an existing Bluetooth low energy ACL connection.
  * 
  * Output AT command:
  * > AT+UBTCST=<conn_handle>,<property_id>
  *
- * @param[in]  puCxHandle:  uCX API handle
- * @param      conn_handle: Connection handle of the Bluetooth low energy connection.
- * @param      property_id: 
+ * @param[in]  puCxHandle:                       uCX API handle
+ * @param      conn_handle:                      Connection handle of the Bluetooth low energy connection.
+ * @param      property_id:                      
+ * @param[out] pBluetoothGetConnectionStatusRsp: Please see \ref uCxBluetoothGetConnectionStatus_t
  */
-void uCxBeginBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id);
-
-/**
- * 
- *
- * @param[in]  puCxHandle:                    uCX API handle
- * @param[out] pBluetoothConnectionStatusRsp: Please see \ref uCxBluetoothConnectionStatus_t
- */
-bool uCxBluetoothConnectionStatusGetResponse2(uCxHandle_t * puCxHandle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp);
+int32_t uCxBluetoothGetConnectionStatus(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothGetConnectionStatus_t * pBluetoothGetConnectionStatusRsp);
 
 /**
  * Write custom advertising data.

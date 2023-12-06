@@ -158,32 +158,30 @@ bool uCxBluetoothListConnectionsGetResponse(uCxHandle_t * puCxHandle, uCxBluetoo
     return ret >= 0;
 }
 
-void uCxBeginBluetoothConnectionStatus1(uCxHandle_t * puCxHandle, int32_t conn_handle)
+void uCxBeginBluetoothListConnectionStatus(uCxHandle_t * puCxHandle, int32_t conn_handle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTCST=", "d", conn_handle, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-bool uCxBluetoothConnectionStatusGetResponse1(uCxHandle_t * puCxHandle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
+bool uCxBluetoothListConnectionStatusGetResponse(uCxHandle_t * puCxHandle, uCxBluetoothListConnectionStatus_t * pBluetoothListConnectionStatusRsp)
 {
     int32_t ret;
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothListConnectionStatusRsp->property_id, &pBluetoothListConnectionStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
     return ret >= 0;
 }
 
-void uCxBeginBluetoothConnectionStatus2(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id)
+int32_t uCxBluetoothGetConnectionStatus(uCxHandle_t * puCxHandle, int32_t conn_handle, uPropertyId_t property_id, uCxBluetoothGetConnectionStatus_t * pBluetoothGetConnectionStatusRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UBTCST=", "dd", conn_handle, property_id, U_CX_AT_UTIL_PARAM_LAST);
-}
-
-bool uCxBluetoothConnectionStatusGetResponse2(uCxHandle_t * puCxHandle, uCxBluetoothConnectionStatus_t * pBluetoothConnectionStatusRsp)
-{
-    int32_t ret;
-    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothConnectionStatusRsp->property_id, &pBluetoothConnectionStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
-    return ret >= 0;
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UBTCST:", "dd", &pBluetoothGetConnectionStatusRsp->property_id, &pBluetoothGetConnectionStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxBluetoothSetAdvertiseData(uCxHandle_t * puCxHandle, const uint8_t * adv_data, int32_t adv_data_len)
