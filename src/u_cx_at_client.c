@@ -22,6 +22,10 @@
 
 #define NO_STATUS   (INT_MAX)
 
+/* Special character sent for entering binary mode */
+#define U_CX_SOH_CHAR    0x01
+
+
 /* ----------------------------------------------------------------
  * TYPES
  * -------------------------------------------------------------- */
@@ -212,6 +216,12 @@ static inline int32_t writeAndLog(uCxAtClient_t *pClient, const void *pData, siz
     return pConfig->write(pClient, pConfig->pStreamHandle, pData, dataLen);
 }
 
+static inline int32_t writeNoLog(uCxAtClient_t *pClient, const void *pData, size_t dataLen)
+{
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+    return pConfig->write(pClient, pConfig->pStreamHandle, pData, dataLen);
+}
+
 /* ----------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * -------------------------------------------------------------- */
@@ -237,6 +247,7 @@ void uCxAtClientSetUrcCallback(uCxAtClient_t *pClient, uUrcCallback_t urcCallbac
 void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
                               va_list args)
 {
+    bool binaryTransfer = false;
     char buf[U_IP_STRING_MAX_LENGTH_BYTES];
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
@@ -245,24 +256,27 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
     writeAndLog(pClient, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
     while (*pCh != 0) {
-        if (pCh != pParamFmt) {
+        if ((pCh != pParamFmt) && (*pCh != 'B')) { // Don't add ',' for Binary transfer
             writeAndLog(pClient, ",", 1);
         }
 
         memset(&buf, 0, sizeof(buf));
         switch (*pCh) {
             case 'd': {
+                // Digit (integer)
                 int32_t i = va_arg(args, int32_t);
                 int32_t len = snprintf(buf, sizeof(buf), "%d", i);
                 writeAndLog(pClient, buf, len);
             }
             break;
             case 's': {
+                // String
                 char *pStr = va_arg(args, char *);
                 writeAndLog(pClient, pStr, strlen(pStr));
             }
             break;
             case 'i': {
+                // IP address
                 uSockIpAddress_t *pIpAddr = va_arg(args, uSockIpAddress_t *);
                 int32_t len = uCxIpAddressToString(pIpAddr, buf, sizeof(buf));
                 U_CX_AT_PORT_ASSERT(len > 0);
@@ -270,6 +284,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'm': {
+                // MAC address
                 uMacAddress_t *pMacAddr = va_arg(args, uMacAddress_t *);
                 int32_t len = uCxMacAddressToString(pMacAddr, buf, sizeof(buf));
                 U_CX_AT_PORT_ASSERT(len > 0);
@@ -277,13 +292,34 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             }
             break;
             case 'b': {
+                // Bluetooth LE address
                 uBtLeAddress_t *pBtLeAddr = va_arg(args, uBtLeAddress_t *);
                 int32_t len = uCxBdAddressToString(pBtLeAddr, buf, sizeof(buf));
                 U_CX_AT_PORT_ASSERT(len > 0);
                 writeAndLog(pClient, buf, len);
             }
             break;
+            case 'B': {
+                // Binary data transfer
+                uint8_t *pData = va_arg(args, uint8_t *);
+                int32_t len = va_arg(args, int32_t);
+                char binHeader[3] = {
+                    U_CX_SOH_CHAR,
+                    (uint8_t)(len >> 8),
+                    (uint8_t)(len & 0xFF),
+                };
+                U_CX_AT_PORT_ASSERT(len > 0);
+                writeNoLog(pClient, binHeader, sizeof(binHeader));
+                writeNoLog(pClient, buf, len);
+                U_CX_LOG(U_CX_LOG_CHANNEL_TX, "[%d bytes]", len);
+
+                // Binary transfer must always be last param
+                U_CX_AT_PORT_ASSERT(pCh[1] == 0);
+                binaryTransfer = true;
+            }
+            break;
             case 'h': {
+                // Binary data transferred as hex string
                 uint8_t *pData = va_arg(args, uint8_t *);
                 int32_t len = va_arg(args, int32_t);
                 for (int32_t i = 0; i < len; i++) {
@@ -296,7 +332,9 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
         pCh++;
     }
 
-    pConfig->write(pClient, pConfig->pStreamHandle, "\r", 1);
+    if (!binaryTransfer) {
+        pConfig->write(pClient, pConfig->pStreamHandle, "\r", 1);
+    }
     U_CX_LOG_END(U_CX_LOG_CHANNEL_TX);
 }
 
