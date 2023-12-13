@@ -15,6 +15,9 @@
 #define CONTEXT_VALUE  ((void *)0x11223344)
 #define STREAM_HANDLER ((void *)0x44332211)
 
+#define BIN_HDR(DATA_LENGTH) \
+    0x01,(DATA_LENGTH) >> 8,(DATA_LENGTH) & 0xFF
+
 /* ----------------------------------------------------------------
  * TYPES
  * -------------------------------------------------------------- */
@@ -35,6 +38,9 @@ static uint8_t gUrcBuffer[1024];
 
 static uint8_t gTxBuffer[1024];
 static size_t gTxBufferPos;
+
+static uint8_t *gPRxDataPtr;
+static int32_t gRxDataLen;
 
 static uCxAtClientConfig_t gClientConfig = {
     .pContext = CONTEXT_VALUE,
@@ -67,12 +73,15 @@ static int32_t write(uCxAtClient_t *pClient, void *pStreamHandle,
 static int32_t read(uCxAtClient_t *pClient, void *pStreamHandle,
                     void *pData, size_t length, int32_t timeoutMs)
 {
+    (void)timeoutMs;
     TEST_ASSERT_EQUAL(&gClient, pClient);
     TEST_ASSERT_EQUAL(STREAM_HANDLER, pStreamHandle);
-    (void)pData;
-    (void)length;
-    (void)timeoutMs;
-    return -1;
+    int32_t cpyLen = U_MIN((int32_t)length, gRxDataLen);
+    if (cpyLen > 0) {
+        memcpy(pData, gPRxDataPtr, cpyLen);
+        gPRxDataPtr += cpyLen;
+    }
+    return cpyLen;
 }
 
 static void uAtClientSendCmdVaList_wrapper(uCxAtClient_t *pClient, const char *pCmd,
@@ -96,6 +105,10 @@ void setUp(void)
     uCxAtClientInit(&gClientConfig, &gClient);
     memset(&gTxBuffer[0], 0xc0, sizeof(gTxBuffer));
     gTxBufferPos = 0;
+    gPRxDataPtr = NULL;
+    gRxDataLen = -1;
+
+    uPortGetTickTimeMs_IgnoreAndReturn(0);
 }
 
 void tearDown(void)
@@ -147,9 +160,27 @@ void test_uCxAtClientSendCmdVaList_withByteArray(void)
 void test_uCxAtClientSendCmdVaList_withBinary(void)
 {
     uint8_t data[] = {0x00,0x11,0x22,0x33,0x44,0x55};
-    uint8_t expected[] = { 'A','T','+','F','O','O','=',0x01,0x00,0x06,0x00,0x11,0x22,0x33,0x44,0x55};
+    uint8_t expected[] = { 'A','T','+','F','O','O','=',BIN_HDR(6),0x00,0x11,0x22,0x33,0x44,0x55};
     uAtClientSendCmdVaList_wrapper(&gClient, "AT+FOO=", "B",
                                    &data[0], sizeof(data), U_CX_AT_UTIL_PARAM_LAST);
     TEST_ASSERT_EQUAL_MEMORY(expected, &gTxBuffer[0], sizeof(expected));
     TEST_ASSERT_EQUAL(sizeof(expected), gTxBufferPos);
+}
+
+void test_uCxAtClientCmdGetRspParamLine_withBinary(void)
+{
+    uint8_t binaryBuf[6] = {0};
+    size_t binaryLen = sizeof(binaryBuf);
+    uint8_t rxData[] = { '+','F','O','O',':','\"','f','o','o','\"',BIN_HDR(6),0x00,0x11,0x22,0x33,0x44,0x55};
+    uint8_t expectedBinData[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+
+    // Start by putting the client in command state
+    uCxAtClientCmdBeginF(&gClient, "", "", U_CX_AT_UTIL_PARAM_LAST);
+
+    gPRxDataPtr = &rxData[0];
+    gRxDataLen = sizeof(rxData);
+    char *pRsp = uCxAtClientCmdGetRspParamLine(&gClient, "+FOO:", binaryBuf, &binaryLen);
+    TEST_ASSERT_EQUAL_MEMORY(expectedBinData, binaryBuf, sizeof(binaryBuf));
+    TEST_ASSERT_EQUAL(sizeof(binaryBuf), binaryLen);
+    TEST_ASSERT_EQUAL_STRING("\"foo\"", pRsp);
 }

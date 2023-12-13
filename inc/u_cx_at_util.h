@@ -16,6 +16,16 @@
 
 #define U_CX_AT_UTIL_PARAM_LAST  NULL
 
+/**
+ * Returns the maximum value of the two parameters.
+ */
+#define U_MAX(a,b)              (((a) > (b)) ? (a) : (b))
+
+/**
+ * Returns the minimum value of the two parameters.
+ */
+#define U_MIN(a,b)              (((a) < (b)) ? (a) : (b))
+
 /* ----------------------------------------------------------------
  * TYPES
  * -------------------------------------------------------------- */

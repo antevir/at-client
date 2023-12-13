@@ -24,7 +24,29 @@
 struct uCxAtClient;
 
 typedef void (*uUrcCallback_t)(struct uCxAtClient *pClient, void *pTag, char *pLine,
-                               size_t lineLength);
+                               size_t lineLength, uint8_t *pBinaryData, size_t binaryDataLen);
+
+
+typedef enum {
+    U_CX_AT_RX_STATE_CHARACTER,
+    U_CX_AT_RX_STATE_BINARY_RSP,
+    U_CX_AT_RX_STATE_BINARY_URC,
+    U_CX_AT_RX_STATE_BINARY_FLUSH
+} uCxAtRxState_t;
+
+typedef struct {
+
+    uint8_t rxHeaderCount;
+    uint16_t remainingDataBytes;
+    uint8_t *pBuffer;
+    size_t bufferSize;
+    size_t bufferPos;
+} uCxAtBinaryRx_t;
+
+typedef struct {
+    uint8_t *pBuffer;
+    size_t *pBufferLength;
+} uCxAtBinaryResponseBuf_t;
 
 typedef struct uCxAtClient {
     const struct uCxAtClientConfig *pConfig;
@@ -39,6 +61,9 @@ typedef struct uCxAtClient {
     int32_t status;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
+    uCxAtRxState_t rxState;
+    uCxAtBinaryRx_t binaryRx;
+    uCxAtBinaryResponseBuf_t rspBinaryBuf;
     U_CX_MUTEX_HANDLE cmdMutex;
 } uCxAtClient_t;
 
@@ -177,15 +202,22 @@ void uCxAtClientCmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *
 /**
   * @brief  Get AT response parameter line for AT command started with uCxAtClientCmdBeginF()
   *
-  * @param[in]  pClient:      the AT client from uCxAtClientInit().
-  * @param[in]  pExpectedRsp: the expected AT response suffix. Typically an AT command AT+FOO will respond
-  *                           with something like '+FOO:123,"foo"'. In this case you set pExpectedRsp to '+FOO:'.
-  *                           For some AT commands (such as AT+GMM) there are no suffix. In this case you can
-  *                           set pExpectedRsp to either "" or NULL.
-  * @retval                   a null terminated AT parameter line on success, otherwise NULL.
-  *                           NOTE: The pExpectedRsp part will not be included in this string.
+  * @param[in]  pClient:            the AT client from uCxAtClientInit().
+  * @param[in]  pExpectedRsp:       the expected AT response suffix. Typically an AT command AT+FOO will respond
+  *                                 with something like '+FOO:123,"foo"'. In this case you set pExpectedRsp to '+FOO:'.
+  *                                 For some AT commands (such as AT+GMM) there are no suffix. In this case you can
+  *                                 set pExpectedRsp to either "" or NULL.
+  * @param[in]  pBinaryBuf:         if the AT response is expected to respond with binary transfer then you must
+  *                                 set this pointer to a buffer that can receive all that data.
+  *                                 May be set to NULL if no binary transfer is expected.
+  * @param[inout] pBinaryBufLength: a pointer to the length of the binary buffer. After transmission
+  *                                 is completed the pointer will be updated with the amount of bytes received.
+  *                                 May be set to NULL if no binary transfer is expected.
+  * @retval                         a null terminated AT parameter line on success, otherwise NULL.
+  *                                 NOTE: The pExpectedRsp part will not be included in this string.
   */
-char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpectedRsp);
+char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                    uint8_t *pBinaryBuf, size_t *pBinaryBufLength);
 
 /**
   * @brief  Get parsed AT response parameters for AT command started with uCxAtClientCmdBeginF()
@@ -193,16 +225,23 @@ char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpecte
   * This function will read a response line like uCxAtClientCmdGetRspParamLine(), but will also try to
   * parse each AT parameter.
   *
-  * @param[in]  pClient:      the AT client from uCxAtClientInit().
-  * @param[in]  pExpectedRsp: the expected AT response suffix. Typically an AT command AT+FOO will respond
-  *                           with something like '+FOO:123,"foo"'. In this case you set pExpectedRsp to '+FOO:'.
-  *                           For some AT commands (such as AT+GMM) there are no suffix. In this case you can
-  *                           set pExpectedRsp to either "" or NULL.
-  * @param[in]  pParamFmt:    format string - see uCxAtClientExecSimpleCmdF().
-  * @param      ...:          the AT params. Last param is always U_CX_AT_UTIL_PARAM_LAST!
-  * @retval                   the number of parsed parameters on success otherwise negative value.
+  * @param[in]  pClient:            the AT client from uCxAtClientInit().
+  * @param[in]  pExpectedRsp:       the expected AT response suffix. Typically an AT command AT+FOO will respond
+  *                                 with something like '+FOO:123,"foo"'. In this case you set pExpectedRsp to '+FOO:'.
+  *                                 For some AT commands (such as AT+GMM) there are no suffix. In this case you can
+  *                                 set pExpectedRsp to either "" or NULL.
+  * @param[in]  pBinaryBuf:         if the AT response is expected to respond with binary transfer then you must
+  *                                 set this pointer to a buffer that can receive all that data.
+  *                                 May be set to NULL if no binary transfer is expected.
+  * @param[inout] pBinaryBufLength: a pointer to the length of the binary buffer. After transmission
+  *                                 is completed the pointer will be updated with the amount of bytes received.
+  *                                 May be set to NULL if no binary transfer is expected.
+  * @param[in]  pParamFmt:          format string - see uCxAtClientExecSimpleCmdF().
+  * @param      ...:                the AT params. Last param is always U_CX_AT_UTIL_PARAM_LAST!
+  * @retval                         the number of parsed parameters on success otherwise negative value.
   */
 int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpectedRsp,
+                                    uint8_t *pBinaryBuf, size_t *pBinaryBufLength,
                                     const char *pParamFmt, ...);
 
 /**
