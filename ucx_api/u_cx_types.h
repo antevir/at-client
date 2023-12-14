@@ -83,19 +83,25 @@ typedef enum
 
 typedef enum
 {
-    U_PROPERTY_ID_CONNECTION_INTERVAL = 1,   /**< Connection inteval used on this connection.
+    U_PROPERTY_ID_CONNECTION_INTERVAL,       /**< Connection interval used on this connection.
                                                    Range: 6 to 3200
                                                    Time = status_val * 1.25 ms
                                                    Time range: 7.5 ms to 4000 ms */
-    U_PROPERTY_ID_PERIPHERAL_LATENCY = 2,    /**< Peripheral latency for the connection in number of connection events. Range: 0 to 499 */
-    U_PROPERTY_ID_SUPERVISION_TIMEOUT = 3,   /**< Supervision timeout (in ms) for this connections. Range: 100 ms to 32000 ms */
-    U_PROPERTY_ID_MTU_SIZE = 4,              /**< MTU size for this connections. */
-    U_PROPERTY_ID_PDU_TX_PAYLOAD_LENGTH = 5, /**< Data Channel TX PDU Payload Length. */
-    U_PROPERTY_ID_PDU_RX_PAYLOAD_LENGTH = 6, /**< Data Channel RX PDU Payload Length. */
-    U_PROPERTY_ID_DATA_LENGTH_EXTENSION = 7, /**< Data Length Extension state. 0: Data Length Extension Off \ 1: Data Length Extension On */
-    U_PROPERTY_ID_LOCAL_ROLE = 8,            /**< Local role in this connection. 1: Low Energy Central \ 2: Low Energy Peripheral */
-    U_PROPERTY_ID_L2CAP_MODE = 9             /**< Current L2CAP mode. Possible values are: 1: Basic L2CAP mode \ 2: LE Credit Based Flow
-                                                  Control Mode */
+    U_PROPERTY_ID_PERIPHERAL_LATENCY = 1,    /**< Peripheral latency for the connection in number of connection events. Range: 0 to 499 */
+    U_PROPERTY_ID_SUPERVISION_TIMEOUT = 2,   /**< Supervision timeout (in ms) for this connections. Range: 100 ms to 32000 ms */
+    U_PROPERTY_ID_MTU_SIZE = 3,              /**< MTU size for this connections. */
+    U_PROPERTY_ID_PDU_TX_PAYLOAD_LENGTH = 4, /**< Data Channel TX PDU Payload Length. */
+    U_PROPERTY_ID_PDU_RX_PAYLOAD_LENGTH = 5, /**< Data Channel RX PDU Payload Length. */
+    U_PROPERTY_ID_DATA_LENGTH_EXTENSION = 6, /**< Data Length Extension state. 0: Data Length Extension Off \ 1: Data Length Extension On */
+    U_PROPERTY_ID_LOCAL_ROLE = 7,            /**< Local role in this connection. 1: Low Energy Central \ 2: Low Energy Peripheral */
+    U_PROPERTY_ID_TX_PHY = 8,                /**< TX Phy used in this connection
+                                                  Bit 0: 1 Mbps
+                                                  Bit 1: 2 Mbps
+                                                  Bit 2: reserved for future use */
+    U_PROPERTY_ID_RX_PHY = 9                 /**< RX Phy used in this connection
+                                                  Bit 0: 1 Mbps
+                                                  Bit 1: 2 Mbps
+                                                  Bit 2: reserved for future use */
 } uPropertyId_t;
 
 typedef enum
@@ -328,12 +334,6 @@ typedef enum
 
 typedef enum
 {
-    U_ALL_ONE,    /**< Read the oldest message */
-    U_ALL_ALL = 1 /**< Read all available MQTT messages, beginning with the oldest */
-} uAll_t;
-
-typedef enum
-{
     U_CERT_TYPEROOT,       /**< Root certificate */
     U_CERT_TYPECLIENT = 1, /**< Client certificate */
     U_CERT_TYPEKEY = 2     /**< Client private key */
@@ -390,7 +390,7 @@ typedef enum
     U_BOND_STATUS_BONDING_FAILED_TIMEOUT = 1, /**< Bonding procedure failed due to page timeout. */
     U_BOND_STATUS_BONDING_FAILED_AUTH = 2,    /**< Bonding failed because of authentication or pairing failed. This could be due to incorrect
                                                    PIN/passkey. */
-    U_BOND_STATUS_BONDING_FAILED_MITM = 3     /**< Bonding failed becuase the protection against Man-In-The-Middle attack could not be
+    U_BOND_STATUS_BONDING_FAILED_MITM = 3     /**< Bonding failed because the protection against Man-In-The-Middle attack could not be
                                                    guaranteed; the generated link key was too weak. */
 } uBondStatus_t;
 
@@ -415,8 +415,8 @@ struct uCxHandle;
 typedef void (*uUEBTC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, uBtLeAddress_t *bd_addr);
 typedef void (*uUEBTDC_t)(struct uCxHandle *puCxHandle, int32_t conn_handle);
 typedef void (*uUEBTB_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, uBondStatus_t bond_status);
-typedef void (*uUEBTUC_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t nummeric_value);
-typedef void (*uUEBTUPD_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t nummeric_value);
+typedef void (*uUEBTUC_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t numeric_value);
+typedef void (*uUEBTUPD_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr, int32_t numeric_value);
 typedef void (*uUEBTUPE_t)(struct uCxHandle *puCxHandle, uBtLeAddress_t *bd_addr);
 typedef void (*uUEBTPHYU_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t phy_status, int32_t tx_phy, int32_t rx_phy);
 typedef void (*uUEBTGCN_t)(struct uCxHandle *puCxHandle, int32_t conn_handle, int32_t value_handle, uByteArray_t *hex_data);

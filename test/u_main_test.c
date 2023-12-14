@@ -82,12 +82,4 @@ int main(void)
     uCxAtClientSetUrcCallback(&client, myUrc, NULL);
     uCxAtClientExecSimpleCmdF(&client, "AT+BIN", "B", "abc123", 6);
     uCxAtClientExecSimpleCmd(&client, "ATE0");
-    for (int i = 0; i < 3; i++) {
-        uCxAtClientCmdBeginF(&client, "ATI", "d", 9, U_CX_AT_UTIL_PARAM_LAST);
-        char *pRsp = uCxAtClientCmdGetRspParamLine(&client, "");
-        if (pRsp) {
-            printf("%d Got response: %s\n", i, pRsp);
-        }
-        uCxAtClientCmdEnd(&client);
-    }
 }

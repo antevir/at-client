@@ -342,20 +342,7 @@ int32_t uCxMqttSubscribe4(uCxHandle_t * puCxHandle, int32_t mqtt_id, uSubscribeA
  * @param      mqtt_id:             MQTT Config ID
  * @param[out] pMqttReadMessageRsp: Please see \ref uCxMqttReadMessage_t
  */
-bool uCxBeginMqttReadMessage1(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp);
-
-/**
- * Read available MQTT message.
- * 
- * Output AT command:
- * > AT+UMQR=<mqtt_id>,<all>
- *
- * @param[in]  puCxHandle:          uCX API handle
- * @param      mqtt_id:             MQTT Config ID
- * @param      all:                 
- * @param[out] pMqttReadMessageRsp: Please see \ref uCxMqttReadMessage_t
- */
-bool uCxBeginMqttReadMessage2(uCxHandle_t * puCxHandle, int32_t mqtt_id, uAll_t all, uCxMqttReadMessage_t * pMqttReadMessageRsp);
+bool uCxBeginMqttReadMessage(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp);
 
 
 #ifdef __cplusplus

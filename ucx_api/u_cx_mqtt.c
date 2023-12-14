@@ -42,7 +42,7 @@ bool uCxBeginMqttGetConnectionParams(uCxHandle_t * puCxHandle, int32_t mqtt_id, 
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQCP=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQCP:", "dsdss", &pMqttGetConnectionParamsRsp->mqtt_id, &pMqttGetConnectionParamsRsp->hostname, &pMqttGetConnectionParamsRsp->port, &pMqttGetConnectionParamsRsp->client_id, &pMqttGetConnectionParamsRsp->username, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQCP:", NULL, NULL, "dsdss", &pMqttGetConnectionParamsRsp->mqtt_id, &pMqttGetConnectionParamsRsp->hostname, &pMqttGetConnectionParamsRsp->port, &pMqttGetConnectionParamsRsp->client_id, &pMqttGetConnectionParamsRsp->username, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -63,7 +63,7 @@ int32_t uCxMqttGetKeepAlive(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGe
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQKA=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQKA:", "dd", &pMqttGetKeepAliveRsp->mqtt_id, &pMqttGetKeepAliveRsp->keep_alive, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQKA:", NULL, NULL, "dd", &pMqttGetKeepAliveRsp->mqtt_id, &pMqttGetKeepAliveRsp->keep_alive, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -93,7 +93,7 @@ bool uCxBeginMqttGetLastWillAndTestament(uCxHandle_t * puCxHandle, int32_t mqtt_
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQLWT=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQLWT", "dssdd", &pMqttGetLastWillAndTestamentRsp->mqtt_id, &pMqttGetLastWillAndTestamentRsp->topic, &pMqttGetLastWillAndTestamentRsp->will_msg, &pMqttGetLastWillAndTestamentRsp->qos, &pMqttGetLastWillAndTestamentRsp->retain, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQLWT", NULL, NULL, "dssdd", &pMqttGetLastWillAndTestamentRsp->mqtt_id, &pMqttGetLastWillAndTestamentRsp->topic, &pMqttGetLastWillAndTestamentRsp->will_msg, &pMqttGetLastWillAndTestamentRsp->qos, &pMqttGetLastWillAndTestamentRsp->retain, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -114,7 +114,7 @@ bool uCxBeginMqttGetTlsConfig(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqtt
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQTLS=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQTLS:", "ddsss", &pMqttGetTlsConfigRsp->mqtt_id, &pMqttGetTlsConfigRsp->tls_version, &pMqttGetTlsConfigRsp->ca_name, &pMqttGetTlsConfigRsp->client_cert_name, &pMqttGetTlsConfigRsp->client_key_name, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQTLS:", NULL, NULL, "ddsss", &pMqttGetTlsConfigRsp->mqtt_id, &pMqttGetTlsConfigRsp->tls_version, &pMqttGetTlsConfigRsp->ca_name, &pMqttGetTlsConfigRsp->client_cert_name, &pMqttGetTlsConfigRsp->client_key_name, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -142,20 +142,11 @@ int32_t uCxMqttSubscribe4(uCxHandle_t * puCxHandle, int32_t mqtt_id, uSubscribeA
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+UMQS=", "ddsd", mqtt_id, subscribe_action, topic, qos, U_CX_AT_UTIL_PARAM_LAST);
 }
 
-bool uCxBeginMqttReadMessage1(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp)
+bool uCxBeginMqttReadMessage(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UMQR=", "d", mqtt_id, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQR:", "ddsds", &pMqttReadMessageRsp->mqtt_id, &pMqttReadMessageRsp->num_unread, &pMqttReadMessageRsp->topic, &pMqttReadMessageRsp->message_len, &pMqttReadMessageRsp->message, U_CX_AT_UTIL_PARAM_LAST);
-    return ret > 0;
-}
-
-bool uCxBeginMqttReadMessage2(uCxHandle_t * puCxHandle, int32_t mqtt_id, uAll_t all, uCxMqttReadMessage_t * pMqttReadMessageRsp)
-{
-    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    int32_t ret;
-    uCxAtClientCmdBeginF(pAtClient, "AT+UMQR=", "dd", mqtt_id, all, U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQR:", "ddsds", &pMqttReadMessageRsp->mqtt_id, &pMqttReadMessageRsp->num_unread, &pMqttReadMessageRsp->topic, &pMqttReadMessageRsp->message_len, &pMqttReadMessageRsp->message, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UMQR:", NULL, NULL, "ddsds", &pMqttReadMessageRsp->mqtt_id, &pMqttReadMessageRsp->num_unread, &pMqttReadMessageRsp->topic, &pMqttReadMessageRsp->message_len, &pMqttReadMessageRsp->message, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }

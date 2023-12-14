@@ -68,7 +68,7 @@ int32_t uCxSystemReboot(uCxHandle_t * puCxHandle);
 int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle);
 
 /**
- * get and set interface address
+ * Get interface address
  * 
  * Output AT command:
  * > AT+USYLA=<interface_id>
@@ -79,10 +79,10 @@ int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle);
  *                           will be restored to factory-programmed value. A reboot is required The least significant
  *                           bit of the first octet of the <address> must be 0.
  */
-int32_t uCxSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * pAddress);
+int32_t uCxSystemGetLocalAddress(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * pAddress);
 
 /**
- * get and set interface address
+ * Set interface address
  * 
  * Output AT command:
  * > AT+USYLA=<interface_id>,<address>
@@ -92,11 +92,8 @@ int32_t uCxSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t inter
  * @param      address:      MAC address of the interface id. If the address is set to 000000000000, the local address
  *                           will be restored to factory-programmed value. A reboot is required The least significant
  *                           bit of the first octet of the <address> must be 0.
- * @param[out] pAddress:     MAC address of the interface id. If the address is set to 000000000000, the local address
- *                           will be restored to factory-programmed value. A reboot is required The least significant
- *                           bit of the first octet of the <address> must be 0.
  */
-int32_t uCxSystemGetLocalAddress2(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * address, uMacAddress_t * pAddress);
+int32_t uCxSystemSetLocalAddress(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * address);
 
 /**
  * The module is completely restored to factory defaults. All settings are reset to default values.
@@ -123,7 +120,8 @@ int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle);
 int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle);
 
 /**
- * Configure new UART settings that will be used after restart
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * unsupported.
  * 
  * Output AT command:
  * > AT+USYUS=<baud_rate>
@@ -134,7 +132,8 @@ int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle);
 int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate);
 
 /**
- * Configure new UART settings that will be used after restart
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * unsupported.
  * 
  * Output AT command:
  * > AT+USYUS=<baud_rate>,<flow_control>
@@ -146,7 +145,8 @@ int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate);
 int32_t uCxSystemSetUartSettings2(uCxHandle_t * puCxHandle, int32_t baud_rate, int32_t flow_control);
 
 /**
- * Configure new UART settings that will be used after restart
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * unsupported.
  * 
  * Output AT command:
  * > AT+USYUS=<baud_rate>,<flow_control>,<change_after_confirm>

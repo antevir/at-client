@@ -35,7 +35,7 @@ bool uCxSecurityListCertificatesGetResponse(uCxHandle_t * puCxHandle, uCxSecurit
 {
     int32_t ret;
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USECL:", "ds", &pSecurityListCertificatesRsp->cert_type, &pSecurityListCertificatesRsp->name, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USECL:", NULL, NULL, "ds", &pSecurityListCertificatesRsp->cert_type, &pSecurityListCertificatesRsp->name, U_CX_AT_UTIL_PARAM_LAST);
     return ret >= 0;
 }
 
@@ -49,7 +49,7 @@ bool uCxSecurityListTlsExtensionsGetResponse(uCxHandle_t * puCxHandle, uCxSecuri
 {
     int32_t ret;
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE:", "dd", &pSecurityListTlsExtensionsRsp->extension, &pSecurityListTlsExtensionsRsp->enabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE:", NULL, NULL, "dd", &pSecurityListTlsExtensionsRsp->extension, &pSecurityListTlsExtensionsRsp->enabled, U_CX_AT_UTIL_PARAM_LAST);
     return ret >= 0;
 }
 
@@ -64,7 +64,7 @@ int32_t uCxSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE0?", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", NULL, NULL, "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -82,7 +82,7 @@ int32_t uCxSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pE
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE1?", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", NULL, NULL, "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }

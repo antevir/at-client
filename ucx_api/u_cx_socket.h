@@ -35,6 +35,12 @@ typedef struct
 
 typedef struct
 {
+    int32_t socket_handle;  /**< Socket identifier be used for any operation on that socket. */
+    int32_t written_length; /**< Data length that was actually written to socket. */
+} uCxSocketWriteBinary_t;
+
+typedef struct
+{
     int32_t socket_handle;    /**< Socket identifier be used for any operation on that socket. */
     int32_t length;           /**< Number of bytes to read. */
     const char * string_data; /**< Data encoded as ascii chars. */
@@ -194,6 +200,20 @@ int32_t uCxSocketGetReadMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
 int32_t uCxSocketWriteString(uCxHandle_t * puCxHandle, int32_t socket_handle, const char * string_data, uCxSocketWriteString_t * pSocketWriteStringRsp);
 
 /**
+ * Writes binary data to the specified socket in binary mode.
+ * 
+ * Output AT command:
+ * > AT+USOWB=<socket_handle>
+ *
+ * @param[in]  puCxHandle:            uCX API handle
+ * @param      socket_handle:         Socket identifier be used for any operation on that socket.
+ * @param[in]  pWData:                binary data to write
+ * @param      wDataLen:              number of bytes to write
+ * @param[out] pSocketWriteBinaryRsp: Please see \ref uCxSocketWriteBinary_t
+ */
+int32_t uCxSocketWriteBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, uint8_t * pWData, size_t wDataLen, uCxSocketWriteBinary_t * pSocketWriteBinaryRsp);
+
+/**
  * Closes the specified socket.
  * 
  * The command blocks the AT command interface until the completion of the socket close operation.
@@ -220,6 +240,20 @@ int32_t uCxSocketClose(uCxHandle_t * puCxHandle, int32_t socket_handle);
  * @param[out] pSocketReadStringRsp: Please see \ref uCxSocketReadString_t
  */
 bool uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uCxSocketReadString_t * pSocketReadStringRsp);
+
+/**
+ * Reads the specified amount of data from the specified socket in binary mode.
+ * 
+ * Output AT command:
+ * > AT+USORB=<socket_handle>,<length>
+ *
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
+ * @param      length:        Number of bytes to read.
+ * @param[out] pRData:        Output data buffer
+ * @param[out] pSocketHandle: Socket identifier be used for any operation on that socket.
+ */
+int32_t uCxSocketReadBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uint8_t * pRData, int32_t * pSocketHandle);
 
 /**
  * Sets the specified socket in listening mode on the specified port of service, waiting for incoming connections (TCP) or
