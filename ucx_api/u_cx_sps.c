@@ -34,18 +34,25 @@ int32_t uCxSpsSetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t sps
 int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * pSpsServiceOption)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USPS?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPS:", "d", pSpsServiceOption);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPS:", "d", pSpsServiceOption, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
     return ret;
 }
 
-int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data)
+int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data, uCxSpsWriteString_t * pSpsWriteStringRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USPSWS=", "ds", conn_handle, string_data, U_CX_AT_UTIL_PARAM_LAST);
+    int32_t ret;
+    uCxAtClientCmdBeginF(pAtClient, "AT+USPSWS=", "ds", conn_handle, string_data, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSWS:", "dd", &pSpsWriteStringRsp->conn_handle, &pSpsWriteStringRsp->written_length, U_CX_AT_UTIL_PARAM_LAST);
+    if (ret >= 0) {
+        ret = uCxAtClientCmdEnd(pAtClient);
+    }
+    return ret;
 }
 
 int32_t uCxSpsSetDataMode(uCxHandle_t * puCxHandle, uReadMode_t read_mode)
@@ -57,17 +64,20 @@ int32_t uCxSpsSetDataMode(uCxHandle_t * puCxHandle, uReadMode_t read_mode)
 int32_t uCxSpsGetDataMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USPSRM?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSRM:", "d", pReadMode);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSRM:", "d", pReadMode, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
     return ret;
 }
 
-int32_t uCxBeginSpsReadString(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uCxSpsReadString_t * pSpsReadStringRsp)
+bool uCxBeginSpsReadString(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uCxSpsReadString_t * pSpsReadStringRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USPSRS=", "dd", conn_handle, length, U_CX_AT_UTIL_PARAM_LAST);
-    return uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSRS:", "dds", &pSpsReadStringRsp->conn_handle, &pSpsReadStringRsp->length, &pSpsReadStringRsp->string_data);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USPSRS:", "dds", &pSpsReadStringRsp->conn_handle, &pSpsReadStringRsp->length, &pSpsReadStringRsp->string_data, U_CX_AT_UTIL_PARAM_LAST);
+    return ret > 0;
 }

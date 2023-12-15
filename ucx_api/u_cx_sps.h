@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -23,8 +24,14 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
+
+typedef struct
+{
+    int32_t conn_handle;    /**< Connection handle of remote peer which has SPS enabled */
+    int32_t written_length; /**< Data length that was written. */
+} uCxSpsWriteString_t;
 
 typedef struct
 {
@@ -32,6 +39,7 @@ typedef struct
     int32_t length;           /**< Data bytes to read. */
     const char * string_data; /**< SPS data in string format */
 } uCxSpsReadString_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -88,11 +96,12 @@ int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * p
  * Output AT command:
  * > AT+USPSWS=<conn_handle>,<string_data>
  *
- * @param[in]  puCxHandle:  uCX API handle
- * @param      conn_handle: Connection handle of remote peer which has SPS enabled
- * @param      string_data: Data to send, max 244 bytes
+ * @param[in]  puCxHandle:         uCX API handle
+ * @param      conn_handle:        Connection handle of remote peer which has SPS enabled
+ * @param      string_data:        Data encoded as ascii chars.
+ * @param[out] pSpsWriteStringRsp: Please see \ref uCxSpsWriteString_t
  */
-int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data);
+int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data, uCxSpsWriteString_t * pSpsWriteStringRsp);
 
 /**
  * Set the mode in which to receive SPS data in AT mode.
@@ -128,7 +137,7 @@ int32_t uCxSpsGetDataMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
  * @param      length:            Data bytes to read.
  * @param[out] pSpsReadStringRsp: Please see \ref uCxSpsReadString_t
  */
-int32_t uCxBeginSpsReadString(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uCxSpsReadString_t * pSpsReadStringRsp);
+bool uCxBeginSpsReadString(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uCxSpsReadString_t * pSpsReadStringRsp);
 
 
 #ifdef __cplusplus

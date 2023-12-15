@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -23,8 +24,21 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
+
+typedef struct
+{
+    int32_t cert_type;
+    const char * name;
+} uCxSecurityListCertificates_t;
+
+typedef struct
+{
+    int32_t extension;
+    int32_t enabled;
+} uCxSecurityListTlsExtensions_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -52,6 +66,42 @@ int32_t uCxSecurityCertificateRemove(uCxHandle_t * puCxHandle, uCertType_t cert_
  * @param      remove_all: 
  */
 int32_t uCxSecurityCertificateRemoveAll(uCxHandle_t * puCxHandle, uRemoveAll_t remove_all);
+
+/**
+ * Read all uploaded certificate names
+ * 
+ * Output AT command:
+ * > AT+USECL?
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginSecurityListCertificates(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                   uCX API handle
+ * @param[out] pSecurityListCertificatesRsp: Please see \ref uCxSecurityListCertificates_t
+ */
+bool uCxSecurityListCertificatesGetResponse(uCxHandle_t * puCxHandle, uCxSecurityListCertificates_t * pSecurityListCertificatesRsp);
+
+/**
+ * Read all TLS extension settings
+ * 
+ * Output AT command:
+ * > AT+USETE?
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ */
+void uCxBeginSecurityListTlsExtensions(uCxHandle_t * puCxHandle);
+
+/**
+ * 
+ *
+ * @param[in]  puCxHandle:                    uCX API handle
+ * @param[out] pSecurityListTlsExtensionsRsp: Please see \ref uCxSecurityListTlsExtensions_t
+ */
+bool uCxSecurityListTlsExtensionsGetResponse(uCxHandle_t * puCxHandle, uCxSecurityListTlsExtensions_t * pSecurityListTlsExtensionsRsp);
 
 /**
  * Turn Server Name Indication TLS extension on and off on a system level

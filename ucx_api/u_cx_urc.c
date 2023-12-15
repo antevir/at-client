@@ -106,11 +106,11 @@ static int32_t parseUEBTGCN(uCxHandle_t * puCxHandle, char * pParams, size_t par
 {
     int32_t conn_handle;
     int32_t value_handle;
-    const char * hex_data;
+    uByteArray_t hex_data;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "dds", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "ddh", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTGCN) {
-        puCxHandle->callbacks.UEBTGCN(puCxHandle, conn_handle, value_handle, hex_data);
+        puCxHandle->callbacks.UEBTGCN(puCxHandle, conn_handle, value_handle, &hex_data);
     }
     return ret;
 }
@@ -119,11 +119,11 @@ static int32_t parseUEBTGCI(uCxHandle_t * puCxHandle, char * pParams, size_t par
 {
     int32_t conn_handle;
     int32_t value_handle;
-    const char * hex_data;
+    uByteArray_t hex_data;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "dds", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "ddh", &conn_handle, &value_handle, &hex_data, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTGCI) {
-        puCxHandle->callbacks.UEBTGCI(puCxHandle, conn_handle, value_handle, hex_data);
+        puCxHandle->callbacks.UEBTGCI(puCxHandle, conn_handle, value_handle, &hex_data);
     }
     return ret;
 }
@@ -132,12 +132,12 @@ static int32_t parseUEBTGCW(uCxHandle_t * puCxHandle, char * pParams, size_t par
 {
     int32_t conn_handle;
     int32_t value_handle;
-    const char * value;
+    uByteArray_t value;
     int32_t options;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "ddsd", &conn_handle, &value_handle, &value, &options, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "ddhd", &conn_handle, &value_handle, &value, &options, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTGCW) {
-        puCxHandle->callbacks.UEBTGCW(puCxHandle, conn_handle, value_handle, value, options);
+        puCxHandle->callbacks.UEBTGCW(puCxHandle, conn_handle, value_handle, &value, options);
     }
     return ret;
 }
@@ -488,6 +488,17 @@ static int32_t parseUEDGP(uCxHandle_t * puCxHandle, char * pParams, size_t param
     return ret;
 }
 
+static int32_t parseUEDGI(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
+{
+    const char * iperf_output;
+    int32_t ret = 0;
+    ret = uCxAtUtilParseParamsF(pParams, "s", &iperf_output, U_CX_AT_UTIL_PARAM_LAST);
+    if ((ret >= 0) && puCxHandle->callbacks.UEDGI) {
+        puCxHandle->callbacks.UEDGI(puCxHandle, iperf_output);
+    }
+    return ret;
+}
+
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
  * ---------------------------------------------------------- */
@@ -612,6 +623,9 @@ int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pPar
     }
     if (strcmp(pUrcName, "+UEDGP") == 0) {
         return parseUEDGP(puCxHandle, pParams, paramsLength);
+    }
+    if (strcmp(pUrcName, "+UEDGI") == 0) {
+        return parseUEDGI(puCxHandle, pParams, paramsLength);
     }
     return -1;
 }

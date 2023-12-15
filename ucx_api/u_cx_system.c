@@ -28,8 +28,9 @@ int32_t uCxSystemStoreConfiguration(uCxHandle_t * puCxHandle)
 int32_t uCxSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * pAddress)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USYLA=", "d", interface_id, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -39,8 +40,9 @@ int32_t uCxSystemGetLocalAddress1(uCxHandle_t * puCxHandle, uInterfaceId_t inter
 int32_t uCxSystemGetLocalAddress2(uCxHandle_t * puCxHandle, uInterfaceId_t interface_id, uMacAddress_t * address, uMacAddress_t * pAddress)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USYLA=", "dm", interface_id, address, U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYLA:", "m", pAddress, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -80,8 +82,9 @@ int32_t uCxSystemSetUartSettings3(uCxHandle_t * puCxHandle, int32_t baud_rate, i
 int32_t uCxSystemGetUartSettings(uCxHandle_t * puCxHandle, uCxSystemGetUartSettings_t * pSystemGetUartSettingsRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USYUS?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYUS:", "dd", &pSystemGetUartSettingsRsp->baud_rate, &pSystemGetUartSettingsRsp->flow_control);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USYUS:", "dd", &pSystemGetUartSettingsRsp->baud_rate, &pSystemGetUartSettingsRsp->flow_control, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -115,8 +118,9 @@ int32_t uCxSystemSetEchoOn(uCxHandle_t * puCxHandle)
 int32_t uCxSystemGetEcho(uCxHandle_t * puCxHandle, uEchoOn_t * pEchoOn)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "ATE?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pEchoOn);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pEchoOn, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -132,8 +136,9 @@ int32_t uCxSystemSetEscSequenceChar(uCxHandle_t * puCxHandle, int32_t escape_cha
 int32_t uCxSystemGetEscSequenceChar(uCxHandle_t * puCxHandle, int32_t * pEscapeChar)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "ATS2?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pEscapeChar);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pEscapeChar, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -149,8 +154,9 @@ int32_t uCxSystemSetLineTermChar(uCxHandle_t * puCxHandle, int32_t line_term)
 int32_t uCxSystemGetLineTermChar(uCxHandle_t * puCxHandle, int32_t * pLineTerm)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "ATS3?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pLineTerm);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pLineTerm, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -166,8 +172,9 @@ int32_t uCxSystemSetRspFormatChar(uCxHandle_t * puCxHandle, int32_t resp_format)
 int32_t uCxSystemGetRspFormatChar(uCxHandle_t * puCxHandle, int32_t * pRespFormat)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "ATS4?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pRespFormat);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pRespFormat, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -183,8 +190,9 @@ int32_t uCxSystemSetBackspaceChar(uCxHandle_t * puCxHandle, int32_t backspace)
 int32_t uCxSystemGetBackspaceChar(uCxHandle_t * puCxHandle, int32_t * pBackspace)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "ATS5?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pBackspace);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "d", pBackspace, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -200,8 +208,9 @@ int32_t uCxSystemSetEscSequenceSettings(uCxHandle_t * puCxHandle, int32_t pre_ti
 int32_t uCxSystemGetEscSequenceSettings(uCxHandle_t * puCxHandle, uCxSystemGetEscSequenceSettings_t * pSystemGetEscSequenceSettingsRsp)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UTMES?", "", U_CX_AT_UTIL_PARAM_LAST);
-    int32_t ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UTMES:", "ddd", &pSystemGetEscSequenceSettingsRsp->pre_timeout, &pSystemGetEscSequenceSettingsRsp->post_timeout, &pSystemGetEscSequenceSettingsRsp->escape_timeout);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UTMES:", "ddd", &pSystemGetEscSequenceSettingsRsp->pre_timeout, &pSystemGetEscSequenceSettingsRsp->post_timeout, &pSystemGetEscSequenceSettingsRsp->escape_timeout, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }

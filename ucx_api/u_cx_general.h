@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -23,8 +24,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -49,7 +51,7 @@ int32_t uCxGeneralAttention(uCxHandle_t * puCxHandle);
  * @param[in]  puCxHandle:     uCX API handle
  * @param[out] ppManufacturer: Manufacturer ("u-blox").
  */
-int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char ** ppManufacturer);
+bool uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, const char ** ppManufacturer);
 
 /**
  * Read device model.
@@ -60,7 +62,7 @@ int32_t uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, c
  * @param[in]  puCxHandle:    uCX API handle
  * @param[out] ppDeviceModel: Device model
  */
-int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char ** ppDeviceModel);
+bool uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const char ** ppDeviceModel);
 
 /**
  * Read software version.
@@ -71,7 +73,7 @@ int32_t uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, co
  * @param[in]  puCxHandle: uCX API handle
  * @param[out] ppVersion:  Version.
  */
-int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char ** ppVersion);
+bool uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char ** ppVersion);
 
 /**
  * Read serial number.
@@ -82,7 +84,7 @@ int32_t uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char *
  * @param[in]  puCxHandle:     uCX API handle
  * @param[out] ppSerialNumber: Serial number.
  */
-int32_t uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char ** ppSerialNumber);
+bool uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char ** ppSerialNumber);
 
 
 #ifdef __cplusplus

@@ -15,6 +15,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include "u_cx_types.h"
 #include "u_cx.h"
 
@@ -23,7 +24,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 /* ------------------------------------------------------------
- * RESPONSE STRUCTS
+ * RESPONSES
  * ---------------------------------------------------------- */
 
 typedef struct
@@ -67,6 +68,7 @@ typedef struct
     int32_t message_len;  /**< Length of the MQTT message */
     const char * message; /**< MQTT message */
 } uCxMqttReadMessage_t;
+
 
 /* ------------------------------------------------------------
  * PUBLIC FUNCTIONS
@@ -145,7 +147,7 @@ int32_t uCxMqttSetConnectionParams6(uCxHandle_t * puCxHandle, int32_t mqtt_id, c
  * @param      mqtt_id:                     MQTT Config ID
  * @param[out] pMqttGetConnectionParamsRsp: Please see \ref uCxMqttGetConnectionParams_t
  */
-int32_t uCxBeginMqttGetConnectionParams(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetConnectionParams_t * pMqttGetConnectionParamsRsp);
+bool uCxBeginMqttGetConnectionParams(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetConnectionParams_t * pMqttGetConnectionParamsRsp);
 
 /**
  * Connect to a broker using the MQTT config ID.
@@ -234,7 +236,7 @@ int32_t uCxMqttSetLastWillAndTestament5(uCxHandle_t * puCxHandle, int32_t mqtt_i
  * @param      mqtt_id:                         MQTT Config ID
  * @param[out] pMqttGetLastWillAndTestamentRsp: Please see \ref uCxMqttGetLastWillAndTestament_t
  */
-int32_t uCxBeginMqttGetLastWillAndTestament(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetLastWillAndTestament_t * pMqttGetLastWillAndTestamentRsp);
+bool uCxBeginMqttGetLastWillAndTestament(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetLastWillAndTestament_t * pMqttGetLastWillAndTestamentRsp);
 
 /**
  * Setup MQTT TLS config. Certs do not have to be uploaded until connection.
@@ -274,7 +276,7 @@ int32_t uCxMqttSetTlsConfig5(uCxHandle_t * puCxHandle, int32_t mqtt_id, uTlsVers
  * @param      mqtt_id:              MQTT Config ID
  * @param[out] pMqttGetTlsConfigRsp: Please see \ref uCxMqttGetTlsConfig_t
  */
-int32_t uCxBeginMqttGetTlsConfig(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetTlsConfig_t * pMqttGetTlsConfigRsp);
+bool uCxBeginMqttGetTlsConfig(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttGetTlsConfig_t * pMqttGetTlsConfigRsp);
 
 /**
  * Disconnect the MQTT client from the broker.
@@ -340,7 +342,7 @@ int32_t uCxMqttSubscribe4(uCxHandle_t * puCxHandle, int32_t mqtt_id, uSubscribeA
  * @param      mqtt_id:             MQTT Config ID
  * @param[out] pMqttReadMessageRsp: Please see \ref uCxMqttReadMessage_t
  */
-int32_t uCxBeginMqttReadMessage1(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp);
+bool uCxBeginMqttReadMessage1(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxMqttReadMessage_t * pMqttReadMessageRsp);
 
 /**
  * Read available MQTT message.
@@ -353,7 +355,7 @@ int32_t uCxBeginMqttReadMessage1(uCxHandle_t * puCxHandle, int32_t mqtt_id, uCxM
  * @param      all:                 
  * @param[out] pMqttReadMessageRsp: Please see \ref uCxMqttReadMessage_t
  */
-int32_t uCxBeginMqttReadMessage2(uCxHandle_t * puCxHandle, int32_t mqtt_id, uAll_t all, uCxMqttReadMessage_t * pMqttReadMessageRsp);
+bool uCxBeginMqttReadMessage2(uCxHandle_t * puCxHandle, int32_t mqtt_id, uAll_t all, uCxMqttReadMessage_t * pMqttReadMessageRsp);
 
 
 #ifdef __cplusplus
