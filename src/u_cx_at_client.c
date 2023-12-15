@@ -401,7 +401,9 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
             case 's': {
                 // String
                 char *pStr = va_arg(args, char *);
+                writeAndLog(pClient, "\"", 1);
                 writeAndLog(pClient, pStr, strlen(pStr));
+                writeAndLog(pClient, "\"", 1);
             }
             break;
             case 'i': {
