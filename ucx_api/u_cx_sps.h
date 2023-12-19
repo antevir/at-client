@@ -35,6 +35,12 @@ typedef struct
 
 typedef struct
 {
+    int32_t conn_handle;    /**< Connection handle of remote peer which has SPS enabled */
+    int32_t written_length; /**< Data length that was written. */
+} uCxSpsWriteBinary_t;
+
+typedef struct
+{
     int32_t conn_handle;      /**< Connection handle of remote peer */
     int32_t length;           /**< Data bytes to read. */
     const char * string_data; /**< SPS data in string format */
@@ -104,6 +110,20 @@ int32_t uCxSpsGetServiceEnable(uCxHandle_t * puCxHandle, uSpsServiceOption_t * p
 int32_t uCxSpsWriteString(uCxHandle_t * puCxHandle, int32_t conn_handle, const char * string_data, uCxSpsWriteString_t * pSpsWriteStringRsp);
 
 /**
+ * Writes the specified amount of data to the specified SPS connection in binary mode. Max 1000 bytes.
+ * 
+ * Output AT command:
+ * > AT+USPSWB=<conn_handle>
+ *
+ * @param[in]  puCxHandle:         uCX API handle
+ * @param      conn_handle:        Connection handle of remote peer which has SPS enabled
+ * @param[in]  pWData:             binary data to write
+ * @param      wDataLen:           number of bytes to write
+ * @param[out] pSpsWriteBinaryRsp: Please see \ref uCxSpsWriteBinary_t
+ */
+int32_t uCxSpsWriteBinary(uCxHandle_t * puCxHandle, int32_t conn_handle, uint8_t * pWData, size_t wDataLen, uCxSpsWriteBinary_t * pSpsWriteBinaryRsp);
+
+/**
  * Set the mode in which to receive SPS data in AT mode.
  * 
  * Output AT command:
@@ -138,6 +158,20 @@ int32_t uCxSpsGetDataMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
  * @param[out] pSpsReadStringRsp: Please see \ref uCxSpsReadString_t
  */
 bool uCxBeginSpsReadString(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uCxSpsReadString_t * pSpsReadStringRsp);
+
+/**
+ * Reads the specified amount of data from the specified connection handle in binary mode.
+ * 
+ * Output AT command:
+ * > AT+USPSRB=<conn_handle>,<length>
+ *
+ * @param[in]  puCxHandle:  uCX API handle
+ * @param      conn_handle: Connection handle of remote peer
+ * @param      length:      Data bytes to read.
+ * @param[out] pRData:      Output data buffer
+ * @param[out] pConnHandle: Connection handle of remote peer
+ */
+int32_t uCxSpsReadBinary(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t length, uint8_t * pRData, int32_t * pConnHandle);
 
 
 #ifdef __cplusplus

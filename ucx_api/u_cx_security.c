@@ -25,6 +25,18 @@ int32_t uCxSecurityCertificateRemoveAll(uCxHandle_t * puCxHandle, uRemoveAll_t r
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECR=", "d", remove_all, U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxSecurityUploadCertificate2(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, uint8_t * pWData, size_t wDataLen)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECUB=", "dsB", cert_type, name, pWData, wDataLen, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxSecurityUploadCertificate3(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, const char * password, uint8_t * pWData, size_t wDataLen)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECUB=", "dssB", cert_type, name, password, pWData, wDataLen, U_CX_AT_UTIL_PARAM_LAST);
+}
+
 void uCxBeginSecurityListCertificates(uCxHandle_t * puCxHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
