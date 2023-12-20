@@ -25,6 +25,18 @@ int32_t uCxSecurityCertificateRemoveAll(uCxHandle_t * puCxHandle, uRemoveAll_t r
     return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECR=", "d", remove_all, U_CX_AT_UTIL_PARAM_LAST);
 }
 
+int32_t uCxSecurityUploadCertificate2(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, uint8_t * pWData, size_t wDataLen)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECUB=", "dsB", cert_type, name, pWData, wDataLen, U_CX_AT_UTIL_PARAM_LAST);
+}
+
+int32_t uCxSecurityUploadCertificate3(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, const char * password, uint8_t * pWData, size_t wDataLen)
+{
+    uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
+    return uCxAtClientExecSimpleCmdF(pAtClient, "AT+USECUB=", "dssB", cert_type, name, password, pWData, wDataLen, U_CX_AT_UTIL_PARAM_LAST);
+}
+
 void uCxBeginSecurityListCertificates(uCxHandle_t * puCxHandle)
 {
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
@@ -35,7 +47,7 @@ bool uCxSecurityListCertificatesGetResponse(uCxHandle_t * puCxHandle, uCxSecurit
 {
     int32_t ret;
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USECL:", "ds", &pSecurityListCertificatesRsp->cert_type, &pSecurityListCertificatesRsp->name, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USECL:", NULL, NULL, "ds", &pSecurityListCertificatesRsp->cert_type, &pSecurityListCertificatesRsp->name, U_CX_AT_UTIL_PARAM_LAST);
     return ret >= 0;
 }
 
@@ -49,7 +61,7 @@ bool uCxSecurityListTlsExtensionsGetResponse(uCxHandle_t * puCxHandle, uCxSecuri
 {
     int32_t ret;
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE:", "dd", &pSecurityListTlsExtensionsRsp->extension, &pSecurityListTlsExtensionsRsp->enabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE:", NULL, NULL, "dd", &pSecurityListTlsExtensionsRsp->extension, &pSecurityListTlsExtensionsRsp->enabled, U_CX_AT_UTIL_PARAM_LAST);
     return ret >= 0;
 }
 
@@ -64,7 +76,7 @@ int32_t uCxSecurityGetTlsServerNameIndication(uCxHandle_t * puCxHandle, uEnabled
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE0?", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE0:", NULL, NULL, "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }
@@ -82,7 +94,7 @@ int32_t uCxSecurityGetTlsHandshakeFrag(uCxHandle_t * puCxHandle, uEnabled_t * pE
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+USETE1?", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+USETE1:", NULL, NULL, "d", pEnabled, U_CX_AT_UTIL_PARAM_LAST);
     if (ret >= 0) {
         ret = uCxAtClientCmdEnd(pAtClient);
     }

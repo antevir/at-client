@@ -30,4 +30,7 @@ add_executable(${APP_NAME_TEST}
   test/u_main_test.c
   ${UCX_API_SRC}
 )
+find_package(Threads REQUIRED)
+target_link_libraries(${APP_NAME_TEST} PRIVATE Threads::Threads)
+
 target_include_directories(${APP_NAME_TEST} PUBLIC ${UBXLIB_INC} ${UBXLIB_PUBLIC_INC_PORT} inc ucx_api)

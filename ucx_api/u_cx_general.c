@@ -24,7 +24,7 @@ bool uCxBeginGeneralGetManufacturerIdentification(uCxHandle_t * puCxHandle, cons
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMI", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppManufacturer, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", NULL, NULL, "s", ppManufacturer, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -33,7 +33,7 @@ bool uCxBeginGeneralGetDeviceModelIdentification(uCxHandle_t * puCxHandle, const
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMM", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppDeviceModel, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", NULL, NULL, "s", ppDeviceModel, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -42,7 +42,7 @@ bool uCxBeginGeneralGetSoftwareVersion(uCxHandle_t * puCxHandle, const char ** p
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+GMR", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppVersion, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", NULL, NULL, "s", ppVersion, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }
 
@@ -51,6 +51,6 @@ bool uCxBeginGeneralGetSerialNumber(uCxHandle_t * puCxHandle, const char ** ppSe
     uCxAtClient_t *pAtClient = puCxHandle->pAtClient;
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+GSN", "", U_CX_AT_UTIL_PARAM_LAST);
-    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", "s", ppSerialNumber, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtClientCmdGetRspParamsF(pAtClient, "", NULL, NULL, "s", ppSerialNumber, U_CX_AT_UTIL_PARAM_LAST);
     return ret > 0;
 }

@@ -29,7 +29,8 @@
  * STATIC FUNCTIONS
  * -------------------------------------------------------------- */
 
-static void urcCallback(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength)
+static void urcCallback(struct uCxAtClient *pClient, void *pTag, char *pLine, size_t lineLength,
+                        uint8_t *pBinaryData, size_t binaryDataLen)
 {
     uCxHandle_t *puCxHandle = (uCxHandle_t *)pTag;
     char *pParams = pLine;

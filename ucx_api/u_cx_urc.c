@@ -56,11 +56,11 @@ static int32_t parseUEBTB(uCxHandle_t * puCxHandle, char * pParams, size_t param
 static int32_t parseUEBTUC(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
     uBtLeAddress_t bd_addr;
-    int32_t nummeric_value;
+    int32_t numeric_value;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &nummeric_value, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &numeric_value, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTUC) {
-        puCxHandle->callbacks.UEBTUC(puCxHandle, &bd_addr, nummeric_value);
+        puCxHandle->callbacks.UEBTUC(puCxHandle, &bd_addr, numeric_value);
     }
     return ret;
 }
@@ -68,11 +68,11 @@ static int32_t parseUEBTUC(uCxHandle_t * puCxHandle, char * pParams, size_t para
 static int32_t parseUEBTUPD(uCxHandle_t * puCxHandle, char * pParams, size_t paramsLength)
 {
     uBtLeAddress_t bd_addr;
-    int32_t nummeric_value;
+    int32_t numeric_value;
     int32_t ret = 0;
-    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &nummeric_value, U_CX_AT_UTIL_PARAM_LAST);
+    ret = uCxAtUtilParseParamsF(pParams, "bd", &bd_addr, &numeric_value, U_CX_AT_UTIL_PARAM_LAST);
     if ((ret >= 0) && puCxHandle->callbacks.UEBTUPD) {
-        puCxHandle->callbacks.UEBTUPD(puCxHandle, &bd_addr, nummeric_value);
+        puCxHandle->callbacks.UEBTUPD(puCxHandle, &bd_addr, numeric_value);
     }
     return ret;
 }

@@ -68,6 +68,37 @@ int32_t uCxSecurityCertificateRemove(uCxHandle_t * puCxHandle, uCertType_t cert_
 int32_t uCxSecurityCertificateRemoveAll(uCxHandle_t * puCxHandle, uRemoveAll_t remove_all);
 
 /**
+ * Write an X.509 certificate or private key using binary transfer.
+ * 
+ * Output AT command:
+ * > AT+USECUB=<cert_type>,<name>
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      cert_type:  
+ * @param      name:       
+ * @param[in]  pWData:     binary data to write
+ * @param      wDataLen:   number of bytes to write
+ */
+int32_t uCxSecurityUploadCertificate2(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, uint8_t * pWData, size_t wDataLen);
+
+/**
+ * Write an X.509 certificate or private key using binary transfer.
+ * 
+ * Output AT command:
+ * > AT+USECUB=<cert_type>,<name>,<password>
+ *
+ * @param[in]  puCxHandle: uCX API handle
+ * @param      cert_type:  
+ * @param      name:       
+ * @param      password:   Decryption password; applicable only for PKCS8 encrypted client private keys. The maximum
+ *                         length is 64 characters.
+ *                         NOTE: Supported Encryption method for private keys is AES only
+ * @param[in]  pWData:     binary data to write
+ * @param      wDataLen:   number of bytes to write
+ */
+int32_t uCxSecurityUploadCertificate3(uCxHandle_t * puCxHandle, uCertType_t cert_type, const char * name, const char * password, uint8_t * pWData, size_t wDataLen);
+
+/**
  * Read all uploaded certificate names
  * 
  * Output AT command:
