@@ -102,8 +102,11 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength,
             // Setup the binary buffer, but don't return AT_PARSER_GOT_RSP
             // until transfer is done.
             uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
-            size_t length = pRspBuf->pBufferLength == NULL ? 0 : *pRspBuf->pBufferLength;
-            *pRspBuf->pBufferLength = 0;
+            size_t length = 0;
+            if (pRspBuf->pBufferLength) {
+                length = *pRspBuf->pBufferLength;
+                *pRspBuf->pBufferLength = 0;
+            }
             setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_RSP,
                                 pRspBuf->pBuffer, length);
             return AT_PARSER_START_BINARY;
