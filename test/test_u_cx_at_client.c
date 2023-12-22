@@ -6,6 +6,7 @@
 #include "mock_u_cx_at_config.h"
 #include "u_cx_at_util.h"
 #include "u_cx_at_params.h"
+#include "u_cx_at_urc_queue.h"
 #include "u_cx_at_client.h"
 
 /* ----------------------------------------------------------------

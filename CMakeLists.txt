@@ -26,6 +26,7 @@ add_executable(${APP_NAME_TEST}
   src/u_cx_at_client.c
   src/u_cx_at_util.c
   src/u_cx_at_params.c
+  src/u_cx_at_urc_queue.c
   src/u_cx_log.c
   test/u_main_test.c
   ${UCX_API_SRC}
