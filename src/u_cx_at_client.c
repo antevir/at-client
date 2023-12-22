@@ -34,6 +34,7 @@ enum uCxAtParserCode {
     AT_PARSER_NOP = 0,
     AT_PARSER_GOT_STATUS,
     AT_PARSER_GOT_RSP,
+    AT_PARSER_GOT_URC,
     AT_PARSER_START_BINARY,
     AT_PARSER_ERROR
 };
@@ -51,17 +52,18 @@ enum uCxAtParserCode {
  * -------------------------------------------------------------- */
 
 // Helper function for setting up the RX binary transfer buffer
-static void setupBinaryRxBuffer(uCxAtClient_t *pClient, uCxAtRxState_t state,
-                                uint8_t *pBuffer, size_t bufferSize)
+static void setupBinaryRxBuffer(uCxAtClient_t *pClient, uCxAtBinaryState_t state,
+                                uint8_t *pBuffer, size_t bufferSize, uint16_t remainingBytes)
 {
     uCxAtBinaryRx_t *pBinRx = &pClient->binaryRx;
     memset(pBinRx, 0, sizeof(uCxAtBinaryRx_t));
     pBinRx->pBuffer = pBuffer;
     pBinRx->bufferSize = bufferSize;
-    pClient->rxState = state;
+    pBinRx->state = state;
+    pBinRx->remainingDataBytes = remainingBytes;
 }
 
-static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength, bool gotBinaryData)
+static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength, size_t binDataLength)
 {
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
     int32_t ret = AT_PARSER_NOP;
@@ -97,26 +99,12 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength,
             pClient->pRspParams = &pLine[0];
             ret = AT_PARSER_GOT_RSP;
         }
-        if ((ret == AT_PARSER_GOT_RSP) && gotBinaryData) {
-            // We are receiving an AT response with binary data
-            // Setup the binary buffer, but don't return AT_PARSER_GOT_RSP
-            // until transfer is done.
-            uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
-            size_t length = 0;
-            if (pRspBuf->pBufferLength) {
-                length = *pRspBuf->pBufferLength;
-                *pRspBuf->pBufferLength = 0;
-            }
-            setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_RSP,
-                                pRspBuf->pBuffer, length);
-            return AT_PARSER_START_BINARY;
-        }
     }
 
     if (ret == AT_PARSER_NOP) {
         // Check if this is URC data
         if ((pLine[0] == '+') || (pLine[0] == '*')) {
-            if (!pClient->executingCmd && !gotBinaryData) {
+            if (!pClient->executingCmd && (binDataLength > 0)) {
                 // If there are no command is currently executing we can just
                 // execute the URC handler right away
                 if (pClient->urcCallback) {
@@ -139,23 +127,11 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength,
                     // URC buffer too small. Fail assert for now.
                     U_CX_AT_PORT_ASSERT(false);
                 }
-
-                if (gotBinaryData) {
-                    // Place the binary data directly after the URC string
-                    uint8_t *pPtr = pConfig->pUrcBuffer;
-                    size_t len = pConfig->urcBufferLen - pClient->urcBufferPos;
-                    setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_URC,
-                                        &pPtr[pClient->urcBufferPos], len);
-                    ret = AT_PARSER_START_BINARY;
-                }
             }
+            ret = AT_PARSER_GOT_URC;
         } else {
             // Received unexpected data
             // TODO: Handle
-            if (gotBinaryData) {
-                setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_FLUSH, NULL, 0);
-                ret = AT_PARSER_START_BINARY;
-            }
         }
     }
 
@@ -166,11 +142,13 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
 {
     int32_t ret = AT_PARSER_NOP;
     char *pRxBuffer = (char *)pClient->pConfig->pRxBuffer;
-    bool gotBinaryData = (ch == U_CX_SOH_CHAR);
 
-    if ((ch == '\r') || (ch == '\n') || gotBinaryData) {
+    if (ch == U_CX_SOH_CHAR) {
         pRxBuffer[pClient->rxBufferPos] = 0;
-        ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos, gotBinaryData);
+        ret = AT_PARSER_START_BINARY;
+    } else if ((ch == '\r') || (ch == '\n')) {
+        pRxBuffer[pClient->rxBufferPos] = 0;
+        ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos, 0);
         pClient->rxBufferPos = 0;
     } else if (isprint(ch)) {
         pRxBuffer[pClient->rxBufferPos++] = ch;
@@ -181,6 +159,40 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
     }
 
     return ret;
+}
+
+static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint16_t binLength)
+{
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+
+    switch(parserRet) {
+        case AT_PARSER_GOT_RSP: {
+            // We are receiving an AT response with binary data
+            // Setup the binary buffer, but don't return AT_PARSER_GOT_RSP
+            // until transfer is done.
+            uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
+            size_t length = 0;
+            if (pRspBuf->pBufferLength) {
+                length = *pRspBuf->pBufferLength;
+                *pRspBuf->pBufferLength = 0;
+            }
+            setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_RSP,
+                                pRspBuf->pBuffer, length, binLength);
+            break;
+        }
+        case AT_PARSER_GOT_URC: {
+            // Place the binary data directly after the URC string
+            uint8_t *pPtr = pConfig->pUrcBuffer;
+            size_t len = pConfig->urcBufferLen - pClient->urcBufferPos;
+            setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_URC,
+                                &pPtr[pClient->urcBufferPos], len, binLength);
+            break;
+        }
+        default:
+            // Unexpected data - just flush it
+            setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
+            break;
+    }
 }
 
 static int32_t handleBinaryRx(uCxAtClient_t *pClient)
@@ -202,7 +214,9 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
         } else {
             // The two length bytes have now been received
             uint16_t length = (lengthBuf[0] << 8) | lengthBuf[1];
-            pBinRx->remainingDataBytes = length;
+            char *pRxBuffer = (char *)pClient->pConfig->pRxBuffer;
+            ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos, 0);
+            setupBinaryTransfer(pClient, ret, length);
         }
     }
 
@@ -235,11 +249,12 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
 
     if (pBinRx->remainingDataBytes == 0) {
         // Binary transfer done
-        uCxAtRxState_t rxState = pClient->rxState;
-        pClient->rxState = U_CX_AT_RX_STATE_CHARACTER;
+        uCxAtBinaryState_t binState = pClient->binaryRx.state;
+        pClient->binaryRx.state = U_CX_BIN_STATE_BINARY_FLUSH;
+        pClient->isBinaryRx = false;
 
-        switch (rxState) {
-            case U_CX_AT_RX_STATE_BINARY_RSP: {
+        switch (binState) {
+            case U_CX_BIN_STATE_BINARY_RSP: {
                 uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
                 // Report back how much data were received
                 if (pRspBuf->pBufferLength != NULL) {
@@ -248,7 +263,7 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
                 ret = AT_PARSER_GOT_RSP;
                 break;
             }
-            case U_CX_AT_RX_STATE_BINARY_URC:
+            case U_CX_BIN_STATE_BINARY_URC:
                 // TODO
                 break;
             default:
@@ -266,7 +281,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     do {
         int32_t readStatus;
 
-        if (pClient->rxState == U_CX_AT_RX_STATE_CHARACTER) {
+        if (!pClient->isBinaryRx) {
             // Loop for receiving string data
             do {
                 char ch;
@@ -280,6 +295,10 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
         } else {
             ret = handleBinaryRx(pClient);
         }
+
+        if (ret == AT_PARSER_START_BINARY) {
+            pClient->isBinaryRx = true;
+        }
     } while (ret == AT_PARSER_START_BINARY);
 
     return ret;
@@ -287,8 +306,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
 
 static void handleDeferredUrc(uCxAtClient_t *pClient)
 {
-    if ((pClient->urcBufferPos > 0) &&
-        (pClient->rxState != U_CX_AT_RX_STATE_BINARY_URC)) {
+    if ((pClient->urcBufferPos > 0) && !pClient->isBinaryRx) {
 
         if (pClient->urcCallback) {
             const struct uCxAtClientConfig *pConfig = pClient->pConfig;
