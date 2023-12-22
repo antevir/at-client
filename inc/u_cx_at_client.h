@@ -12,6 +12,7 @@
 
 #include "u_cx_at_util.h"
 #include "u_cx_at_params.h"
+#include "u_cx_at_urc_queue.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -61,6 +62,7 @@ typedef struct uCxAtClient {
     int32_t status;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
+    uCxAtUrcQueue_t urcQueue;
     bool isBinaryRx;
     uCxAtBinaryRx_t binaryRx;
     uCxAtBinaryResponseBuf_t rspBinaryBuf;
