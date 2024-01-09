@@ -197,7 +197,7 @@ void test_uCxAtUtilHexToBinary_withValidValues_expectSuccess(void)
         memset(buffer, 0xFF, sizeof(buffer));
         uint32_t ret = uCxAtUtilHexToBinary(seq1[i], buffer, sizeof(buffer));
         TEST_ASSERT_EQUAL_UINT(strlen(seq1[i]) / 2, ret);
-        for (uint32_t j; j < ret; j++) {
+        for (uint32_t j = 0; j < ret; j++) {
             TEST_ASSERT_EQUAL_INT(j, buffer[j]);
         }
     }
