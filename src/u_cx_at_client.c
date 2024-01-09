@@ -393,7 +393,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
         switch (*pCh) {
             case 'd': {
                 // Digit (integer)
-                int32_t i = va_arg(args, int32_t);
+                int i = va_arg(args, int);
                 int32_t len = snprintf(buf, sizeof(buf), "%d", i);
                 writeAndLog(pClient, buf, len);
             }
@@ -483,9 +483,7 @@ int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, cons
 
 int32_t uCxAtClientExecSimpleCmd(uCxAtClient_t *pClient, const char *pCmd)
 {
-    cmdBeginF(pClient, pCmd, "", NULL);
-
-    return cmdEnd(pClient);
+    return uCxAtClientExecSimpleCmdF(pClient, pCmd, "", NULL);
 }
 
 void uCxAtClientCmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, ...)
