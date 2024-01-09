@@ -168,6 +168,8 @@
             - -fsanitize=address
             - -fno-omit-frame-pointer
             - -DU_CX_LOG_AT=0
+            - -O1  # Set O1 so that GCC correctly detects uninitialized variables: https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
+            - -Wno-clobbered # Needed when enabling -O1 for disabling warning in the CMock runners
     :link:
         :*:
             - -fsanitize=address
@@ -179,6 +181,8 @@
             - -Wextra
             - -fsanitize=address
             - -fno-omit-frame-pointer
+            - -O1  # Set O1 so that GCC correctly detects uninitialized variables: https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
+            - -Wno-clobbered # Needed when enabling -O1 for disabling warning in the CMock runners
     :link:
         :*:
             - -fsanitize=address
