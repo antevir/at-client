@@ -51,7 +51,7 @@ static bool ipv4StringToIpAddress(const char *pAddressString,
     pIpAddress->address.ipv4 = 0;
 
     for (int i = 0; i < 4; i++) {
-        if (!isdigit(*pStrPtr)) {
+        if (!isdigit((int)*pStrPtr)) {
             return false;
         }
         long value = strtol(pStrPtr, &pStrPtr, 10);

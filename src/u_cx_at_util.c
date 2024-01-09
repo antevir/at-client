@@ -186,7 +186,7 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
                 int32_t *pI = va_arg(args, int32_t *);
                 U_CX_AT_PORT_ASSERT(pI != U_CX_AT_UTIL_PARAM_LAST);
                 *pI = strtol(pParam, &pEnd, 10);
-                if (((*pParam != '-') && !isdigit(*pParam)) || (*pEnd != 0)) {
+                if (((*pParam != '-') && !isdigit((int)*pParam)) || (*pEnd != 0)) {
                     // Not a valid integer
                     return -ret;
                 }
