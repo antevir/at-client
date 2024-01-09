@@ -32,5 +32,6 @@ add_executable(${APP_NAME_TEST}
 )
 find_package(Threads REQUIRED)
 target_link_libraries(${APP_NAME_TEST} PRIVATE Threads::Threads)
+target_compile_options(${APP_NAME_TEST} PRIVATE -Wall -Werror)
 
 target_include_directories(${APP_NAME_TEST} PUBLIC ${UBXLIB_INC} ${UBXLIB_PUBLIC_INC_PORT} inc ucx_api)
