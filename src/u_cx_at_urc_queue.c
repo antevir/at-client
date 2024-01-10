@@ -54,7 +54,7 @@ void uCxAtUrcQueueInit(uCxAtUrcQueue_t *pUrcQueue, void *pBuffer, size_t bufferL
 void uCxAtUrcQueueDeInit(uCxAtUrcQueue_t *pUrcQueue)
 {
     U_CX_MUTEX_DELETE(pUrcQueue->queueMutex);
-    U_CX_MUTEX_CREATE(pUrcQueue->dequeueMutex);
+    U_CX_MUTEX_DELETE(pUrcQueue->dequeueMutex);
 }
 
 bool uCxAtUrcQueueEnqueueBegin(uCxAtUrcQueue_t *pUrcQueue, const char *pUrcLine, size_t urcLineLen)
