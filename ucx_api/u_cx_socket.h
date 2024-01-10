@@ -29,26 +29,12 @@ extern "C" {
 
 typedef struct
 {
-    int32_t socket_handle;  /**< Socket identifier be used for any operation on that socket. */
-    int32_t written_length; /**< Data length that was written. */
-} uCxSocketWriteString_t;
-
-typedef struct
-{
-    int32_t socket_handle;  /**< Socket identifier be used for any operation on that socket. */
-    int32_t written_length; /**< Data length that was actually written to socket. */
-} uCxSocketWriteBinary_t;
-
-typedef struct
-{
-    int32_t socket_handle;    /**< Socket identifier be used for any operation on that socket. */
     int32_t length;           /**< Number of bytes to read. */
     const char * string_data; /**< Data encoded as ascii chars. */
 } uCxSocketReadString_t;
 
 typedef struct
 {
-    int32_t socket_handle;      /**< Socket identifier be used for any operation on that socket. */
     uSockIpAddress_t remote_ip; /**< The ip address of the remote peer. */
     int32_t remote_port;        /**< The port of the remote peer. */
     int32_t length;             /**< Number of bytes to read. */
@@ -64,17 +50,9 @@ typedef struct
 
 typedef struct
 {
-    int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
     int32_t protocol;      /**< IP protocol. */
     int32_t socket_status;
 } uCxSocketGetStatus_t;
-
-typedef struct
-{
-    int32_t socket_handle; /**< Socket identifier be used for any operation on that socket. */
-    int32_t option;        /**< Available options to set */
-    int32_t value;         /**< See option parameter */
-} uCxSocketGetOption_t;
 
 
 /* ------------------------------------------------------------
@@ -192,12 +170,12 @@ int32_t uCxSocketGetReadMode(uCxHandle_t * puCxHandle, uReadMode_t * pReadMode);
  * Output AT command:
  * > AT+USOWS=<socket_handle>,<string_data>
  *
- * @param[in]  puCxHandle:            uCX API handle
- * @param      socket_handle:         Socket identifier be used for any operation on that socket.
- * @param      string_data:           Data encoded as ascii chars.
- * @param[out] pSocketWriteStringRsp: Please see \ref uCxSocketWriteString_t
+ * @param[in]  puCxHandle:     uCX API handle
+ * @param      socket_handle:  Socket identifier be used for any operation on that socket.
+ * @param      string_data:    Data encoded as ascii chars.
+ * @param[out] pWrittenLength: Data length that was written.
  */
-int32_t uCxSocketWriteString(uCxHandle_t * puCxHandle, int32_t socket_handle, const char * string_data, uCxSocketWriteString_t * pSocketWriteStringRsp);
+int32_t uCxSocketWriteString(uCxHandle_t * puCxHandle, int32_t socket_handle, const char * string_data, int32_t * pWrittenLength);
 
 /**
  * Writes binary data to the specified socket in binary mode.
@@ -205,13 +183,14 @@ int32_t uCxSocketWriteString(uCxHandle_t * puCxHandle, int32_t socket_handle, co
  * Output AT command:
  * > AT+USOWB=<socket_handle>
  *
- * @param[in]  puCxHandle:            uCX API handle
- * @param      socket_handle:         Socket identifier be used for any operation on that socket.
- * @param[in]  pWData:                binary data to write
- * @param      wDataLen:              number of bytes to write
- * @param[out] pSocketWriteBinaryRsp: Please see \ref uCxSocketWriteBinary_t
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
+ * @param[in]  pWData:        binary data to write
+ * @param      wDataLen:      number of bytes to write
+ * @return                    Negative value on error. On success:
+ *                            Data length that was actually written to socket.
  */
-int32_t uCxSocketWriteBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, uint8_t * pWData, size_t wDataLen, uCxSocketWriteBinary_t * pSocketWriteBinaryRsp);
+int32_t uCxSocketWriteBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, uint8_t * pWData, size_t wDataLen);
 
 /**
  * Closes the specified socket.
@@ -251,9 +230,8 @@ bool uCxBeginSocketReadString(uCxHandle_t * puCxHandle, int32_t socket_handle, i
  * @param      socket_handle: Socket identifier be used for any operation on that socket.
  * @param      length:        Number of bytes to read.
  * @param[out] pRData:        Output data buffer
- * @param[out] pSocketHandle: Socket identifier be used for any operation on that socket.
  */
-int32_t uCxSocketReadBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uint8_t * pRData, int32_t * pSocketHandle);
+int32_t uCxSocketReadBinary(uCxHandle_t * puCxHandle, int32_t socket_handle, int32_t length, uint8_t * pRData);
 
 /**
  * Sets the specified socket in listening mode on the specified port of service, waiting for incoming connections (TCP) or
@@ -331,12 +309,12 @@ int32_t uCxSocketSetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOpt
  * Output AT command:
  * > AT+USOO=<socket_handle>,<option>
  *
- * @param[in]  puCxHandle:          uCX API handle
- * @param      socket_handle:       Socket identifier be used for any operation on that socket.
- * @param      option:              Available options to set
- * @param[out] pSocketGetOptionRsp: Please see \ref uCxSocketGetOption_t
+ * @param[in]  puCxHandle:    uCX API handle
+ * @param      socket_handle: Socket identifier be used for any operation on that socket.
+ * @param      option:        Available options to set
+ * @param[out] pValue:        See option parameter
  */
-int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, uCxSocketGetOption_t * pSocketGetOptionRsp);
+int32_t uCxSocketGetOption(uCxHandle_t * puCxHandle, int32_t socket_handle, uOption_t option, int32_t * pValue);
 
 /**
  * Does a DNS lookup of a host name and returns the IP address.

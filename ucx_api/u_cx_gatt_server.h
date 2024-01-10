@@ -77,7 +77,7 @@ int32_t uCxGattServerServiceDefine(uCxHandle_t * puCxHandle, const uint8_t * uui
  *                                       Write: 0x08 - If set, it allows writing of the Characteristic Value with response.
  *                                       Notify: 0x10 - If set, it allows notifications of a characteristic value.
  *                                       Indicate: 0x20 - If set, it allows indication of a characteristic value with
- *                                       acknoledgement.
+ *                                       acknowledgement.
  *                                       Authenticated Signed Writes: 0x40 - If set, it allows signed writes to the characteristic
  *                                       value.
  *                                       Reserved Bit: 0x80 - Do not use. Reserved for future use.
@@ -111,7 +111,7 @@ int32_t uCxGattServerCharDefine5(uCxHandle_t * puCxHandle, const uint8_t * uuid,
  *                                       Write: 0x08 - If set, it allows writing of the Characteristic Value with response.
  *                                       Notify: 0x10 - If set, it allows notifications of a characteristic value.
  *                                       Indicate: 0x20 - If set, it allows indication of a characteristic value with
- *                                       acknoledgement.
+ *                                       acknowledgement.
  *                                       Authenticated Signed Writes: 0x40 - If set, it allows signed writes to the characteristic
  *                                       value.
  *                                       Reserved Bit: 0x80 - Do not use. Reserved for future use.
@@ -144,7 +144,7 @@ int32_t uCxGattServerCharDefine6(uCxHandle_t * puCxHandle, const uint8_t * uuid,
  *                                           Write: 0x08 - If set, it allows writing of the Characteristic Value with response.
  *                                           Notify: 0x10 - If set, it allows notifications of a characteristic value.
  *                                           Indicate: 0x20 - If set, it allows indication of a characteristic value with
- *                                           acknoledgement.
+ *                                           acknowledgement.
  *                                           Authenticated Signed Writes: 0x40 - If set, it allows signed writes to the characteristic
  *                                           value.
  *                                           Reserved Bit: 0x80 - Do not use. Reserved for future use.

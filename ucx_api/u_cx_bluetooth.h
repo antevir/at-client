@@ -30,19 +30,19 @@ extern "C" {
 typedef struct
 {
     uBtLeAddress_t bd_addr;   /**< Bluetooth device address of the remote device. */
-    int32_t rssi;             /**< Recieved signal strength in dBm. */
+    int32_t rssi;             /**< Received signal strength in dBm. */
     const char * device_name; /**< Name of the discovered device. */
     int32_t data_type;
-    uByteArray_t data;        /**< Complete advertise/scan response data recieved from the remote device. */
+    uByteArray_t data;        /**< Complete advertise/scan response data received from the remote device. */
 } uCxBluetoothDiscovery_t;
 
 typedef struct
 {
     uBtLeAddress_t bd_addr;   /**< Bluetooth device address of the remote device. */
-    int32_t rssi;             /**< Recieved signal strength in dBm. */
+    int32_t rssi;             /**< Received signal strength in dBm. */
     const char * device_name; /**< Name of the discovered device. */
     int32_t data_type;
-    uByteArray_t data;        /**< Complete advertise/scan response data recieved from the remote device. */
+    uByteArray_t data;        /**< Complete advertise/scan response data received from the remote device. */
 } uCxBluetoothDiscoveryEx_t;
 
 typedef struct
@@ -271,7 +271,7 @@ int32_t uCxBluetoothGetBgDiscovery(uCxHandle_t * puCxHandle, uBackgroundDiscover
  *
  * @param[in]  puCxHandle:  uCX API handle
  * @param      conn_handle: Connection handle of the Bluetooth low energy connection.
- * @param[out] pRssi:       Recieved signal strength in dBm.
+ * @param[out] pRssi:       Received signal strength in dBm.
  */
 int32_t uCxBluetoothRssi(uCxHandle_t * puCxHandle, int32_t conn_handle, int32_t * pRssi);
 
@@ -431,22 +431,22 @@ int32_t uCxBluetoothDirectedAdvertisement2(uCxHandle_t * puCxHandle, uBtLeAddres
  * > AT+UBTCS0=<connection_interval_minimum>
  *
  * @param[in]  puCxHandle:                  uCX API handle
- * @param      connection_interval_minimum: Connection inteval minimum (must be <= Connection interval maximum). Final results will be
- *                                          a result of negotiation between devices.
+ * @param      connection_interval_minimum: Connection interval minimum (must be <= Connection interval maximum). Final results will
+ *                                          be a result of negotiation between devices.
  *                                           Default: 24.
  *                                           Calculation: connection_interval_minimum * 1.25. ms
  */
 int32_t uCxBluetoothSetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t connection_interval_minimum);
 
 /**
- * Read Connection Interval miniumum.
+ * Read Connection Interval minium.
  * 
  * Output AT command:
  * > AT+UBTCS0?
  *
  * @param[in]  puCxHandle:                 uCX API handle
- * @param[out] pConnectionIntervalMinimum: Connection inteval minimum (must be <= Connection interval maximum). Final results will be
- *                                         a result of negotiation between devices.
+ * @param[out] pConnectionIntervalMinimum: Connection interval minimum (must be <= Connection interval maximum). Final results will
+ *                                         be a result of negotiation between devices.
  *                                          Default: 24.
  *                                          Calculation: connection_interval_minimum * 1.25. ms
  */
@@ -459,8 +459,8 @@ int32_t uCxBluetoothGetConnectionIntervalMin(uCxHandle_t * puCxHandle, int32_t *
  * > AT+UBTCS1=<connection_interval_maximum>
  *
  * @param[in]  puCxHandle:                  uCX API handle
- * @param      connection_interval_maximum: Connection inteval maximum (must be >= Connection interval minimum). Final results will be
- *                                          a result of negotiation between devices.
+ * @param      connection_interval_maximum: Connection interval maximum (must be >= Connection interval minimum). Final results will
+ *                                          be a result of negotiation between devices.
  *                                           Default: 40.
  *                                           Calculation: connection_interval_maximum * 1.25 ms.
  */
@@ -473,8 +473,8 @@ int32_t uCxBluetoothSetConnectionIntervalMax(uCxHandle_t * puCxHandle, int32_t c
  * > AT+UBTCS1?
  *
  * @param[in]  puCxHandle:                 uCX API handle
- * @param[out] pConnectionIntervalMaximum: Connection inteval maximum (must be >= Connection interval minimum). Final results will be
- *                                         a result of negotiation between devices.
+ * @param[out] pConnectionIntervalMaximum: Connection interval maximum (must be >= Connection interval minimum). Final results will
+ *                                         be a result of negotiation between devices.
  *                                          Default: 40.
  *                                          Calculation: connection_interval_maximum * 1.25 ms.
  */

@@ -120,7 +120,7 @@ int32_t uCxSystemFactoryReset(uCxHandle_t * puCxHandle);
 int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle);
 
 /**
- * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000 bps can be set, but are
  * unsupported.
  * 
  * Output AT command:
@@ -132,7 +132,7 @@ int32_t uCxSystemDefaultSettings(uCxHandle_t * puCxHandle);
 int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate);
 
 /**
- * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000 bps can be set, but are
  * unsupported.
  * 
  * Output AT command:
@@ -145,7 +145,7 @@ int32_t uCxSystemSetUartSettings1(uCxHandle_t * puCxHandle, int32_t baud_rate);
 int32_t uCxSystemSetUartSettings2(uCxHandle_t * puCxHandle, int32_t baud_rate, int32_t flow_control);
 
 /**
- * Configure new UART settings that will be used after restart. Baudrates above 4000000+ bps can be set, but are
+ * Configure new UART settings that will be used after restart. Baudrates above 4000000 bps can be set, but are
  * unsupported.
  * 
  * Output AT command:
@@ -168,31 +168,6 @@ int32_t uCxSystemSetUartSettings3(uCxHandle_t * puCxHandle, int32_t baud_rate, i
  * @param[out] pSystemGetUartSettingsRsp: Please see \ref uCxSystemGetUartSettings_t
  */
 int32_t uCxSystemGetUartSettings(uCxHandle_t * puCxHandle, uCxSystemGetUartSettings_t * pSystemGetUartSettingsRsp);
-
-/**
- * Force start of the boot loader.
- * 
- * Output AT command:
- * > AT+USYFWU=<bootloader_mode>,<baud_rate>
- *
- * @param[in]  puCxHandle:      uCX API handle
- * @param      bootloader_mode: 
- * @param      baud_rate:       
- */
-int32_t uCxSystemFirmwareUpdate2(uCxHandle_t * puCxHandle, uBootloaderMode_t bootloader_mode, int32_t baud_rate);
-
-/**
- * Force start of the boot loader.
- * 
- * Output AT command:
- * > AT+USYFWU=<bootloader_mode>,<baud_rate>,<flow_control>
- *
- * @param[in]  puCxHandle:      uCX API handle
- * @param      bootloader_mode: 
- * @param      baud_rate:       
- * @param      flow_control:    
- */
-int32_t uCxSystemFirmwareUpdate3(uCxHandle_t * puCxHandle, uBootloaderMode_t bootloader_mode, int32_t baud_rate, int32_t flow_control);
 
 /**
  * Set echo off
