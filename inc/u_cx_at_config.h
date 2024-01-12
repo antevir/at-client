@@ -45,9 +45,19 @@ extern int32_t uPortGetTickTimeMs(void);
 # define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
 #endif
 
-/* Configuration for enabling logging off AT protocol.*/
+/* Configuration for enabling logging of AT protocol.*/
 #ifndef U_CX_LOG_AT
 # define U_CX_LOG_AT 1
+#endif
+
+/* Configuration for enabling logging of warning messages.*/
+#ifndef U_CX_LOG_WARNING
+# define U_CX_LOG_WARNING 1
+#endif
+
+/* Configuration for enabling logging of debug messages.*/
+#ifndef U_CX_LOG_DEBUG
+# define U_CX_LOG_DEBUG 0
 #endif
 
 /* Configuration for enabling ANSI color for logs.*/

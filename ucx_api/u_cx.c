@@ -7,6 +7,8 @@
 #include <string.h>  // memcpy(), strcmp(), strcspn(), strspm()
 #include <stdio.h>
 
+#include "u_cx_log.h"
+
 #include "u_cx.h"
 
 /* ----------------------------------------------------------------
@@ -46,7 +48,8 @@ static void urcCallback(struct uCxAtClient *pClient, void *pTag, char *pLine, si
         pParams++;
         paramLen--;
     }
-    printf("name is '%s', params are: '%s'\n", pLine, pParams);
+
+    U_CX_LOG_LINE(U_CX_LOG_CH_DBG, "Received URC '%s', params: '%s'", pLine, pParams);
     extern int32_t uCxUrcParse(uCxHandle_t * puCxHandle, const char * pUrcName, char * pParams, size_t paramsLength);
     uCxUrcParse(puCxHandle, pLine, pParams, paramLen);
 }

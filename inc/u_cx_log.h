@@ -15,8 +15,10 @@
  * -------------------------------------------------------------- */
 
 /* Log channels (used as input for U_CX_LOG_BEGIN() and U_CX_LOG_LINE()) */
-#define U_CX_LOG_CHANNEL_TX     U_CX_LOG_AT, ANSI_CYN "[AT TX]"
-#define U_CX_LOG_CHANNEL_RX     U_CX_LOG_AT, ANSI_MAG "[AT RX]"
+#define U_CX_LOG_CH_TX     U_CX_LOG_AT,        ANSI_CYN "[AT TX]"
+#define U_CX_LOG_CH_RX     U_CX_LOG_AT,        ANSI_MAG "[AT RX]"
+#define U_CX_LOG_CH_DBG    U_CX_LOG_DEBUG,     ANSI_RST "[DBG  ]"
+#define U_CX_LOG_CH_WARN   U_CX_LOG_WARNING,   ANSI_YEL "[WARN ]"
 
 /* Simple line logging printf style (\n will be added automatically) */
 #define U_CX_LOG_LINE(logCh, format, ...)  _U_CX_LOG_BEGIN_FMT(logCh, format ANSI_RST "\n", ##__VA_ARGS__)

@@ -30,6 +30,7 @@
     if (READ_RET < 0) {                     \
         CLIENT->lastIoError = READ_RET;     \
         CLIENT->status = U_CX_ERROR_IO;     \
+        U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "read() failed with return value: %d", READ_RET); \
         return AT_PARSER_ERROR;             \
     }
 
@@ -87,7 +88,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         return AT_PARSER_NOP;
     }
 
-    U_CX_LOG_LINE(U_CX_LOG_CHANNEL_RX, "%s", pLine);
+    U_CX_LOG_LINE(U_CX_LOG_CH_RX, "%s", pLine);
 
     if (pClient->executingCmd) {
         if ((pClient->pExpectedRsp != NULL) &&
@@ -101,6 +102,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         } else if (strncmp(pLine, "ERROR", 5) == 0) {
             if (pLine[5] == 0) {
                 pClient->status = U_CX_ERROR_STATUS_ERROR;
+                U_CX_LOG_LINE(U_CX_LOG_CH_DBG, "Command failed");
                 ret = AT_PARSER_GOT_STATUS;
             } else if (pLine[5] == ':') {
                 // Extended error code
@@ -109,6 +111,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
                 int code = strtol(pCodeStr, &pEnd, 10);
                 if (isdigit((int)*pCodeStr) && (*pEnd == 0)) {
                     pClient->status = U_CX_EXTENDED_ERROR_OFFSET - code;
+                    U_CX_LOG_LINE(U_CX_LOG_CH_DBG, "Command failed with error code: %d", code);
                     ret = AT_PARSER_GOT_STATUS;
                 }
             }
@@ -170,7 +173,7 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
 {
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
-    U_CX_LOG_LINE(U_CX_LOG_CHANNEL_RX, "[%d bytes]", binLength);
+    U_CX_LOG_LINE(U_CX_LOG_CH_RX, "[%d bytes]", binLength);
     switch(parserRet) {
         case AT_PARSER_GOT_RSP: {
             // We are receiving an AT response with binary data
@@ -366,6 +369,7 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
         int32_t now = U_CX_PORT_GET_TIME_MS();
         if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
             pClient->status = U_CX_ERROR_CMD_TIMEOUT;
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Command timeout");
             break;
         }
     }
@@ -386,7 +390,7 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
 static inline int32_t writeAndLog(uCxAtClient_t *pClient, const void *pData, size_t dataLen)
 {
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
-    U_CX_LOG(U_CX_LOG_CHANNEL_TX, "%s", (char *)pData);
+    U_CX_LOG(U_CX_LOG_CH_TX, "%s", (char *)pData);
     return pConfig->write(pClient, pConfig->pStreamHandle, pData, dataLen);
 }
 
@@ -427,7 +431,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
     char buf[U_IP_STRING_MAX_LENGTH_BYTES];
     const struct uCxAtClientConfig *pConfig = pClient->pConfig;
 
-    U_CX_LOG_BEGIN(U_CX_LOG_CHANNEL_TX);
+    U_CX_LOG_BEGIN(U_CX_LOG_CH_TX);
 
     writeAndLog(pClient, pCmd, strlen(pCmd));
     const char *pCh = pParamFmt;
@@ -489,7 +493,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
                 U_CX_AT_PORT_ASSERT(len > 0);
                 writeNoLog(pClient, binHeader, sizeof(binHeader));
                 writeNoLog(pClient, pData, len);
-                U_CX_LOG(U_CX_LOG_CHANNEL_TX, "[%d bytes]", len);
+                U_CX_LOG(U_CX_LOG_CH_TX, "[%d bytes]", len);
 
                 // Binary transfer must always be last param
                 U_CX_AT_PORT_ASSERT(pCh[1] == 0);
@@ -513,7 +517,7 @@ void uCxAtClientSendCmdVaList(uCxAtClient_t *pClient, const char *pCmd, const ch
     if (!binaryTransfer) {
         pConfig->write(pClient, pConfig->pStreamHandle, "\r", 1);
     }
-    U_CX_LOG_END(U_CX_LOG_CHANNEL_TX);
+    U_CX_LOG_END(U_CX_LOG_CH_TX);
 }
 
 int32_t uCxAtClientExecSimpleCmdF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt,
@@ -564,6 +568,7 @@ char *uCxAtClientCmdGetRspParamLine(uCxAtClient_t *pClient, const char *pExpecte
         // Check for timeout
         int32_t now = U_CX_PORT_GET_TIME_MS();
         if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Command timeout");
             return NULL;
         }
     }
