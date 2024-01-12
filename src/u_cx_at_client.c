@@ -26,6 +26,12 @@
 /* Special character sent for entering binary mode */
 #define U_CX_SOH_CHAR    0x01
 
+#define CHECK_READ_ERROR(CLIENT, READ_RET)  \
+    if (READ_RET < 0) {                     \
+        CLIENT->lastIoError = READ_RET;     \
+        CLIENT->status = U_CX_ERROR_IO;     \
+        return AT_PARSER_ERROR;             \
+    }
 
 /* ----------------------------------------------------------------
  * TYPES
@@ -94,7 +100,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
             ret = AT_PARSER_GOT_STATUS;
         } else if (strncmp(pLine, "ERROR", 5) == 0) {
             if (pLine[5] == 0) {
-                pClient->status = -1;
+                pClient->status = U_CX_ERROR_STATUS_ERROR;
                 ret = AT_PARSER_GOT_STATUS;
             } else if (pLine[5] == ':') {
                 // Extended error code
@@ -102,7 +108,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
                 char *pCodeStr = &pLine[6];
                 int code = strtol(pCodeStr, &pEnd, 10);
                 if (isdigit((int)*pCodeStr) && (*pEnd == 0)) {
-                    pClient->status = -code;
+                    pClient->status = U_CX_EXTENDED_ERROR_OFFSET - code;
                     ret = AT_PARSER_GOT_STATUS;
                 }
             }
@@ -214,6 +220,7 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
         readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle,
                                             &lengthBuf[pBinRx->rxHeaderCount], readLen,
                                             pClient->pConfig->timeoutMs);
+        CHECK_READ_ERROR(pClient, readStatus);
         if (readStatus > 0) {
             pBinRx->rxHeaderCount += readStatus;
         }
@@ -238,6 +245,7 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
             readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle,
                                                 &pBinRx->pBuffer[pBinRx->bufferPos], readLen,
                                                 pClient->pConfig->timeoutMs);
+            CHECK_READ_ERROR(pClient, readStatus);
             if (readStatus > 0) {
                 pBinRx->bufferPos += readStatus;
             }
@@ -248,6 +256,7 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
             readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle,
                                                 &buf[0], readLen,
                                                 pClient->pConfig->timeoutMs);
+            CHECK_READ_ERROR(pClient, readStatus);
         }
 
         if (readStatus > 0) {
@@ -298,6 +307,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
                 char ch;
                 readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle, &ch, 1,
                                                     pClient->pConfig->timeoutMs);
+                CHECK_READ_ERROR(pClient, readStatus);
                 if (readStatus != 1) {
                     break;
                 }
@@ -355,7 +365,7 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
 
         int32_t now = U_CX_PORT_GET_TIME_MS();
         if ((now - pClient->cmdStartTime) > pClient->cmdTimeout) {
-            pClient->status = -1;
+            pClient->status = U_CX_ERROR_CMD_TIMEOUT;
             break;
         }
     }
@@ -569,7 +579,7 @@ int32_t uCxAtClientCmdGetRspParamsF(uCxAtClient_t *pClient, const char *pExpecte
     char *pRspParams = uCxAtClientCmdGetRspParamLine(pClient, pExpectedRsp,
                                                      pBinaryBuf, pBinaryBufLength);
     if (pRspParams == NULL) {
-        return -1;
+        return U_CX_ERROR_CMD_TIMEOUT;
     }
     va_start(args, pParamFmt);
     int32_t ret = uCxAtUtilParseParamsVaList(pRspParams, pParamFmt, args);
@@ -594,4 +604,9 @@ void uCxAtClientHandleRx(uCxAtClient_t *pClient)
     U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 
     processUrcs(pClient);
+}
+
+int32_t uCxAtGetLastIoError(uCxAtClient_t *pClient)
+{
+    return pClient->lastIoError;
 }

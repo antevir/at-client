@@ -42,6 +42,7 @@ static size_t gTxBufferPos;
 
 static uint8_t *gPRxDataPtr;
 static int32_t gRxDataLen;
+static int32_t gRxIoErrorCode;
 
 static uCxAtClientConfig_t gClientConfig = {
     .pContext = CONTEXT_VALUE,
@@ -78,6 +79,14 @@ static int32_t read(uCxAtClient_t *pClient, void *pStreamHandle,
     (void)timeoutMs;
     TEST_ASSERT_EQUAL(&gClient, pClient);
     TEST_ASSERT_EQUAL(STREAM_HANDLER, pStreamHandle);
+
+    if (gRxIoErrorCode != 0) {
+        if (++zeroCounter > 10) {
+            TEST_FAIL_MESSAGE("Stuck in read loop");
+        }
+        return gRxIoErrorCode;
+    }
+
     int32_t cpyLen = U_MIN((int32_t)length, gRxDataLen);
     if (cpyLen > 0) {
         memcpy(pData, gPRxDataPtr, cpyLen);
@@ -115,6 +124,7 @@ void setUp(void)
     gTxBufferPos = 0;
     gPRxDataPtr = NULL;
     gRxDataLen = -1;
+    gRxIoErrorCode = 0;
 
     uPortGetTickTimeMs_IgnoreAndReturn(0);
 }
@@ -188,7 +198,7 @@ void test_uCxAtClientExecSimpleCmdF_withStatusError_expectError(void)
     char rxData[] = { "\r\nERROR\r\n" };
     gPRxDataPtr = (uint8_t *)&rxData[0];
     gRxDataLen = sizeof(rxData);
-    TEST_ASSERT_EQUAL(-1, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+    TEST_ASSERT_EQUAL(U_CX_ERROR_STATUS_ERROR, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
 }
 
 void test_uCxAtClientExecSimpleCmdF_withStatusExtendedError_expectErrorCode(void)
@@ -196,7 +206,7 @@ void test_uCxAtClientExecSimpleCmdF_withStatusExtendedError_expectErrorCode(void
     char rxData[] = { "\r\nERROR:123\r\n" };
     gPRxDataPtr = (uint8_t *)&rxData[0];
     gRxDataLen = sizeof(rxData);
-    TEST_ASSERT_EQUAL(-123, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+    TEST_ASSERT_EQUAL(U_CX_EXTENDED_ERROR_OFFSET - 123, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
 }
 
 void test_uCxAtClientExecSimpleCmdF_withInvalidStatusExtendedError_expectTimeout(void)
@@ -207,10 +217,39 @@ void test_uCxAtClientExecSimpleCmdF_withInvalidStatusExtendedError_expectTimeout
     uPortGetTickTimeMs_StopIgnore();
     uPortGetTickTimeMs_ExpectAndReturn(0);
     uPortGetTickTimeMs_ExpectAndReturn(20000);
-    TEST_ASSERT_EQUAL(-1, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+    TEST_ASSERT_EQUAL(U_CX_ERROR_CMD_TIMEOUT, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
     TEST_ASSERT_EQUAL_MESSAGE(0, gRxDataLen, "Test didn't read all data");
 }
 
+void test_uCxAtClientExecSimpleCmdF_withReadError_expectIoError(void)
+{
+    gRxIoErrorCode = -1234;
+    TEST_ASSERT_EQUAL(U_CX_ERROR_IO, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+    TEST_ASSERT_EQUAL(-1234, uCxAtGetLastIoError(&gClient));
+}
+
+void test_uCxAtClientCmdGetRspParamLine_withTimeout_expectNull(void)
+{
+    // Start by putting the client in command state
+    uCxAtClientCmdBeginF(&gClient, "", "", U_CX_AT_UTIL_PARAM_LAST);
+
+    uPortGetTickTimeMs_StopIgnore();
+    uPortGetTickTimeMs_ExpectAndReturn(0);
+    uPortGetTickTimeMs_ExpectAndReturn(20000);
+    char rxData[] = { "+UNMATCHED_RSP\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    TEST_ASSERT_EQUAL(NULL, uCxAtClientCmdGetRspParamLine(&gClient, "DUMMY", NULL, NULL));
+}
+
+void test_uCxAtClientCmdGetRspParamLine_withReadError_expectNull(void)
+{
+    // Start by putting the client in command state
+    uCxAtClientCmdBeginF(&gClient, "", "", U_CX_AT_UTIL_PARAM_LAST);
+
+    gRxIoErrorCode = -1234;
+    TEST_ASSERT_EQUAL(NULL, uCxAtClientCmdGetRspParamLine(&gClient, "DUMMY", NULL, NULL));
+}
 
 void test_uCxAtClientCmdGetRspParamLine_withBinary(void)
 {
