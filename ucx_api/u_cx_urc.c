@@ -660,92 +660,92 @@ void uCxUrcRegisterBluetoothPhyUpdate(struct uCxHandle * puCxHandle, uUEBTPHYU_t
     puCxHandle->callbacks.UEBTPHYU = callback;
 }
 
-void uCxUrcRegisterGATTclientNotification(struct uCxHandle * puCxHandle, uUEBTGCN_t callback)
+void uCxUrcRegisterGattClientNotification(struct uCxHandle * puCxHandle, uUEBTGCN_t callback)
 {
     puCxHandle->callbacks.UEBTGCN = callback;
 }
 
-void uCxUrcRegisterGATTclientIndication(struct uCxHandle * puCxHandle, uUEBTGCI_t callback)
+void uCxUrcRegisterGattClientIndication(struct uCxHandle * puCxHandle, uUEBTGCI_t callback)
 {
     puCxHandle->callbacks.UEBTGCI = callback;
 }
 
-void uCxUrcRegisterGATTServerNotification(struct uCxHandle * puCxHandle, uUEBTGCW_t callback)
+void uCxUrcRegisterGattServerNotification(struct uCxHandle * puCxHandle, uUEBTGCW_t callback)
 {
     puCxHandle->callbacks.UEBTGCW = callback;
 }
 
-void uCxUrcRegisterGATTServerReadAttribute(struct uCxHandle * puCxHandle, uUEBTGRR_t callback)
+void uCxUrcRegisterGattServerReadAttribute(struct uCxHandle * puCxHandle, uUEBTGRR_t callback)
 {
     puCxHandle->callbacks.UEBTGRR = callback;
 }
 
-void uCxUrcRegisterGATTServerIndicationAck(struct uCxHandle * puCxHandle, uUEBTGIC_t callback)
+void uCxUrcRegisterGattServerIndicationAck(struct uCxHandle * puCxHandle, uUEBTGIC_t callback)
 {
     puCxHandle->callbacks.UEBTGIC = callback;
 }
 
-void uCxUrcRegisterSPSConnect(struct uCxHandle * puCxHandle, uUESPSC_t callback)
+void uCxUrcRegisterSpsConnect(struct uCxHandle * puCxHandle, uUESPSC_t callback)
 {
     puCxHandle->callbacks.UESPSC = callback;
 }
 
-void uCxUrcRegisterSPSDisconnect(struct uCxHandle * puCxHandle, uUESPSDC_t callback)
+void uCxUrcRegisterSpsDisconnect(struct uCxHandle * puCxHandle, uUESPSDC_t callback)
 {
     puCxHandle->callbacks.UESPSDC = callback;
 }
 
-void uCxUrcRegisterSPSDataAvailable(struct uCxHandle * puCxHandle, uUESPSDA_t callback)
+void uCxUrcRegisterSpsDataAvailable(struct uCxHandle * puCxHandle, uUESPSDA_t callback)
 {
     puCxHandle->callbacks.UESPSDA = callback;
 }
 
-void uCxUrcRegisterWiFiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback)
+void uCxUrcRegisterWifiLinkUp(struct uCxHandle * puCxHandle, uUEWLU_t callback)
 {
     puCxHandle->callbacks.UEWLU = callback;
 }
 
-void uCxUrcRegisterWiFiLinkDown(struct uCxHandle * puCxHandle, uUEWLD_t callback)
+void uCxUrcRegisterWifiLinkDown(struct uCxHandle * puCxHandle, uUEWLD_t callback)
 {
     puCxHandle->callbacks.UEWLD = callback;
 }
 
-void uCxUrcRegisterWiFiStationNetworkUp(struct uCxHandle * puCxHandle, uUEWSNU_t callback)
+void uCxUrcRegisterWifiStationNetworkUp(struct uCxHandle * puCxHandle, uUEWSNU_t callback)
 {
     puCxHandle->callbacks.UEWSNU = callback;
 }
 
-void uCxUrcRegisterWiFiStationNetworkDown(struct uCxHandle * puCxHandle, uUEWSND_t callback)
+void uCxUrcRegisterWifiStationNetworkDown(struct uCxHandle * puCxHandle, uUEWSND_t callback)
 {
     puCxHandle->callbacks.UEWSND = callback;
 }
 
-void uCxUrcRegisterWiFiApNetworkUp(struct uCxHandle * puCxHandle, uUEWAPNU_t callback)
+void uCxUrcRegisterWifiApNetworkUp(struct uCxHandle * puCxHandle, uUEWAPNU_t callback)
 {
     puCxHandle->callbacks.UEWAPNU = callback;
 }
 
-void uCxUrcRegisterWiFiApNetworkDown(struct uCxHandle * puCxHandle, uUEWAPND_t callback)
+void uCxUrcRegisterWifiApNetworkDown(struct uCxHandle * puCxHandle, uUEWAPND_t callback)
 {
     puCxHandle->callbacks.UEWAPND = callback;
 }
 
-void uCxUrcRegisterWiFiApUp(struct uCxHandle * puCxHandle, uUEWAPU_t callback)
+void uCxUrcRegisterWifiApUp(struct uCxHandle * puCxHandle, uUEWAPU_t callback)
 {
     puCxHandle->callbacks.UEWAPU = callback;
 }
 
-void uCxUrcRegisterWiFiApDown(struct uCxHandle * puCxHandle, uUEWAPD_t callback)
+void uCxUrcRegisterWifiApDown(struct uCxHandle * puCxHandle, uUEWAPD_t callback)
 {
     puCxHandle->callbacks.UEWAPD = callback;
 }
 
-void uCxUrcRegisterWiFiApStationAssociated(struct uCxHandle * puCxHandle, uUEWAPSA_t callback)
+void uCxUrcRegisterWifiApStationAssociated(struct uCxHandle * puCxHandle, uUEWAPSA_t callback)
 {
     puCxHandle->callbacks.UEWAPSA = callback;
 }
 
-void uCxUrcRegisterWiFiApStationDisassociated(struct uCxHandle * puCxHandle, uUEWAPSDA_t callback)
+void uCxUrcRegisterWifiApStationDisassociated(struct uCxHandle * puCxHandle, uUEWAPSDA_t callback)
 {
     puCxHandle->callbacks.UEWAPSDA = callback;
 }

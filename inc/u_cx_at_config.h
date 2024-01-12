@@ -35,6 +35,7 @@
 # define U_CX_MUTEX_CREATE(mutex)   pthread_mutex_init(&mutex, NULL)
 # define U_CX_MUTEX_DELETE(mutex)   pthread_mutex_destroy(&mutex);
 # define U_CX_MUTEX_LOCK(mutex)     pthread_mutex_lock(&mutex)
+# define U_CX_MUTEX_TRY_LOCK(mutex) pthread_mutex_trylock(&mutex)
 # define U_CX_MUTEX_UNLOCK(mutex)   pthread_mutex_unlock(&mutex)
 #endif
 

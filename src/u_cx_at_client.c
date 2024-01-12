@@ -34,6 +34,7 @@ enum uCxAtParserCode {
     AT_PARSER_NOP = 0,
     AT_PARSER_GOT_STATUS,
     AT_PARSER_GOT_RSP,
+    AT_PARSER_GOT_URC,
     AT_PARSER_START_BINARY,
     AT_PARSER_ERROR
 };
@@ -51,19 +52,19 @@ enum uCxAtParserCode {
  * -------------------------------------------------------------- */
 
 // Helper function for setting up the RX binary transfer buffer
-static void setupBinaryRxBuffer(uCxAtClient_t *pClient, uCxAtRxState_t state,
-                                uint8_t *pBuffer, size_t bufferSize)
+static void setupBinaryRxBuffer(uCxAtClient_t *pClient, uCxAtBinaryState_t state,
+                                uint8_t *pBuffer, size_t bufferSize, uint16_t remainingBytes)
 {
     uCxAtBinaryRx_t *pBinRx = &pClient->binaryRx;
-    memset(pBinRx, 0, sizeof(uCxAtBinaryRx_t));
+    pBinRx->bufferPos = 0;
     pBinRx->pBuffer = pBuffer;
     pBinRx->bufferSize = bufferSize;
-    pClient->rxState = state;
+    pBinRx->state = state;
+    pBinRx->remainingDataBytes = remainingBytes;
 }
 
-static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength, bool gotBinaryData)
+static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
 {
-    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
     int32_t ret = AT_PARSER_NOP;
 
     char *pPtr = pLine;
@@ -97,62 +98,19 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength,
             pClient->pRspParams = &pLine[0];
             ret = AT_PARSER_GOT_RSP;
         }
-        if ((ret == AT_PARSER_GOT_RSP) && gotBinaryData) {
-            // We are receiving an AT response with binary data
-            // Setup the binary buffer, but don't return AT_PARSER_GOT_RSP
-            // until transfer is done.
-            uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
-            size_t length = pRspBuf->pBufferLength == NULL ? 0 : *pRspBuf->pBufferLength;
-            *pRspBuf->pBufferLength = 0;
-            setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_RSP,
-                                pRspBuf->pBuffer, length);
-            return AT_PARSER_START_BINARY;
-        }
     }
 
     if (ret == AT_PARSER_NOP) {
         // Check if this is URC data
         if ((pLine[0] == '+') || (pLine[0] == '*')) {
-            if (!pClient->executingCmd && !gotBinaryData) {
-                // If there are no command is currently executing we can just
-                // execute the URC handler right away
-                if (pClient->urcCallback) {
-                    uint8_t *pBinaryData = pClient->binaryRx.pBuffer;
-                    size_t binaryLen = pClient->binaryRx.bufferPos;
-                    pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pLine, lineLength,
-                                         pBinaryData, binaryLen);
-                }
+            if (uCxAtUrcQueueEnqueueBegin(&pClient->urcQueue, pLine, lineLength)) {
+                ret = AT_PARSER_GOT_URC;
             } else {
-                // AT client is busy handling AT command
-                // Defer callback until command is done
-
-                // We only support deferring one URC at the moment
-                U_CX_AT_PORT_ASSERT(pClient->urcBufferPos == 0);
-
-                if (lineLength <= pConfig->urcBufferLen) {
-                    memcpy(pConfig->pUrcBuffer, pLine, lineLength);
-                    pClient->urcBufferPos = lineLength;
-                } else {
-                    // URC buffer too small. Fail assert for now.
-                    U_CX_AT_PORT_ASSERT(false);
-                }
-
-                if (gotBinaryData) {
-                    // Place the binary data directly after the URC string
-                    uint8_t *pPtr = pConfig->pUrcBuffer;
-                    size_t len = pConfig->urcBufferLen - pClient->urcBufferPos;
-                    setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_URC,
-                                        &pPtr[pClient->urcBufferPos], len);
-                    ret = AT_PARSER_START_BINARY;
-                }
+                // Urc queue full
             }
         } else {
             // Received unexpected data
             // TODO: Handle
-            if (gotBinaryData) {
-                setupBinaryRxBuffer(pClient, U_CX_AT_RX_STATE_BINARY_FLUSH, NULL, 0);
-                ret = AT_PARSER_START_BINARY;
-            }
         }
     }
 
@@ -163,12 +121,22 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
 {
     int32_t ret = AT_PARSER_NOP;
     char *pRxBuffer = (char *)pClient->pConfig->pRxBuffer;
-    bool gotBinaryData = (ch == U_CX_SOH_CHAR);
 
-    if ((ch == '\r') || (ch == '\n') || gotBinaryData) {
+    if (ch == U_CX_SOH_CHAR) {
         pRxBuffer[pClient->rxBufferPos] = 0;
-        ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos, gotBinaryData);
+        ret = AT_PARSER_START_BINARY;
+    } else if ((ch == '\r') || (ch == '\n')) {
+        pRxBuffer[pClient->rxBufferPos] = 0;
+        ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos);
         pClient->rxBufferPos = 0;
+        if (ret == AT_PARSER_GOT_URC) {
+            // We got URC in character mode so no binary transfer is needed
+            // hence we can complete the URC enqueueing
+            uCxAtUrcQueueEnqueueEnd(&pClient->urcQueue, 0);
+            // Make sure we continue calling parseIncomingChar() as the
+            // URC will be handled after the command has completed
+            ret = AT_PARSER_NOP;
+        }
     } else if (isprint(ch)) {
         pRxBuffer[pClient->rxBufferPos++] = ch;
         if (pClient->rxBufferPos == pClient->pConfig->rxBufferLen) {
@@ -178,6 +146,46 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
     }
 
     return ret;
+}
+
+static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint16_t binLength)
+{
+    const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+
+    U_CX_LOG_LINE(U_CX_LOG_CHANNEL_RX, "[%d bytes]", binLength);
+    switch(parserRet) {
+        case AT_PARSER_GOT_RSP: {
+            // We are receiving an AT response with binary data
+            // Setup the binary buffer, but don't return AT_PARSER_GOT_RSP
+            // until transfer is done.
+            uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
+            size_t length = 0;
+            if (pRspBuf->pBufferLength) {
+                length = *pRspBuf->pBufferLength;
+                *pRspBuf->pBufferLength = 0;
+            }
+            setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_RSP,
+                                pRspBuf->pBuffer, length, binLength);
+            break;
+        }
+        case AT_PARSER_GOT_URC: {
+            // Place the binary data directly after the URC string
+            uint8_t *pPtr = pConfig->pUrcBuffer;
+            size_t len = uCxAtUrcQueueEnqueueGetPayloadPtr(&pClient->urcQueue, &pPtr);
+            if (len > binLength) {
+                setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_URC, pPtr, len, binLength);
+            } else {
+                // The binary data can't be fitted into the queue so we need to drop it
+                uCxAtUrcQueueEnqueueAbort(&pClient->urcQueue);
+                setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
+            }
+            break;
+        }
+        default:
+            // Unexpected data - just flush it
+            setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
+            break;
+    }
 }
 
 static int32_t handleBinaryRx(uCxAtClient_t *pClient)
@@ -194,12 +202,19 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
         readStatus = pClient->pConfig->read(pClient, pClient->pConfig->pStreamHandle,
                                             &lengthBuf[pBinRx->rxHeaderCount], readLen,
                                             pClient->pConfig->timeoutMs);
+        if (readStatus > 0) {
+            pBinRx->rxHeaderCount += readStatus;
+        }
         if (readStatus < (int32_t)readLen) {
             return ret;
         } else {
             // The two length bytes have now been received
+            int32_t parse_code;
             uint16_t length = (lengthBuf[0] << 8) | lengthBuf[1];
-            pBinRx->remainingDataBytes = length;
+            char *pRxBuffer = (char *)pClient->pConfig->pRxBuffer;
+            parse_code = parseLine(pClient, pRxBuffer, pClient->rxBufferPos);
+            setupBinaryTransfer(pClient, parse_code, length);
+            pClient->rxBufferPos = 0;
         }
     }
 
@@ -232,11 +247,13 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
 
     if (pBinRx->remainingDataBytes == 0) {
         // Binary transfer done
-        uCxAtRxState_t rxState = pClient->rxState;
-        pClient->rxState = U_CX_AT_RX_STATE_CHARACTER;
+        uCxAtBinaryState_t binState = pClient->binaryRx.state;
+        pClient->binaryRx.state = U_CX_BIN_STATE_BINARY_FLUSH;
+        pClient->binaryRx.rxHeaderCount = 0;
+        pClient->isBinaryRx = false;
 
-        switch (rxState) {
-            case U_CX_AT_RX_STATE_BINARY_RSP: {
+        switch (binState) {
+            case U_CX_BIN_STATE_BINARY_RSP: {
                 uCxAtBinaryResponseBuf_t *pRspBuf = &pClient->rspBinaryBuf;
                 // Report back how much data were received
                 if (pRspBuf->pBufferLength != NULL) {
@@ -245,8 +262,8 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
                 ret = AT_PARSER_GOT_RSP;
                 break;
             }
-            case U_CX_AT_RX_STATE_BINARY_URC:
-                // TODO
+            case U_CX_BIN_STATE_BINARY_URC:
+                uCxAtUrcQueueEnqueueEnd(&pClient->urcQueue, pClient->binaryRx.bufferPos);
                 break;
             default:
                 break;
@@ -263,7 +280,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     do {
         int32_t readStatus;
 
-        if (pClient->rxState == U_CX_AT_RX_STATE_CHARACTER) {
+        if (!pClient->isBinaryRx) {
             // Loop for receiving string data
             do {
                 char ch;
@@ -277,23 +294,29 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
         } else {
             ret = handleBinaryRx(pClient);
         }
+
+        if (ret == AT_PARSER_START_BINARY) {
+            pClient->isBinaryRx = true;
+        }
     } while (ret == AT_PARSER_START_BINARY);
 
     return ret;
 }
 
-static void handleDeferredUrc(uCxAtClient_t *pClient)
+static void processUrcs(uCxAtClient_t *pClient)
 {
-    if ((pClient->urcBufferPos > 0) &&
-        (pClient->rxState != U_CX_AT_RX_STATE_BINARY_URC)) {
-
-        if (pClient->urcCallback) {
-            const struct uCxAtClientConfig *pConfig = pClient->pConfig;
-            pClient->urcCallback(pClient, pClient->pUrcCallbackTag,
-                                 (char *)pConfig->pUrcBuffer, pClient->urcBufferPos,
-                                 NULL, 0); // TODO
+    while (true) {
+        uUrcEntry_t *pEntry = uCxAtUrcQueueDequeueBegin(&pClient->urcQueue);
+        if (pEntry == NULL) {
+            break;
         }
-        pClient->urcBufferPos = 0;
+        if (pClient->urcCallback) {
+            char *pUrcLine = (char *)&pEntry->data[0];
+            uint8_t *pPayload = &pEntry->data[pEntry->strLineLen + 1];
+            pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pUrcLine,
+                                 pEntry->strLineLen, pPayload, pEntry->payloadSize);
+        }
+        uCxAtUrcQueueDequeueEnd(&pClient->urcQueue, pEntry);
     }
 }
 
@@ -333,7 +356,7 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
     U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 
     // We may have received URCs during command execution
-    handleDeferredUrc(pClient);
+    processUrcs(pClient);
 
     return pClient->status;
 }
@@ -359,11 +382,13 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pConfig = pConfig;
+    uCxAtUrcQueueInit(&pClient->urcQueue, pConfig->pUrcBuffer, pConfig->urcBufferLen);
     U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
 void uCxAtClientDeinit(uCxAtClient_t *pClient)
 {
+    uCxAtUrcQueueDeInit(&pClient->urcQueue);
     U_CX_MUTEX_DELETE(pClient->cmdMutex);
 }
 
@@ -555,4 +580,6 @@ void uCxAtClientHandleRx(uCxAtClient_t *pClient)
     }
 
     U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
+
+    processUrcs(pClient);
 }

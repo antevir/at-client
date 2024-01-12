@@ -27,15 +27,9 @@ extern "C" {
 typedef enum
 {
     U_INTERFACE_ID_BLUETOOTH,         /**< Bluetooth */
-    U_INTERFACE_ID_WI_FI_STATION = 1, /**< Wifi station */
-    U_INTERFACE_ID_WIFI_AP = 2        /**< Wifi Accesspoint */
+    U_INTERFACE_ID_WI_FI_STATION = 1, /**< Wi-Fi station */
+    U_INTERFACE_ID_WI_FI_AP = 2       /**< Wi-Fi Access point */
 } uInterfaceId_t;
-
-typedef enum
-{
-    U_BOOTLOADER_MODE_XMODEM,          /**< Enter xmodem mode for u-connect software update using serial port. */
-    U_BOOTLOADER_MODE_COMMAND_LINE = 1 /**< Enter the bootloader command line mode using serial port. */
-} uBootloaderMode_t;
 
 typedef enum
 {
@@ -72,7 +66,7 @@ typedef enum
 typedef enum
 {
     U_DISCOVERY_MODE_ACTIVE,     /**< Active discovery. */
-    U_DISCOVERY_MODE_PASSIVE = 1 /**< Passive, no scan reponse data will be recieved. */
+    U_DISCOVERY_MODE_PASSIVE = 1 /**< Passive, no scan response data will be received. */
 } uDiscoveryMode_t;
 
 typedef enum
@@ -286,8 +280,7 @@ typedef enum
     U_OPTION_NO_DELAY,       /**< Turn on/off No delay feature for TCP sockets.
                                   Integer flag: 0 = off (i.e. Nagle algorithm enabled), 1 = on  (i.e. Nagle algorithm
                                   disabled)
-                                  Default: to 1
-                                  Note: This will make no difference if applied to UDP sockets. */
+                                  Default: to 0 */
     U_OPTION_BLOCK = 1,      /**< Set socket to be blocking or non blocking.
                                   Integer flag: 0 = off, 1 = on.
                                   Sockets are non-blocking by default (Note that read/write will always be non-blocking).

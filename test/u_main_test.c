@@ -28,6 +28,8 @@ static uint64_t gBootTime;
 static int gUartFd;
 static sem_t gUrcSem;
 static volatile uint32_t gUrcEventFlags = 0;
+uCxHandle_t ucxHandle;
+
 
 typedef struct {
     int uartFd;
@@ -51,7 +53,7 @@ static bool waitEvent(uint32_t evtFlag, uint32_t timeout_s)
     return false;
 }
 
-static bool signalEvent(uint32_t evtFlag)
+static void signalEvent(uint32_t evtFlag)
 {
     gUrcEventFlags |= evtFlag;
     sem_post(&gUrcSem);
@@ -84,7 +86,11 @@ static int32_t uCxAtWrite(uCxAtClient_t *pClient, void *pStreamHandle, const voi
 static void networkUpUrc(struct uCxHandle *puCxHandle)
 {
     printf("networkUpUrc\n");
+    uEchoOn_t echo;
+    uCxSystemGetEcho(puCxHandle, &echo);
+
     signalEvent(URC_FLAG_NETWORK_UP);
+    uCxSystemGetEcho(puCxHandle, &echo);
 }
 
 static void sockConnected(struct uCxHandle *puCxHandle, int32_t socket_handle)
@@ -181,12 +187,12 @@ static void *readTask(void *pArg)
             uCxAtClientHandleRx(pRxArgs->pClient);
         }
     }
+    return NULL;
 }
 
 int main(int argc, char **argv)
 {
     uCxAtClient_t client;
-    uCxHandle_t ucxHandle;
 
     static char rxBuf[1024];
     static char urcBuf[1024];
@@ -239,7 +245,7 @@ int main(int argc, char **argv)
     uCxAtClientInit(&config, &client);
 
     uCxInit(&client, &ucxHandle);
-    uCxUrcRegisterWiFiStationNetworkUp(&ucxHandle, networkUpUrc);
+    uCxUrcRegisterWifiStationNetworkUp(&ucxHandle, networkUpUrc);
     uCxUrcRegisterSocketConnect(&ucxHandle, sockConnected);
     uCxUrcRegisterSocketDataAvailable(&ucxHandle, socketData);
 
@@ -252,18 +258,20 @@ int main(int argc, char **argv)
     uCxWifiStationConnect(&ucxHandle, 0);
     waitEvent(URC_FLAG_NETWORK_UP, 20);
 
+    int32_t ret;
     int32_t sockHandle;
+
     uCxSocketCreate1(&ucxHandle, U_PROTOCOL_TCP, &sockHandle);
     uCxSocketConnect(&ucxHandle, sockHandle, "www.google.com", 80);
     waitEvent(URC_FLAG_SOCK_CONNECTED, 5);
-    uCxSocketWriteBinary_t wrRsp;
-    uCxSocketWriteBinary(&ucxHandle, sockHandle, "GET /\r\n", 7, &wrRsp);
+    ret = uCxSocketWriteBinary(&ucxHandle, sockHandle, (uint8_t *)"GET /\r\n", 7);
+    printf("uCxSocketWriteBinary() returned %d\n", ret);
     waitEvent(URC_FLAG_SOCK_DATA, 5);
 
-    char rxData[512];
-    int32_t dummy;
-    int32_t ret;
-    ret = uCxSocketReadBinary(&ucxHandle, sockHandle, sizeof(rxData), &rxData[0], &dummy);
+    uint8_t rxData[512];
+    ret = uCxSocketReadBinary(&ucxHandle, sockHandle, sizeof(rxData), &rxData[0]);
+    printf("uCxSocketReadBinary() returned %d\n", ret);
+    ret = uCxSocketReadBinary(&ucxHandle, sockHandle, sizeof(rxData), &rxData[0]);
     printf("uCxSocketReadBinary() returned %d\n", ret);
 
 

@@ -173,6 +173,7 @@
     :link:
         :*:
             - -fsanitize=address
+            - -lpthread
   :gcov:
     :compile:
         :*:
@@ -186,4 +187,5 @@
     :link:
         :*:
             - -fsanitize=address
+            - -lpthread
 

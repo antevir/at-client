@@ -6,6 +6,7 @@
 #include "mock_u_cx_at_config.h"
 #include "u_cx_at_util.h"
 #include "u_cx_at_params.h"
+#include "u_cx_at_urc_queue.h"
 #include "u_cx_at_client.h"
 
 /* ----------------------------------------------------------------
@@ -182,5 +183,18 @@ void test_uCxAtClientCmdGetRspParamLine_withBinary(void)
     char *pRsp = uCxAtClientCmdGetRspParamLine(&gClient, "+FOO:", binaryBuf, &binaryLen);
     TEST_ASSERT_EQUAL_MEMORY(expectedBinData, binaryBuf, sizeof(binaryBuf));
     TEST_ASSERT_EQUAL(sizeof(binaryBuf), binaryLen);
+    TEST_ASSERT_EQUAL_STRING("\"foo\"", pRsp);
+}
+
+void test_uCxAtClientCmdGetRspParamLine_withUnexpectedBinaryResponse(void)
+{
+    uint8_t rxData[] = { '+','F','O','O',':','\"','f','o','o','\"',BIN_HDR(6),0x00,0x11,0x22,0x33,0x44,0x55};
+
+    // Start by putting the client in command state
+    uCxAtClientCmdBeginF(&gClient, "", "", U_CX_AT_UTIL_PARAM_LAST);
+
+    gPRxDataPtr = &rxData[0];
+    gRxDataLen = sizeof(rxData);
+    char *pRsp = uCxAtClientCmdGetRspParamLine(&gClient, "+FOO:", NULL, NULL);
     TEST_ASSERT_EQUAL_STRING("\"foo\"", pRsp);
 }

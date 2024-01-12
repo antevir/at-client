@@ -115,8 +115,12 @@ int32_t uCxWifiStationGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t sta
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UWSNST=", "d", status_id, U_CX_AT_UTIL_PARAM_LAST);
     ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UWSNST:", NULL, NULL, "di", &pWifiStationGetNetworkStatusRsp->status_id, &pWifiStationGetNetworkStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
-    if (ret >= 0) {
-        ret = uCxAtClientCmdEnd(pAtClient);
+    {
+        // Always call uCxAtClientCmdEnd() even any previous function failed
+        int32_t endRet = uCxAtClientCmdEnd(pAtClient);
+        if (ret >= 0) {
+            ret = endRet;
+        }
     }
     return ret;
 }
@@ -272,8 +276,12 @@ int32_t uCxWifiApGetNetworkStatus(uCxHandle_t * puCxHandle, uStatusId_t status_i
     int32_t ret;
     uCxAtClientCmdBeginF(pAtClient, "AT+UWAPNST=", "d", status_id, U_CX_AT_UTIL_PARAM_LAST);
     ret = uCxAtClientCmdGetRspParamsF(pAtClient, "+UWAPNST:", NULL, NULL, "di", &pWifiApGetNetworkStatusRsp->status_id, &pWifiApGetNetworkStatusRsp->status_val, U_CX_AT_UTIL_PARAM_LAST);
-    if (ret >= 0) {
-        ret = uCxAtClientCmdEnd(pAtClient);
+    {
+        // Always call uCxAtClientCmdEnd() even any previous function failed
+        int32_t endRet = uCxAtClientCmdEnd(pAtClient);
+        if (ret >= 0) {
+            ret = endRet;
+        }
     }
     return ret;
 }

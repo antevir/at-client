@@ -177,6 +177,16 @@ void test_uCxAtUtilParseParamsF_withIpAddr_expectParsedParam(void)
     TEST_ASSERT_EQUAL(0x00102030, ipAddr.address.ipv4);
 }
 
+void test_uCxAtUtilParseParamsF_withIgnoredParam(void)
+{
+    int32_t digit = -1;
+    char testData[64];
+
+    strcpy(testData, "1,2,3");
+    TEST_ASSERT_EQUAL(3, uCxAtUtilParseParamsF(testData, "--d", &digit, U_CX_AT_UTIL_PARAM_LAST));
+    TEST_ASSERT_EQUAL(3, digit);
+}
+
 void test_uCxAtUtilHexToBinary_withValidValues_expectSuccess(void)
 {
     uint8_t buffer[32];

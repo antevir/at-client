@@ -12,6 +12,7 @@
 
 #include "u_cx_at_util.h"
 #include "u_cx_at_params.h"
+#include "u_cx_at_urc_queue.h"
 
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
@@ -28,14 +29,14 @@ typedef void (*uUrcCallback_t)(struct uCxAtClient *pClient, void *pTag, char *pL
 
 
 typedef enum {
-    U_CX_AT_RX_STATE_CHARACTER,
-    U_CX_AT_RX_STATE_BINARY_RSP,
-    U_CX_AT_RX_STATE_BINARY_URC,
-    U_CX_AT_RX_STATE_BINARY_FLUSH
-} uCxAtRxState_t;
+    U_CX_BIN_STATE_BINARY_FLUSH,
+    U_CX_BIN_STATE_BINARY_RSP,
+    U_CX_BIN_STATE_BINARY_URC,
+} uCxAtBinaryState_t;
 
 typedef struct {
 
+    uCxAtBinaryState_t state;
     uint8_t rxHeaderCount;
     uint16_t remainingDataBytes;
     uint8_t *pBuffer;
@@ -61,7 +62,8 @@ typedef struct uCxAtClient {
     int32_t status;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
-    uCxAtRxState_t rxState;
+    uCxAtUrcQueue_t urcQueue;
+    bool isBinaryRx;
     uCxAtBinaryRx_t binaryRx;
     uCxAtBinaryResponseBuf_t rspBinaryBuf;
     U_CX_MUTEX_HANDLE cmdMutex;

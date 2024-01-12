@@ -181,6 +181,9 @@ int32_t uCxAtUtilParseParamsVaList(char *pParams, const char *pParamFmt, va_list
         }
 
         switch (*pFmtCh) {
+            case '-':
+                // Ignore
+                break;
             case 'd': {
                 char * pEnd;
                 int32_t *pI = va_arg(args, int32_t *);
