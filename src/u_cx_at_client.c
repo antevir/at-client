@@ -129,6 +129,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
                 ret = AT_PARSER_GOT_URC;
             } else {
                 // Urc queue full
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "URC queue full - dropping URC");
             }
 #else
             const struct uCxAtClientConfig *pConfig = pClient->pConfig;
@@ -140,6 +141,7 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         } else {
             // Received unexpected data
             // TODO: Handle
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Unexpected data");
         }
     }
 
@@ -208,6 +210,7 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
                 setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_URC, pPtr, len, binLength);
             } else {
                 // The binary data can't be fitted into the queue so we need to drop it
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Not enough space for URC binary data");
                 uCxAtUrcQueueEnqueueAbort(&pClient->urcQueue);
                 setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
             }
@@ -220,6 +223,7 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
                                     &pPtr[bufPos], len, binLength);
             } else {
                 // The binary data can't be fitted into the queue so we need to drop it
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Not enough space for URC binary data");
                 setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
             }
 #endif
@@ -227,6 +231,7 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
         }
         default:
             // Unexpected data - just flush it
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Unexpected binary data");
             setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
             break;
     }
