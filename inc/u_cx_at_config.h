@@ -55,4 +55,33 @@ extern int32_t uPortGetTickTimeMs(void);
 # define U_CX_LOG_USE_ANSI_COLOR 1
 #endif
 
+/** Error code configuration.
+ *
+ *  This can be used for controlling the codes returned by
+ *  uCxAtClientExecSimpleCmd*(), uCxAtClientCmdGetRspParamsF() and
+ *  uCxAtClientCmdEnd();
+ */
+#ifndef U_CX_EXTENDED_ERROR_OFFSET
+// If extended error codes are used (i.e. AT server responds with "ERROR:<err_code>")
+// then this value will be returned transparently with U_CX_EXTENDED_ERROR_OFFSET offset,
+// i.e. return value will be: U_CX_EXTENDED_ERROR_OFFSET-<err_code>
+# define U_CX_EXTENDED_ERROR_OFFSET 0
+#endif
+
+#ifndef U_CX_ERROR_STATUS_ERROR
+// Return value when AT server responds with status "ERROR"
+# define U_CX_ERROR_STATUS_ERROR    -1
+#endif
+
+#ifndef U_CX_ERROR_CMD_TIMEOUT
+// Return value on command timeout
+# define U_CX_ERROR_CMD_TIMEOUT     -0x10000
+#endif
+
+#ifndef U_CX_ERROR_IO
+// Return value when IO (read) returns negative value
+# define U_CX_ERROR_IO              -0x10001
+#endif
+
+
 #endif // U_CX_AT_CONFIG_H

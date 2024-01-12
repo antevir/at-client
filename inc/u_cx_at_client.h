@@ -60,6 +60,7 @@ typedef struct uCxAtClient {
     size_t pExpectedRspLen;
     char *pRspParams;
     int32_t status;
+    int32_t lastIoError;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
     uCxAtUrcQueue_t urcQueue;
@@ -270,5 +271,16 @@ int32_t uCxAtClientCmdEnd(uCxAtClient_t *pClient);
   * @param[in]  pClient:   the AT client from uCxAtClientInit().
   */
 void uCxAtClientHandleRx(uCxAtClient_t *pClient);
+
+/**
+  * @brief  Handle AT RX data
+  *
+  * If the AT client returns U_CX_ERROR_IO you can call this
+  * function to get the underlying IO error code.
+  *
+  * @param[in]  pClient:   the AT client from uCxAtClientInit().
+  * @retval                IO error code.
+  */
+int32_t uCxAtGetLastIoError(uCxAtClient_t *pClient);
 
 #endif // U_CX_AT_CLIENT_H
