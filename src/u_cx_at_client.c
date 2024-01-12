@@ -2,13 +2,14 @@
  * @brief 2nd gen uConnectXpress AT client
  */
 
-#include "limits.h"  // For INT_MAX
-#include "stddef.h"  // NULL, size_t etc.
-#include "stdint.h"  // int32_t etc.
-#include "stdbool.h"
-#include "string.h"  // memcpy(), strcmp(), strcspn(), strspm()
-#include "stdio.h"   // snprintf()
-#include "ctype.h"   // isprint()
+#include <limits.h>  // For INT_MAX
+#include <stddef.h>  // NULL, size_t etc.
+#include <stdint.h>  // int32_t etc.
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>  // memcpy(), strcmp(), strcspn(), strspm()
+#include <stdio.h>   // snprintf()
+#include <ctype.h>   // isprint()
 
 #include "u_cx_at_config.h"
 
@@ -91,9 +92,20 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
         } else if (strcmp(pLine, "OK") == 0) {
             pClient->status = 0;
             ret = AT_PARSER_GOT_STATUS;
-        } else if (strcmp(pLine, "ERROR") == 0) {
-            pClient->status = -1;
-            ret = AT_PARSER_GOT_STATUS;
+        } else if (strncmp(pLine, "ERROR", 5) == 0) {
+            if (pLine[5] == 0) {
+                pClient->status = -1;
+                ret = AT_PARSER_GOT_STATUS;
+            } else if (pLine[5] == ':') {
+                // Extended error code
+                char *pEnd;
+                char *pCodeStr = &pLine[6];
+                int code = strtol(pCodeStr, &pEnd, 10);
+                if (isdigit((int)*pCodeStr) && (*pEnd == 0)) {
+                    pClient->status = -code;
+                    ret = AT_PARSER_GOT_STATUS;
+                }
+            }
         } else if ((pLine[0] != '+') && (pLine[0] != '*')) {
             pClient->pRspParams = &pLine[0];
             ret = AT_PARSER_GOT_RSP;

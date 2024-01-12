@@ -175,6 +175,43 @@ void test_uCxAtClientSendCmdVaList_withBinary(void)
     TEST_ASSERT_EQUAL(sizeof(expected), gTxBufferPos);
 }
 
+void test_uCxAtClientExecSimpleCmdF_withStatusOk_expectSuccess(void)
+{
+    char rxData[] = { "\r\nOK\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    TEST_ASSERT_EQUAL(0, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+}
+
+void test_uCxAtClientExecSimpleCmdF_withStatusError_expectError(void)
+{
+    char rxData[] = { "\r\nERROR\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    TEST_ASSERT_EQUAL(-1, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+}
+
+void test_uCxAtClientExecSimpleCmdF_withStatusExtendedError_expectErrorCode(void)
+{
+    char rxData[] = { "\r\nERROR:123\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    TEST_ASSERT_EQUAL(-123, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+}
+
+void test_uCxAtClientExecSimpleCmdF_withInvalidStatusExtendedError_expectTimeout(void)
+{
+    char rxData[] = { "\r\nERROR:1a23\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    uPortGetTickTimeMs_StopIgnore();
+    uPortGetTickTimeMs_ExpectAndReturn(0);
+    uPortGetTickTimeMs_ExpectAndReturn(20000);
+    TEST_ASSERT_EQUAL(-1, uCxAtClientExecSimpleCmdF(&gClient, "DUMMY", ""));
+    TEST_ASSERT_EQUAL_MESSAGE(0, gRxDataLen, "Test didn't read all data");
+}
+
+
 void test_uCxAtClientCmdGetRspParamLine_withBinary(void)
 {
     uint8_t binaryBuf[6] = {0};
