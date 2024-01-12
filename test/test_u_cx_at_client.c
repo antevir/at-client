@@ -74,6 +74,7 @@ static int32_t write(uCxAtClient_t *pClient, void *pStreamHandle,
 static int32_t read(uCxAtClient_t *pClient, void *pStreamHandle,
                     void *pData, size_t length, int32_t timeoutMs)
 {
+    static int zeroCounter = 0;
     (void)timeoutMs;
     TEST_ASSERT_EQUAL(&gClient, pClient);
     TEST_ASSERT_EQUAL(STREAM_HANDLER, pStreamHandle);
@@ -81,6 +82,12 @@ static int32_t read(uCxAtClient_t *pClient, void *pStreamHandle,
     if (cpyLen > 0) {
         memcpy(pData, gPRxDataPtr, cpyLen);
         gPRxDataPtr += cpyLen;
+        gRxDataLen -= cpyLen;
+        zeroCounter = 0;
+    } else {
+        if (++zeroCounter > 10) {
+            TEST_FAIL_MESSAGE("Stuck in read loop");
+        }
     }
     return cpyLen;
 }
