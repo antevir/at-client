@@ -49,6 +49,8 @@
   :test_preprocess:
     - *common_defines
     - TEST
+  :test_u_cx_at_client_no_urc_queue:
+    - U_CX_USE_URC_QUEUE=0
 
 :cmock:
   :mock_prefix: mock_

@@ -45,6 +45,20 @@ extern int32_t uPortGetTickTimeMs(void);
 # define U_CX_PORT_GET_TIME_MS()   uPortGetTickTimeMs()
 #endif
 
+/* Configuration for enabling URC queue
+ *
+ * With "U_CX_USE_URC_QUEUE 1" you can execute new AT commands directly
+ * in the URC callback. However, this comes with some penalty as you need
+ * to provide the AT client with an extra URC queue buffer and whenever an
+ * URC is received it will be copied from the rxBuffer to the URC buffer.
+ *
+ * NOTE: With "U_CX_USE_URC_QUEUE 0" you must never execute any AT command
+ *       directly from the URC callback.
+ */
+#ifndef U_CX_USE_URC_QUEUE
+# define U_CX_USE_URC_QUEUE 1
+#endif
+
 /* Configuration for enabling logging of AT protocol.*/
 #ifndef U_CX_LOG_AT
 # define U_CX_LOG_AT 1
@@ -92,6 +106,5 @@ extern int32_t uPortGetTickTimeMs(void);
 // Return value when IO (read) returns negative value
 # define U_CX_ERROR_IO              -0x10001
 #endif
-
 
 #endif // U_CX_AT_CONFIG_H
