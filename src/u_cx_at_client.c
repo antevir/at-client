@@ -376,7 +376,10 @@ static void processUrcs(uCxAtClient_t *pClient)
         }
         if (pClient->urcCallback) {
             char *pUrcLine = (char *)&pEntry->data[0];
-            uint8_t *pPayload = &pEntry->data[pEntry->strLineLen + 1];
+            uint8_t *pPayload = NULL;
+            if (pEntry->payloadSize > 0) {
+                pPayload = &pEntry->data[pEntry->strLineLen + 1];
+            }
             pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pUrcLine,
                                  pEntry->strLineLen, pPayload, pEntry->payloadSize);
         }
