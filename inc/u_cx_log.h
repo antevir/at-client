@@ -7,6 +7,7 @@
 
 #include <stdarg.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "u_cx_at_config.h"
 
@@ -48,12 +49,12 @@
 
 /* Internal defines - do not use! */
 #define _U_CX_LOG_BEGIN_FMT(enabled, chText, format, ...)   \
-    if (enabled) {                                          \
+    if (enabled && uCxLogIsEnabled()) {                     \
         uCxLogPrintTime();                                  \
         U_CX_PORT_PRINTF(chText " " format, ##__VA_ARGS__); \
     }
 #define _U_CX_LOG(enabled, chText, format, ...)  \
-    if (enabled) {                               \
+    if (enabled && uCxLogIsEnabled()) {          \
         U_CX_PORT_PRINTF(format, ##__VA_ARGS__); \
     }
 
@@ -70,5 +71,33 @@
  * -------------------------------------------------------------- */
 
 void uCxLogPrintTime(void);
+
+/**
+  * @brief Turn off all logging
+  *
+  * Please see note for uCxLogEnable()
+  */
+void uCxLogDisable(void);
+
+/**
+  * @brief Turn on logging (default)
+  *
+  * NOTE: Logging output is also controlled by the following config macros:
+  *       - U_CX_LOG_AT
+  *       - U_CX_LOG_WARNING
+  *       - U_CX_LOG_DEBUG
+  *       If all of these are set to 0 then uCxLogEnable(), uCxLogDisable() and
+  *       uCxLogIsEnabled() will have no effect.
+  */
+void uCxLogEnable(void);
+
+/**
+  * @brief Check if logging is enabled at runtime
+  *
+  * Please see note for uCxLogEnable()
+  *
+  * @retval true if logging is enabled
+  */
+bool uCxLogIsEnabled(void);
 
 #endif // U_CX_LOG_H
