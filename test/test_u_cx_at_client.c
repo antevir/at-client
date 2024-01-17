@@ -119,6 +119,7 @@ static void uAtClientSendCmdVaList_wrapper(uCxAtClient_t *pClient, const char *p
 void setUp(void)
 {
     uCxLogPrintTime_Ignore();
+    uCxLogIsEnabled_IgnoreAndReturn(false);
     uCxAtClientInit(&gClientConfig, &gClient);
     memset(&gTxBuffer[0], 0xc0, sizeof(gTxBuffer));
     gTxBufferPos = 0;
