@@ -14,6 +14,7 @@
   :test_file_prefix: test_
   :which_ceedling: gem
   :ceedling_version: 0.31.1
+  :compile_threads: 16
   :default_tasks:
     - test:all
 
@@ -166,6 +167,10 @@
             - -Wall
             - -Wextra
             - -fsanitize=address
+            - -fsanitize=undefined
+            - -fsanitize-address-use-after-scope
+            - -fno-sanitize-recover
+            - -fstack-protector-all
             - -fno-omit-frame-pointer
             - -DU_CX_LOG_AT=0
             - -O1  # Set O1 so that GCC correctly detects uninitialized variables: https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
@@ -173,6 +178,9 @@
     :link:
         :*:
             - -fsanitize=address
+            - -fsanitize=undefined
+            - -fsanitize-address-use-after-scope
+            - -fno-sanitize-recover
             - -lpthread
   :gcov:
     :compile:
@@ -181,11 +189,18 @@
             - -Wall
             - -Wextra
             - -fsanitize=address
+            - -fsanitize=undefined
+            - -fsanitize-address-use-after-scope
+            - -fno-sanitize-recover
+            - -fstack-protector-all
             - -fno-omit-frame-pointer
             - -O1  # Set O1 so that GCC correctly detects uninitialized variables: https://stackoverflow.com/questions/17705880/gcc-failing-to-warn-of-uninitialized-variable
             - -Wno-clobbered # Needed when enabling -O1 for disabling warning in the CMock runners
     :link:
         :*:
             - -fsanitize=address
+            - -fsanitize=undefined
+            - -fsanitize-address-use-after-scope
+            - -fno-sanitize-recover
             - -lpthread
 
