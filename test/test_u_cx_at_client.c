@@ -242,6 +242,19 @@ void test_uCxAtClientCmdGetRspParamLine_withTimeout_expectNull(void)
     TEST_ASSERT_EQUAL(NULL, uCxAtClientCmdGetRspParamLine(&gClient, "DUMMY", NULL, NULL));
 }
 
+void test_uCxAtClientCmdGetRspParamLine_withCmdEchoAndRsp_expectRsp(void)
+{
+    // Start by putting the client in command state
+    uCxAtClientCmdBeginF(&gClient, "", "", U_CX_AT_UTIL_PARAM_LAST);
+
+    char rxData[] = { "AT+FOO\r\n+MYRSP:123\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = sizeof(rxData);
+    char *pRsp = uCxAtClientCmdGetRspParamLine(&gClient, "+MYRSP:", NULL, NULL);
+    TEST_ASSERT_NOT_NULL(pRsp);
+    TEST_ASSERT_EQUAL_STRING("123", pRsp);
+}
+
 void test_uCxAtClientCmdGetRspParamLine_withReadError_expectNull(void)
 {
     // Start by putting the client in command state
