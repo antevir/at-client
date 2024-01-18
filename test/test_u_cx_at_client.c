@@ -19,6 +19,8 @@
 #define BIN_HDR(DATA_LENGTH) \
     0x01,(DATA_LENGTH) >> 8,(DATA_LENGTH) & 0xFF
 
+#define TEST_URC "+MYURC:123,\"abc\""
+
 /* ----------------------------------------------------------------
  * TYPES
  * -------------------------------------------------------------- */
@@ -294,4 +296,52 @@ void test_uCxAtClientCmdGetRspParamLine_withUnexpectedBinaryResponse(void)
     gRxDataLen = sizeof(rxData);
     char *pRsp = uCxAtClientCmdGetRspParamLine(&gClient, "+FOO:", NULL, NULL);
     TEST_ASSERT_EQUAL_STRING("\"foo\"", pRsp);
+}
+
+void test_uCxAtClientHandleRx_withStringUrc_expectUrcCallback(void)
+{
+    char rxData[] = { "\r\n" TEST_URC "\r\n" };
+    gPRxDataPtr = (uint8_t *)&rxData[0];
+    gRxDataLen = strlen(rxData);
+
+    void urcCallback(struct uCxAtClient *pClient, void *pTag, char *pLine,
+                     size_t lineLength, uint8_t *pBinaryData, size_t binaryDataLen)
+    {
+        TEST_ASSERT_EQUAL(&gClient, pClient);
+        TEST_ASSERT_NULL(pTag);
+        TEST_ASSERT_EQUAL_STRING(TEST_URC, pLine);
+        TEST_ASSERT_EQUAL(strlen(pLine), lineLength);
+        TEST_ASSERT_NULL(pBinaryData);
+        TEST_ASSERT_EQUAL(0, binaryDataLen);
+    }
+
+    uCxAtClientSetUrcCallback(&gClient, urcCallback, NULL);
+    uCxAtClientHandleRx(&gClient);
+}
+
+void test_uCxAtClientHandleRx_withBinUrc_expectUrcCallback(void)
+{
+    char strData[] = { "\r\n" TEST_URC };
+    uint8_t binData[] = {BIN_HDR(6),0x00,0x11,0x22,0x33,0x44,0x55};
+    uint8_t rxData[strlen(strData) + sizeof(binData)];
+    memcpy(&rxData[0], &strData[0], strlen(strData));
+    memcpy(&rxData[strlen(strData)], &binData[0], sizeof(binData));
+    gPRxDataPtr = &rxData[0];
+    gRxDataLen = strlen(strData) + sizeof(binData);
+
+    void urcCallback(struct uCxAtClient *pClient, void *pTag, char *pLine,
+                     size_t lineLength, uint8_t *pBinaryData, size_t binaryDataLen)
+    {
+        uint8_t expectedBinData[] = {0x00,0x11,0x22,0x33,0x44,0x55};
+        TEST_ASSERT_EQUAL(&gClient, pClient);
+        TEST_ASSERT_NULL(pTag);
+        TEST_ASSERT_EQUAL_STRING(TEST_URC, pLine);
+        TEST_ASSERT_EQUAL(strlen(pLine), lineLength);
+        TEST_ASSERT_NOT_NULL(pBinaryData);
+        TEST_ASSERT_EQUAL(sizeof(expectedBinData), binaryDataLen);
+        TEST_ASSERT_EQUAL_MEMORY(expectedBinData, pBinaryData, sizeof(expectedBinData));
+    }
+
+    uCxAtClientSetUrcCallback(&gClient, urcCallback, NULL);
+    uCxAtClientHandleRx(&gClient);
 }

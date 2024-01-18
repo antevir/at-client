@@ -63,7 +63,9 @@ typedef struct uCxAtClient {
     int32_t lastIoError;
     uUrcCallback_t urcCallback;
     void *pUrcCallbackTag;
+#if U_CX_USE_URC_QUEUE == 1
     uCxAtUrcQueue_t urcQueue;
+#endif
     bool isBinaryRx;
     uCxAtBinaryRx_t binaryRx;
     uCxAtBinaryResponseBuf_t rspBinaryBuf;
@@ -73,8 +75,10 @@ typedef struct uCxAtClient {
 typedef struct uCxAtClientConfig {
     void *pRxBuffer;        /**< Pointer to a buffer that the client will use as RX buffer */
     size_t rxBufferLen;     /**< Size of the RX buffer. */
+#if U_CX_USE_URC_QUEUE == 1
     void *pUrcBuffer;       /**< Pointer to a separate URC buffer */
     size_t urcBufferLen;    /**< Size of the URC buffer. */
+#endif
     void *pStreamHandle;    /**< User pointer associated with the AT interface.
                                  This pointer will be passed to write and read functions below
                                  and can be used to talk to a certain COM port etc.*/

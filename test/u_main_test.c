@@ -86,11 +86,7 @@ static int32_t uCxAtWrite(uCxAtClient_t *pClient, void *pStreamHandle, const voi
 static void networkUpUrc(struct uCxHandle *puCxHandle)
 {
     printf("networkUpUrc\n");
-    uEchoOn_t echo;
-    uCxSystemGetEcho(puCxHandle, &echo);
-
     signalEvent(URC_FLAG_NETWORK_UP);
-    uCxSystemGetEcho(puCxHandle, &echo);
 }
 
 static void sockConnected(struct uCxHandle *puCxHandle, int32_t socket_handle)
@@ -195,12 +191,16 @@ int main(int argc, char **argv)
     uCxAtClient_t client;
 
     static char rxBuf[1024];
+#if U_CX_USE_URC_QUEUE == 1
     static char urcBuf[1024];
+#endif
     static uCxAtClientConfig_t config = {
         .pRxBuffer = &rxBuf[0],
         .rxBufferLen = sizeof(rxBuf),
+#if U_CX_USE_URC_QUEUE == 1
         .pUrcBuffer = &urcBuf[0],
         .urcBufferLen = sizeof(urcBuf),
+#endif
         .pStreamHandle = NULL,
         .write = uCxAtWrite,
         .read = uCxAtRead

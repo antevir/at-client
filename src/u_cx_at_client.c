@@ -124,14 +124,24 @@ static int32_t parseLine(uCxAtClient_t *pClient, char *pLine, size_t lineLength)
     if (ret == AT_PARSER_NOP) {
         // Check if this is URC data
         if ((pLine[0] == '+') || (pLine[0] == '*')) {
+#if U_CX_USE_URC_QUEUE == 1
             if (uCxAtUrcQueueEnqueueBegin(&pClient->urcQueue, pLine, lineLength)) {
                 ret = AT_PARSER_GOT_URC;
             } else {
                 // Urc queue full
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "URC queue full - dropping URC");
             }
+#else
+            const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+            if (pClient->urcCallback) {
+                pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pConfig->pRxBuffer,
+                                     pClient->rxBufferPos, NULL, 0);
+            }
+#endif
         } else {
             // Received unexpected data
             // TODO: Handle
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Unexpected data");
         }
     }
 
@@ -150,6 +160,7 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
         pRxBuffer[pClient->rxBufferPos] = 0;
         ret = parseLine(pClient, pRxBuffer, pClient->rxBufferPos);
         pClient->rxBufferPos = 0;
+#if U_CX_USE_URC_QUEUE == 1
         if (ret == AT_PARSER_GOT_URC) {
             // We got URC in character mode so no binary transfer is needed
             // hence we can complete the URC enqueueing
@@ -158,6 +169,7 @@ static int32_t parseIncomingChar(uCxAtClient_t *pClient, char ch)
             // URC will be handled after the command has completed
             ret = AT_PARSER_NOP;
         }
+#endif
     } else if (isprint(ch)) {
         pRxBuffer[pClient->rxBufferPos++] = ch;
         if (pClient->rxBufferPos == pClient->pConfig->rxBufferLen) {
@@ -190,6 +202,7 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
             break;
         }
         case AT_PARSER_GOT_URC: {
+#if U_CX_USE_URC_QUEUE == 1
             // Place the binary data directly after the URC string
             uint8_t *pPtr = pConfig->pUrcBuffer;
             size_t len = uCxAtUrcQueueEnqueueGetPayloadPtr(&pClient->urcQueue, &pPtr);
@@ -197,13 +210,28 @@ static void setupBinaryTransfer(uCxAtClient_t *pClient, int32_t parserRet, uint1
                 setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_URC, pPtr, len, binLength);
             } else {
                 // The binary data can't be fitted into the queue so we need to drop it
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Not enough space for URC binary data");
                 uCxAtUrcQueueEnqueueAbort(&pClient->urcQueue);
                 setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
             }
+#else
+            size_t bufPos = pClient->rxBufferPos;
+            uint8_t *pPtr = pConfig->pRxBuffer;
+            size_t len = pConfig->rxBufferLen - bufPos;
+            if (len > binLength) {
+                setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_URC,
+                                    &pPtr[bufPos], len, binLength);
+            } else {
+                // The binary data can't be fitted into the queue so we need to drop it
+                U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Not enough space for URC binary data");
+                setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
+            }
+#endif
             break;
         }
         default:
             // Unexpected data - just flush it
+            U_CX_LOG_LINE(U_CX_LOG_CH_WARN, "Unexpected binary data");
             setupBinaryRxBuffer(pClient, U_CX_BIN_STATE_BINARY_FLUSH, NULL, 0, binLength);
             break;
     }
@@ -286,9 +314,19 @@ static int32_t handleBinaryRx(uCxAtClient_t *pClient)
                 ret = AT_PARSER_GOT_RSP;
                 break;
             }
-            case U_CX_BIN_STATE_BINARY_URC:
+            case U_CX_BIN_STATE_BINARY_URC: {
+#if U_CX_USE_URC_QUEUE == 1
                 uCxAtUrcQueueEnqueueEnd(&pClient->urcQueue, pClient->binaryRx.bufferPos);
+#else
+                const struct uCxAtClientConfig *pConfig = pClient->pConfig;
+                if (pClient->urcCallback) {
+                    pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pConfig->pRxBuffer,
+                                         pClient->rxBufferPos, pClient->binaryRx.pBuffer,
+                                         pClient->binaryRx.bufferPos);
+                }
+#endif
                 break;
+            }
             default:
                 break;
         }
@@ -328,6 +366,7 @@ static int32_t handleRxData(uCxAtClient_t *pClient)
     return ret;
 }
 
+#if U_CX_USE_URC_QUEUE == 1
 static void processUrcs(uCxAtClient_t *pClient)
 {
     while (true) {
@@ -337,13 +376,17 @@ static void processUrcs(uCxAtClient_t *pClient)
         }
         if (pClient->urcCallback) {
             char *pUrcLine = (char *)&pEntry->data[0];
-            uint8_t *pPayload = &pEntry->data[pEntry->strLineLen + 1];
+            uint8_t *pPayload = NULL;
+            if (pEntry->payloadSize > 0) {
+                pPayload = &pEntry->data[pEntry->strLineLen + 1];
+            }
             pClient->urcCallback(pClient, pClient->pUrcCallbackTag, pUrcLine,
                                  pEntry->strLineLen, pPayload, pEntry->payloadSize);
         }
         uCxAtUrcQueueDequeueEnd(&pClient->urcQueue, pEntry);
     }
 }
+#endif
 
 static void cmdBeginF(uCxAtClient_t *pClient, const char *pCmd, const char *pParamFmt, va_list args)
 {
@@ -381,8 +424,10 @@ static int32_t cmdEnd(uCxAtClient_t *pClient)
 
     U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 
+#if U_CX_USE_URC_QUEUE == 1
     // We may have received URCs during command execution
     processUrcs(pClient);
+#endif
 
     return pClient->status;
 }
@@ -408,13 +453,17 @@ void uCxAtClientInit(const uCxAtClientConfig_t *pConfig, uCxAtClient_t *pClient)
 {
     memset(pClient, 0, sizeof(uCxAtClient_t));
     pClient->pConfig = pConfig;
+#if U_CX_USE_URC_QUEUE == 1
     uCxAtUrcQueueInit(&pClient->urcQueue, pConfig->pUrcBuffer, pConfig->urcBufferLen);
+#endif
     U_CX_MUTEX_CREATE(pClient->cmdMutex);
 }
 
 void uCxAtClientDeinit(uCxAtClient_t *pClient)
 {
+#if U_CX_USE_URC_QUEUE == 1
     uCxAtUrcQueueDeInit(&pClient->urcQueue);
+#endif
     U_CX_MUTEX_DELETE(pClient->cmdMutex);
 }
 
@@ -608,7 +657,9 @@ void uCxAtClientHandleRx(uCxAtClient_t *pClient)
 
     U_CX_MUTEX_UNLOCK(pClient->cmdMutex);
 
+#if U_CX_USE_URC_QUEUE == 1
     processUrcs(pClient);
+#endif
 }
 
 int32_t uCxAtGetLastIoError(uCxAtClient_t *pClient)

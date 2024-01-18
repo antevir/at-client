@@ -10,6 +10,8 @@
 #include "u_cx_log.h"
 #include "u_cx_at_urc_queue.h"
 
+#if U_CX_USE_URC_QUEUE == 1
+
 /* ----------------------------------------------------------------
  * COMPILE-TIME MACROS
  * -------------------------------------------------------------- */
@@ -161,3 +163,5 @@ void uCxAtUrcQueueDequeueEnd(uCxAtUrcQueue_t *pUrcQueue, uUrcEntry_t *pEntry)
 
     U_CX_MUTEX_UNLOCK(pUrcQueue->dequeueMutex);
 }
+
+#endif // U_CX_USE_URC_QUEUE == 1
