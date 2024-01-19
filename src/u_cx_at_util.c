@@ -269,3 +269,12 @@ int32_t uCxAtUtilParseParamsF(char *pParams, const char *pParamFmt, ...)
 
     return ret;
 }
+
+void uCxAtUtilReplaceChar(char *pData, size_t dataLen, char from, char to)
+{
+    for (int i = 0; i < dataLen; i++) {
+        if (pData[i] == from) {
+            pData[i] = to;
+        }
+    }
+}
