@@ -1,4 +1,4 @@
-# 2nd gen uConnectXpress AT client
+# ucxclient
 This repo contains an AT command client for talking to 2nd gen uConnectXpress modules such as NORA-W36. The client is written in C with a small RAM footprint.
 
 There are two levels of APIs included in this repo; the lower [uAtClient API](#uatclient-api) and the upper [uConnectXpress API](#uconnectxpress-api)
@@ -115,3 +115,22 @@ Some things are not required for successfully running the AT client (such as U_C
 | U_CX_PORT_GET_TIME_MS | Must return a 32 bit timestamp in milliseconds.|
 | read()   | Passed as argument to uCxAtClientInit(). Should read data from UART with a timeout in millisec. Must return the number of bytes received, 0 if there is no data available withing the timeout or negative value on error. |
 | write()  | Passed as argument to uCxAtClientInit(). Should write data to the UART. Must return the number of actual bytes written or negative number on error. |
+
+# Disclaimer
+Copyright &#x00a9; u-blox
+
+u-blox reserves all rights in this deliverable (documentation, software, etc.,
+hereafter “Deliverable”).
+
+u-blox grants you the right to use, copy, modify and distribute the
+Deliverable provided hereunder for any purpose without fee.
+
+THIS DELIVERABLE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTY. IN PARTICULAR, NEITHER THE AUTHOR NOR U-BLOX MAKES ANY
+REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
+DELIVERABLE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+
+In case you provide us a feedback or make a contribution in the form of a
+further development of the Deliverable (“Contribution”), u-blox will have the
+same rights as granted to you, namely to use, copy, modify and distribute the
+Contribution provided to us for any purpose without fee.
